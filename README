@@ -1,0 +1,33 @@
+
+Pydiploy est une libraire proposant des fonctions d'administration et de déploiement d'applications Python sur des
+environnements multiples (i.e : développement, test, pré-production, production). Elle se base sur l'outil Fabric et se
+veut générique afin de standardiser les déploiement et administration de telles applications au sein de la Direction
+Informatique. Pour cela, il suffit de créer un fichier fabfile.py  au sein d'un projet Python, d'importer les modules
+de pydiploy contenant des fonctions exécutant des tâches unitaires et les personnaliser pour votre application si elle
+le nécessite ::
+
+	from pydiploy.prepare import oracle_client, create_python_env
+	from fabric.api import task
+	
+	@task
+	def dev():
+		env.hosts = ['localhost']
+
+	@task
+	def prepare():
+		create_python_env()
+	 	oracle_client()
+
+L'ensemble des tâches définies dans un fichier fabfile peuvent être lancées directement depuis la ligne de commande
+dans l'environnement adéquat ::
+
+	$> fab -l
+
+
+	Available commands:
+
+		prepare
+		dev
+	
+	$> fab dev prepare
+	...
