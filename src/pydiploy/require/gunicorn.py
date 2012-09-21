@@ -17,7 +17,8 @@ def server():
         require.python.package('gunicorn', upgrade=True)
 
 
-def launcher(port, workers=3, user="django", group="di", log_level="ERROR"):
+def launcher(port, workers=3, user="django", group="di", log_level="ERROR",
+        with_upstart=False):
     """
     """
     server()
@@ -36,6 +37,10 @@ def launcher(port, workers=3, user="django", group="di", log_level="ERROR"):
     }
     require.files.template_file(path=launcher_filename,
             template_contents=GUNICORN_APP_LAUNCHER, context=context)
+
+    if with_upstart:
+        instance_name = '%(project_name)s %(env)s' % env
+        upstart(launcher_filename, instance_name)
 
 
 GUNICORN_APP_LAUNCHER = """\
@@ -58,14 +63,9 @@ exec %(virtualenv)s/bin/gunicorn %(settings_package)s.wsgi:application \
 """
 
 
-def upstart(gunicorn_launcher="", instance_name=""):
+def upstart(gunicorn_launcher, instance_name):
     """
     """
-    if not gunicorn_launcher:
-        gunicorn_launcher = '%(remote_workdir)s/bin/%(project_name)s' % env
-    if not instance_name:
-        instance_name = '%(project_name)s %(env)s' % env
-
     upstart_filename = '/etc/init/%(project_name)s.conf' % env
     context = {
         'instance_name': instance_name,
