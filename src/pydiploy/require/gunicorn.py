@@ -13,7 +13,8 @@ from fabtools import require
 def server():
     """
     """
-    require.python.package('gunicorn')
+    with require.python.virtualenv(env.virtualenv_dir):
+        require.python.package('gunicorn', upgrade=True)
 
 
 def launcher(port, workers=3, user="django", group="di", log_level="ERROR"):
