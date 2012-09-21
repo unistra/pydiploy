@@ -5,7 +5,7 @@
 from fabric.api import local
 
 
-def archive(filename, tag="HEAD", remote="", prefix=""):
+def archive(path, tag="HEAD", remote="", prefix=""):
     """
     """
     options = ['--format=tar']
@@ -15,4 +15,4 @@ def archive(filename, tag="HEAD", remote="", prefix=""):
         options.append('--prefix=%s' % prefix)
 
     options_build = ' '.join(options)
-    local('git archive %s %s |gzip > %s' % (options_build, tag, filename))
+    local('git archive %s %s |gzip > %s' % (options_build, tag, path))
