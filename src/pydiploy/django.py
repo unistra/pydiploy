@@ -1,41 +1,33 @@
 
 from fabric.api import env
-from fabric.api import exists
+from fabric.contrib.files import exists
 from fabtools import require
 
 from pydiploy import require as dip_require
-from pydiploy import database
 
 
-def pre_install(tmp_directory, media_root, local_settings_context):
-    dip_require.django.base_conf(media_root)
+def pre_install(tmp_directory, with_settings):
     require.files.directory(env.remote_workdir)
     require.files.directory(env.remote_logdir)
-    if local_settings_context is not None:
-        dip_require.django.settings(tmp_directory, local_settings_context)
-
-
-def install(tmp_directory):
-    dip_require.python.install(tmp_directory)
-    database.install()
+    if with_settings:
+        dip_require.django.settings(tmp_directory)
 
 
 def post_install(tmp_directory):
-    dip_require.django.manager()
+    dip_require.django.manager(tmp_directory)
 
     static_temp = '%s/src/%s/static' % (tmp_directory, env.project_name)
     if exists(static_temp):
-        dip_require.django.staticfiles(static_temp)
+        dip_require.django.staticfiles(tmp_directory)
 
     local_temp = '%s/src/%s/locale' % (tmp_directory, env.project_name)
     if exists(local_temp):
-        dip_require.django.locale(local_temp)
+        dip_require.django.locale(tmp_directory)
 
     require.files.directory(env.django_media_root, use_sudo=True,
-            owner='django', group='di')
+            owner=env.user, group=env.group)
 
-def deploy(tmp_directory, local_settings_context=None,
-        media_root='/var/www/data'):
-    pre_install(tmp_directory, media_root, local_settings_context)
-    install(tmp_directory)
+def install(tmp_directory, with_settings=False):
+    pre_install(tmp_directory, with_settings)
+    dip_require.python.install(tmp_directory)
     post_install(tmp_directory)
