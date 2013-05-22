@@ -15,7 +15,7 @@ Requires function to install database client for Python ::
 from fabtools import require
 
 
-def sqlite3(use_sudo=False):
+def sqlite3(use_sudo=False, user=None):
     """
     Require python client for sqlite3
 
@@ -35,4 +35,5 @@ def sqlite3(use_sudo=False):
     """
 
     require.deb.package('libsqlite3-dev', update=True)
-    require.python.package('pysqlite', upgrade=True, use_sudo=use_sudo)
+    require.python.package('pysqlite', upgrade=True, use_sudo=use_sudo,
+            user=user)
