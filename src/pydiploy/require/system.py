@@ -6,20 +6,14 @@ import fabtools
 from pydiploy.require import groups
 
 
-def django_user():
+def django_user(name, group_name):
     """
     """
-    groups.create('di')
-    groups.create('admin')
-    if not fabtools.user.exists('django'):
-        fabtools.user.create('django', home='/home/django', groups=['di',
-        'admin'])
-    fabtools.require.files.directory('/home/django', use_sudo=True,
-            owner='django', group='di')
+    fabtools.require.user(name, create_home=True, create_group=False,
+            group=group_name, shell='/bin/bash')
 
 
-def django_group(no_check=False):
+def django_group(name):
     """
     """
-    groups.create('di')
-    groups.create('admin')
+    fabtools.require.group(name)
