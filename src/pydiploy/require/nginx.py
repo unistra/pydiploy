@@ -11,7 +11,7 @@ def gunicorn_site_proxy(redirect_port_80=False):
     
     if redirect_port_80:
         template_contents = DJANGO_HTTPS + DJANGO_NGINX
-    else
+    else:
         template_contents = DJANGO_HTTP + DJANGO_NGINX
 
     fabtools.require.nginx.site(env.virtualhost,
