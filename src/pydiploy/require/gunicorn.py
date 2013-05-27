@@ -6,7 +6,10 @@ Gunicorn
 
 """
 
+import os 
+
 from fabric.api import env
+from fabric.api import require
 import fabtools
 
 
@@ -17,26 +20,19 @@ def server():
         fabtools.require.python.package('gunicorn', upgrade=True)
 
 
-def launcher(with_upstart=False):
+def launcher(user, group, with_upstart=False, **kwargs):
     """
     """
-    server()
-    
-    fabtools.require.files.directory('%(remote_workdir)s/bin' % env)
-    launcher_filename = '%(remote_workdir)s/bin/%(project_name)s' % env
-    context = {
-        'appdir': env.remote_workdir,
-        'workers': env.gunicorn_workers,
-        'user': env.user,
-        'group': env.group,
-        'port': env.gunicorn_port,
-        'log_level': env.gunicorn_loglevel,
-        'virtualenv': env.virtualenv_dir,
-        'settings_package': env.project_name
+    require('appdir', 'project_name', 'owner_user', 'owner_group',
+        'virtualenvdir', 'gunicorn_workers', 'gunicorn_loglevel',
+        'gunicorn_port')
 
-    }
+    server()
+    fabtools.require.files.directory(os.path.join(env.appdir, 'bin'),
+        use_sudo=True, user=user, group=group, mode='755')
+    launcher_filename = os.path.join(env.appdir, 'bin', env.project_name)
     fabtools.require.files.template_file(path=launcher_filename,
-            template_contents=GUNICORN_APP_LAUNCHER, context=context,
+            template_contents=GUNICORN_APP_LAUNCHER, context=env,
             mode='700')
 
     if with_upstart:
@@ -48,18 +44,18 @@ GUNICORN_APP_LAUNCHER = """\
 #!/bin/bash
 set -e
 LOGFILE=%(appdir)s/log/gunicorn.log
-NUM_WORKERS=%(workers)s
+NUM_WORKERS=%(gunicorn_workers)s
 # user/group to run as
-USER=%(user)s
-GROUP=%(group)s
+USER=%(owner_user)s
+GROUP=%(owner_group)s
 HOST=127.0.0.1
-PORT=%(port)s
-LOG_LEVEL=%(log_level)s
+PORT=%(gunicorn_port)s
+LOG_LEVEL=%(gunicorn_loglevel)s
 cd %(appdir)s
-source %(virtualenv)s/bin/activate
-exec %(virtualenv)s/bin/gunicorn %(settings_package)s.wsgi:application \
+source %(virtualenvdir)s/bin/activate
+exec %(virtualenvdir)s/bin/gunicorn %(project_name)s.wsgi:application \
     -w $NUM_WORKERS --user=$USER --group=$GROUP --log-level=$LOG_LEVEL \
-    -b $HOST:$PORT -p %(settings_package)s.pid -t 60 --log-file=$LOGFILE \
+    -b $HOST:$PORT -p %(project_name)s.pid -t 60 --log-file=$LOGFILE \
     2>>$LOGFILE
 """
 

@@ -16,6 +16,7 @@ from .require import git
 
 
 def deploy(project_name, tag, remote='', destination_directory='/tmp'):
+    tag = tag.lower()
     archive_name = '%s-%s' % (project_name, tag)
     archive_path = git.archive(archive_name, tag=tag, remote=remote,
             prefix='%s%s' % (archive_name, os.path.sep))
