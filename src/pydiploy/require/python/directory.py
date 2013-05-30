@@ -13,13 +13,14 @@ from fabric.contrib.files import exists
 import fabtools
 from fabtools import require
 
-from pydiploy.system import get_distant_home
+from pydiploy.system import remote_home
 
 
 def install(tmp_directory):
     """
     """
-    with fabtools.python.virtualenv(env.virtualenv_dir):
+    require('virtualenvdir')
+    with fabtools.python.virtualenv(env.virtualenvdir):
         with cd(tmp_directory):
             run('python setup.py install')
             if exists('requirements/%s.txt' % env.env):
@@ -29,7 +30,7 @@ def install(tmp_directory):
 def appdir(user, group, app_name):
     """
     """
-    if not env.appdir:
+    if not env.has_key('appdir'):
         env.appdir = os.path.join(remote_home(user), app_name)
         require.directory(env.appdir, use_sudo=True, owner=user, group=group,
             mode='755')
@@ -39,7 +40,7 @@ def appdir(user, group, app_name):
 def logdir(user, group, app_name):
     """
     """
-    if not env.logdir:
+    if not env.has_key('logdir'):
         env.logdir = os.path.join(appdir(user, group, app_name), 'log')
         require.directory(env.logdir, use_sudo=True, owner=user, group=group,
                 mode='755')
