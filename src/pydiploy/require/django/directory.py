@@ -15,10 +15,11 @@ import fabtools
 from ...system import remote_home
 
 
-def media(user, group, app_name):
+def media(user, group):
+    require('virtualhost')
     if not env.has_key('django_media_root'):
         env.django_media_root = os.path.join(os.path.sep, 'var', 'www', 'data',
-                app_name)
+                env.virtualhost)
         fabtools.require.files.directory(env.django_media_root, use_sudo=True,
                 owner=user, group=group, mode='755')
     return env.django_media_root
@@ -32,3 +33,14 @@ def local_settings(user):
     fabtools.require.files.directory(local_path, use_sudo=True, owner=user,
             mode='755')
     return local_path
+
+
+def static(user, group):
+    """
+    """
+    require('virtualhost', 'appdir')
+    if not env.has_key('django_static_root'):
+        env.django_static_root = os.path.join(env.appdir, 'static')
+        fabtools.require.files.directory(env.django_static_root, use_sudo=True,
+                owner=user, group=group, mode='755')
+    return env.django_static_root

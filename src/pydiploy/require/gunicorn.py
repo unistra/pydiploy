@@ -16,7 +16,7 @@ import fabtools
 def server():
     """
     """
-    with fabtools.python.virtualenv(env.virtualenv_dir):
+    with fabtools.python.virtualenv(env.virtualenvdir):
         fabtools.require.python.package('gunicorn', upgrade=True)
 
 
@@ -29,11 +29,11 @@ def launcher(user, group, with_upstart=False, **kwargs):
 
     server()
     fabtools.require.files.directory(os.path.join(env.appdir, 'bin'),
-        use_sudo=True, user=user, group=group, mode='755')
+        use_sudo=True, owner=user, group=group, mode='755')
     launcher_filename = os.path.join(env.appdir, 'bin', env.project_name)
     fabtools.require.files.template_file(path=launcher_filename,
             template_contents=GUNICORN_APP_LAUNCHER, context=env,
-            mode='700')
+            mode='700', owner=user, use_sudo=True)
 
     if with_upstart:
         instance_name = '%(project_name)s %(env)s' % env

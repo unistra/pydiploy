@@ -16,33 +16,36 @@ from ...system import remote_home
 from .directory import local_settings
 
 
-def manager(remote_user, template_path):
+def manager(template_path, remote_user=None):
     """
     """
     require('appdir')
+    kwargs = remote_user and {'use_sudo': True, 'owner': remote_user} or {}
     fabtools.require.files.template_file(
             path=os.path.join(env.appdir, 'manage.py'), 
             template_source=template_path, context=env, 
-            use_sudo=True, owner=remote_user
+            **kwargs
     )
 
 
-def log(app_name):
+def log():
     """
     """
-    require('logdir')
+    require('logdir', 'project_name')
     if not env.has_key('django_logile'):
-        env.django_logfile = os.path.join(env.logdir, '%s.log' % app_name)
+        env.django_logfile = os.path.join(
+                env.logdir, '%s.log' % env.project_name
+        )
     return env.django_logfile
 
 
-def settings(remote_user, template_path):
+def settings(template_path, remote_user=None):
     """
     """
     require('project_name')
     local_path = local_settings(remote_user)
+    kwargs = remote_user and {'use_sudo': True, 'owner': remote_user} or {}
     fabtools.require.files.template_file(
         path=os.path.join(local_path, 'conf.py'),
-        template_source=template_path, context=env, use_sudo=True,
-        owner=remote_user
+        template_source=template_path, context=env, **kwargs
     )

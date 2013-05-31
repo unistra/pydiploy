@@ -2,10 +2,11 @@
 """
 
 from fabric.api import env
-from fabtools import require
+from fabric.api import require
+import fabtools
 
 
-def gunicorn_site_proxy(redirect_port_80=False):
+def gunicorn_site_proxy(user, redirect_port_80=False):
     require('appdir', 'http_port', 'virtualhost', 'gunicorn_port')
     env.proxy_url = 'http://127.0.0.1:%s' % env.gunicorn_port
     
@@ -15,7 +16,7 @@ def gunicorn_site_proxy(redirect_port_80=False):
         template_contents = DJANGO_HTTP + DJANGO_NGINX
 
     fabtools.require.nginx.site(env.virtualhost,
-        template_contents=template_contents, context=env)
+        template_contents=template_contents, **env)
 
 
 DJANGO_HTTPS = """\

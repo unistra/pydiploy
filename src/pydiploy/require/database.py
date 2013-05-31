@@ -37,3 +37,14 @@ def sqlite3(use_sudo=False, user=None):
     require.deb.package('libsqlite3-dev', update=True)
     require.python.package('pysqlite', upgrade=True, use_sudo=use_sudo,
             user=user)
+
+
+def openldap(use_sudo=False, user=None):
+    """
+    """
+
+    require.deb.package('libldap2-dev', update=True)
+    require.deb.package('libsasl2-dev', update=True)
+    require.deb.package('libssl-dev', update=True)
+    require.python.package('python-ldap', upgrade=True, use_sudo=use_sudo,
+            user=user)

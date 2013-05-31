@@ -16,6 +16,7 @@ def archive(filename, path='/tmp', format="tar.gz", tag="HEAD", remote="",
         prefix="", project_path="."):
     """
     """
+
     if format not in ('tar', 'tar.gz', 'zip'):
         abort('Git archive format not supported: %s' % format)
 
