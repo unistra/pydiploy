@@ -25,7 +25,8 @@ def post_install(tmp_directory):
         dip_require.django.locale(tmp_directory)
 
     require.files.directory(env.django_media_root, use_sudo=True,
-            owner=env.user, group=env.group)
+                            owner=env.user, group=env.group)
+
 
 def install(tmp_directory, with_settings=False):
     pre_install(tmp_directory, with_settings)

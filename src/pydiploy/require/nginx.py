@@ -1,22 +1,24 @@
-"""
-"""
+# -*- coding: utf-8 -*-
 
-from fabric.api import env
-from fabric.api import require
+"""
+"""
+import os
+from fabric.api import env, require, cd, sudo
+from fabric.contrib.project import rsync_project
 import fabtools
 
 
 def gunicorn_site_proxy(user, redirect_port_80=False):
     require('appdir', 'http_port', 'virtualhost', 'gunicorn_port')
     env.proxy_url = 'http://127.0.0.1:%s' % env.gunicorn_port
-    
+
     if redirect_port_80:
         template_contents = DJANGO_HTTPS + DJANGO_NGINX
     else:
         template_contents = DJANGO_HTTP + DJANGO_NGINX
 
     fabtools.require.nginx.site(env.virtualhost,
-        template_contents=template_contents, **env)
+                                template_contents=template_contents, **env)
 
 
 DJANGO_HTTPS = """\
@@ -57,7 +59,7 @@ DJANGO_NGINX = """\
                     expires max;
             }
     }
-    
+
     location /media {
             root /var/www/data/%(virtualhost)s;
             if ($query_string) {
@@ -90,3 +92,53 @@ DJANGO_NGINX = """\
 
 }
 """
+
+
+def root_web():
+    """
+    """
+    fabtools.require.files.directory(env.remote_static_root, use_sudo=True,
+                                     owner='root', group='root', mode='755')
+
+
+def nginx_pkg(update=False):
+    """
+    """
+    fabtools.require.deb.packages(['nginx'], update=update)
+
+
+def nginx_reload():
+    """Start/Restart nginx"""
+    if not fabtools.service.is_running('nginx'):
+        fabtools.service.start('nginx')
+    else:
+        fabtools.service.reload('nginx')
+
+
+def web_static_files():
+    rsync_project(os.path.join(env.remote_static_root, env.application_name),
+                  os.path.join(env.local_tmp_dir, 'assets/'), delete=True,
+                  extra_opts='--rsync-path="sudo rsync"',
+                  ssh_opts='-t')
+
+
+def web_configuration():
+    """Setup webserver's configuration"""
+    nginx_root = '/etc/nginx'
+    nginx_available = nginx_root + '/sites-available'
+    nginx_enabled = nginx_root + '/sites-enabled'
+    cmscts_conf = '%s/%s.conf' % (nginx_available, env.server_name)
+    fabtools.files.upload_template('fabfile/.cmscts.conf',
+                                   cmscts_conf,
+                                   context=env,
+                                   use_jinja=True,
+                                   use_sudo=True,
+                                   user='root',
+                                   chown=True,
+                                   mode='644')
+
+    if not fabtools.files.is_link('%s/%s.conf' % (nginx_enabled,
+                                                  env.server_name)):
+        with cd(nginx_enabled):
+            sudo('ln -s %s .' % cmscts_conf)
+            sudo('rm default')

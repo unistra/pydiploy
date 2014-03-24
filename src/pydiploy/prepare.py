@@ -40,9 +40,9 @@ def update_bashrc():
     """ Met à jour le fichier bashrc afin de prendre en compte le fichier .bash_profile dans le shell de l'utilisateur.
     """
     bashrc_profile = Template(""
-        "if [ -f ~/.bash_profile ]; then"
-        "    . ~/.bash_profile"
-        "fi")
+                              "if [ -f ~/.bash_profile ]; then"
+                              "    . ~/.bash_profile"
+                              "fi")
     run('echo %s >> $HOME/.bashrc' % bashrc_profile)
     run('touch $HOME∕.bash_profile')
     run('source $HOME/.bashrc')
@@ -57,7 +57,8 @@ def generate_bash_profile():
         "export PIP_RESPECT_VIRTUALENV=true\n"
         "source /usr/local/bin/virtualenvwrapper.sh"
     )
-    run('echo "%s" >> $HOME/.bash_profile' % bash_profile.substitute(env_root_path=env.virtualenvs_path))
+    run('echo "%s" >> $HOME/.bash_profile' %
+        bash_profile.substitute(env_root_path=env.virtualenvs_path))
 
 
 @task
@@ -99,19 +100,22 @@ def oracle_client():
     sudo('aptitude install libaio-dev')
 
     # needed client packages and installation of them
-    packages = ['instantclient-basic-linux-x86-64-{version}.zip', 'instantclient-sdk-linux-x86-{version}.zip',
+    packages = [
+        'instantclient-basic-linux-x86-64-{version}.zip', 'instantclient-sdk-linux-x86-{version}.zip',
         'instantclient-sqlplus-linux-x86-64-{version}.zip']
     sudo('mkdir -p {home}'.format(**env.oracle))
     for package in packages:
         package = package.format(**env.oracle)
-        run('wget http://{0[root]}/{0[libs]/oracle/{1}'.format(env.local_repository, package))
+        run('wget http://{0[root]}/{0[libs]/oracle/{1}'.format(
+            env.local_repository, package))
         sudo('unzip -d {0[home]} $HOME/{1}'.format(env.oracle, package))
         run('rm $HOME/{0}'.format(package))
-    oracle_dir = '{home}/instantclient_'.format(**env.oracle) + '_'.join(env.oracle['version'].split('.')[:2])
+    oracle_dir = '{home}/instantclient_'.format(
+        **env.oracle) + '_'.join(env.oracle['version'].split('.')[:2])
     with cd(oracle_dir):
         run('ln -s libclntsh.so.* libclntsh.so')
 
-    # library configuration 
+    # library configuration
     oracle_conf = Template(
         "\n# ORACLE CLIENT CONFIGURATION"
         "export ORACLE_HOME=$oracle_dir"
@@ -142,7 +146,8 @@ def sap_client():
     sudo('mkdir /usr/sap')
     saprfc = "rfcsdk_64.tar.gz"
     with cd('/tmp'):
-        run('wget http://{0[root]}/{0[libs]/sifac/{1}}'.format(env.local_repository, saprfc))
+        run('wget http://{0[root]}/{0[libs]/sifac/{1}}'.format(
+            env.local_repository, saprfc))
     with cd('/usr/sap'):
         sudo("tar xvf /tmp/rfcsdk_64.tar.gz")
     sudo('ln -s /usr/sap/rfcsdk/lib/librfccm.so /lib/')

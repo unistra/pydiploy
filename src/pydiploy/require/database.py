@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Database
 ========
@@ -15,7 +17,7 @@ Requires function to install database client for Python ::
 from fabtools import require
 
 
-def sqlite3(use_sudo=False, user=None):
+def sqlite3_pkg(use_sudo=False, user=None):
     """
     Require python client for sqlite3
 
@@ -36,10 +38,10 @@ def sqlite3(use_sudo=False, user=None):
 
     require.deb.package('libsqlite3-dev', update=True)
     require.python.package('pysqlite', upgrade=True, use_sudo=use_sudo,
-            user=user)
+                           user=user)
 
 
-def openldap(use_sudo=False, user=None):
+def ldap_pkg(use_sudo=False, user=None):
     """
     """
 
@@ -47,4 +49,8 @@ def openldap(use_sudo=False, user=None):
     require.deb.package('libsasl2-dev', update=True)
     require.deb.package('libssl-dev', update=True)
     require.python.package('python-ldap', upgrade=True, use_sudo=use_sudo,
-            user=user)
+                           user=user)
+
+
+def postgres_pkg(update=False):
+    require.deb.packages(['libpq-dev'], update=update)

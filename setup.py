@@ -5,26 +5,27 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name = "pydiploy",
+    name="pydiploy",
 
-    version = '0.1',
-    packages = find_packages('src', exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
-    package_dir = {'': 'src'},
+    version='0.2',
+    packages=find_packages(
+        'src', exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
+    package_dir={'': 'src'},
 
-    install_requires  = [
+    install_requires=[
         'fabric',
     ],
-    dependency_links =  [
+    dependency_links=[
         'http://repodipory.u-strasbg.fr/lib/python'
     ],
 
 
-    author = 'Arnaud Grausem',
-    author_email = 'arnaud.grausem@unistra.fr',
-    description = 'Déploiement automatisé, gestion de l\'environnement de développement et gestion de la prodcution'
+    author='dip',
+    author_email='di-dip@unistra.fr',
+    description='Déploiement automatisé, gestion de l\'environnement de développement et gestion de la prodution'
     'pour une application Python',
-    keywords = "deploy development automatic production",
-    url = 'http://di.u-strasbg.fr/metiers/dip/documentation/arc',
+    keywords="deploy development automatic production",
+    url='http://git.u-strasbg.fr/git/pydiploy',
 
 
 )

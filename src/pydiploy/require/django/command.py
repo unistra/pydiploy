@@ -9,7 +9,7 @@ from fabric.api import get
 from fabric.api import put
 from fabric.api import require
 from fabric.api import run
-from fabric.api import sudo 
+from fabric.api import sudo
 from fabric.api import shell_env
 
 import fabtools
@@ -40,7 +40,7 @@ def locales(user=None, settings_module=None):
         with cd(env.appdir):
             if user:
                 with shell_env(HOME=remote_home(user),
-                        DJANGO_SETTINGS_MODULE=settings):
+                               DJANGO_SETTINGS_MODULE=settings):
                     sudo(command, user=user)
             else:
                 run(command)

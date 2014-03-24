@@ -6,7 +6,7 @@ Gunicorn
 
 """
 
-import os 
+import os
 
 from fabric.api import env
 from fabric.api import require
@@ -24,16 +24,16 @@ def launcher(user, group, with_upstart=False, **kwargs):
     """
     """
     require('appdir', 'project_name', 'owner_user', 'owner_group',
-        'virtualenvdir', 'gunicorn_workers', 'gunicorn_loglevel',
-        'gunicorn_port')
+            'virtualenvdir', 'gunicorn_workers', 'gunicorn_loglevel',
+            'gunicorn_port')
 
     server()
     fabtools.require.files.directory(os.path.join(env.appdir, 'bin'),
-        use_sudo=True, owner=user, group=group, mode='755')
+                                     use_sudo=True, owner=user, group=group, mode='755')
     launcher_filename = os.path.join(env.appdir, 'bin', env.project_name)
     fabtools.require.files.template_file(path=launcher_filename,
-            template_contents=GUNICORN_APP_LAUNCHER, context=env,
-            mode='700', owner=user, use_sudo=True)
+                                         template_contents=GUNICORN_APP_LAUNCHER, context=env,
+                                         mode='700', owner=user, use_sudo=True)
 
     if with_upstart:
         instance_name = '%(project_name)s %(env)s' % env
@@ -70,7 +70,7 @@ def upstart(gunicorn_launcher, instance_name):
     }
 
     fabtools.require.files.template_file(path=upstart_filename,
-            template_contents=UPSTART_CONF, context=context, use_sudo=True)
+                                         template_contents=UPSTART_CONF, context=context, use_sudo=True)
 
 
 UPSTART_CONF = """\

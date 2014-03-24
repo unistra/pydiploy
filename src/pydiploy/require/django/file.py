@@ -22,9 +22,9 @@ def manager(template_path, remote_user=None):
     require('appdir')
     kwargs = remote_user and {'use_sudo': True, 'owner': remote_user} or {}
     fabtools.require.files.template_file(
-            path=os.path.join(env.appdir, 'manage.py'), 
-            template_source=template_path, context=env, 
-            **kwargs
+        path=os.path.join(env.appdir, 'manage.py'),
+        template_source=template_path, context=env,
+        **kwargs
     )
 
 
@@ -34,7 +34,7 @@ def log():
     require('logdir', 'project_name')
     if not env.has_key('django_logile'):
         env.django_logfile = os.path.join(
-                env.logdir, '%s.log' % env.project_name
+            env.logdir, '%s.log' % env.project_name
         )
     return env.django_logfile
 

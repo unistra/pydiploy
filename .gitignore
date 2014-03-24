@@ -25,6 +25,7 @@ pip-log.txt
 .coverage
 .tox
 nosetests.xml
+unittest_settings.py
 
 # Translations
 *.mo
@@ -33,3 +34,15 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Sphinx
+docs/_build
+
+# Misc
+.project
+.settings
+.pydevproject
+*.pyc
+*.db
+*.sublime-*
+.fab_tasks~
