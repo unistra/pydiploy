@@ -3,7 +3,7 @@
 import os
 import fabtools
 from time import time
-from fabric.api import sudo, execute, env, require, lcd, local, basename
+from fabric.api import sudo, execute, env, require, lcd, local
 from fabric.contrib.project import rsync_project
 from .system import permissions, symlink
 from .git import archive
@@ -47,7 +47,7 @@ def deploy_code():
                       tag=env.tag,
                       remote=env.remote_repo_url)
     with lcd('/tmp'):
-        local('tar xvf %s' % basename(tarball))
+        local('tar xvf %s' % os.path.basename(tarball))
 
     exclude_files = ['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'data',
                      'log', 'bin', 'manage.py', 'cmscts/wsgi.py', '*.db',

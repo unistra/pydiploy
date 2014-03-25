@@ -3,11 +3,7 @@
 """
 """
 
-import os
-
-from fabric.api import env
-from fabric.api import run
-from fabtools import require
+from fabric.api import env, run
 
 
 def remote_home(user):

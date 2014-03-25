@@ -1,10 +1,9 @@
+# -*- coding: utf-8 -*-
+
 """
 """
 
-from fabric.api import hide
-from fabric.api import settings
-from fabric.api import sudo
-from fabric.api import run
+from fabric.api import hide, settings, sudo, run
 
 
 def exists(name):

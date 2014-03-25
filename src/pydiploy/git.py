@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Git
 ===
@@ -8,10 +10,7 @@ Create an archive from a remote or directly from a project
 
 import os
 
-from fabric.api import cd
-from fabric.api import put
-from fabric.api import run
-from fabric.api import sudo
+from fabric.api import cd, put, run, sudo
 
 from .require import git
 

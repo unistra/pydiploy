@@ -10,8 +10,10 @@ d'une application Python. Les fonctions acessibles via les tâches `Fabric <http
 * sap_client : préparation de la machine à l'installation du client SAP pour Python
 """
 
+import os
+
 from string import Template
-from fabric.api import env
+from fabric.api import env, cd, require, run, sudo, task
 from fabric.api import cd
 from fabric.api import require
 from fabric.api import run
@@ -19,73 +21,73 @@ from fabric.api import sudo
 from fabric.api import task
 
 
-def setuptools():
-    """ Installation des libraires d'installation de librairies Python depuis des dépôts centraux comme `Pypi
-    <pypi.python.org>`_ ou locaux comme `repodipory <http://repodipory.u-strasbg.fr/lib/python>`_, ou des dépôts de
-    code comme GitHub. Les commandes `pip <http://www.pip-installer.org/en/latest/usage.html>`_ et
-    `easy_install <http://peak.telecommunity.com/DevCenter/EasyInstall#using-easy-install>`_ seront alors disponibles.
-    """
-    sudo("aptitude install python-setuptools")
-    sudo("easy_install pip")
+# def setuptools():
+#     """ Installation des libraires d'installation de librairies Python depuis des dépôts centraux comme `Pypi
+#     <pypi.python.org>`_ ou locaux comme `repodipory <http://repodipory.u-strasbg.fr/lib/python>`_, ou des dépôts de
+#     code comme GitHub. Les commandes `pip <http://www.pip-installer.org/en/latest/usage.html>`_ et
+# `easy_install <http://peak.telecommunity.com/DevCenter/EasyInstall#using-easy-install>`_ seront alors disponibles.
+#     """
+#     sudo("aptitude install python-setuptools")
+#     sudo("easy_install pip")
 
 
-def virtualenv():
-    """ Installation ou mise jour des outils `virtualenv <http://www.virtualenv.org/en/latest/index.html>`_ et
-    `virtualenvwrapper <http://www.doughellmann.com/projects/virtualenvwrapper/>`_
-    """
-    sudo("pip install -U virtualenv virtualenvwrapper")
+# def virtualenv():
+#     """ Installation ou mise jour des outils `virtualenv <http://www.virtualenv.org/en/latest/index.html>`_ et
+#     `virtualenvwrapper <http://www.doughellmann.com/projects/virtualenvwrapper/>`_
+#     """
+#     sudo("pip install -U virtualenv virtualenvwrapper")
 
 
-def update_bashrc():
-    """ Met à jour le fichier bashrc afin de prendre en compte le fichier .bash_profile dans le shell de l'utilisateur.
-    """
-    bashrc_profile = Template(""
-                              "if [ -f ~/.bash_profile ]; then"
-                              "    . ~/.bash_profile"
-                              "fi")
-    run('echo %s >> $HOME/.bashrc' % bashrc_profile)
-    run('touch $HOME∕.bash_profile')
-    run('source $HOME/.bashrc')
+# def update_bashrc():
+#     """ Met à jour le fichier bashrc afin de prendre en compte le fichier .bash_profile dans le shell de l'utilisateur.
+#     """
+#     bashrc_profile = Template(""
+#                               "if [ -f ~/.bash_profile ]; then"
+#                               "    . ~/.bash_profile"
+#                               "fi")
+#     run('echo %s >> $HOME/.bashrc' % bashrc_profile)
+#     run('touch $HOME∕.bash_profile')
+#     run('source $HOME/.bashrc')
 
 
-def generate_bash_profile():
-    """ Génération du fichier de profil Bash pour permettre l'activation des fonctionnalités de virtualenwrapper.
-    """
-    require('virtualenvs_path')
-    bash_profile = Template(
-        "export WORKON_HOME=$env_root_path\n"
-        "export PIP_RESPECT_VIRTUALENV=true\n"
-        "source /usr/local/bin/virtualenvwrapper.sh"
-    )
-    run('echo "%s" >> $HOME/.bash_profile' %
-        bash_profile.substitute(env_root_path=env.virtualenvs_path))
+# def generate_bash_profile():
+#     """ Génération du fichier de profil Bash pour permettre l'activation des fonctionnalités de virtualenwrapper.
+#     """
+#     require('virtualenvs_path')
+#     bash_profile = Template(
+#         "export WORKON_HOME=$env_root_path\n"
+#         "export PIP_RESPECT_VIRTUALENV=true\n"
+#         "source /usr/local/bin/virtualenvwrapper.sh"
+#     )
+#     run('echo "%s" >> $HOME/.bash_profile' %
+#         bash_profile.substitute(env_root_path=env.virtualenvs_path))
 
 
-@task
-def install_tools():
-    """ Installation d'outils de base:
+# @task
+# def install_tools():
+#     """ Installation d'outils de base:
 
-    * unzip
-    """
-    sudo('aptitude install unzip')
-
-
-@task
-def update_python_env():
-    """ Mise à jour de l'environnement Python.
-    """
-    sudo("pip install -U pip")
-    virtualenv()
+#     * unzip
+#     """
+#     sudo('aptitude install unzip')
 
 
-@task
-def create_python_env():
-    """ Création de l'environnement Python.
-    """
-    setuptools()
-    sudo('aptitude install python-dev')
-    virtualenv()
-    generate_bash_profile()
+# @task
+# def update_python_env():
+#     """ Mise à jour de l'environnement Python.
+#     """
+#     sudo("pip install -U pip")
+#     virtualenv()
+
+
+# @task
+# def create_python_env():
+#     """ Création de l'environnement Python.
+#     """
+#     setuptools()
+#     sudo('aptitude install python-dev')
+#     virtualenv()
+#     generate_bash_profile()
 
 
 @task

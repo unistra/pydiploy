@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Gunicorn
 ========
@@ -8,8 +10,7 @@ Gunicorn
 
 import os
 
-from fabric.api import env
-from fabric.api import require
+from fabric.api import env, require
 import fabtools
 
 

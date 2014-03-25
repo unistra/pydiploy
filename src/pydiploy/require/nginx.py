@@ -3,95 +3,9 @@
 """
 """
 import os
-from fabric.api import env, require, cd, sudo
+from fabric.api import env, cd, sudo
 from fabric.contrib.project import rsync_project
 import fabtools
-
-
-def gunicorn_site_proxy(user, redirect_port_80=False):
-    require('appdir', 'http_port', 'virtualhost', 'gunicorn_port')
-    env.proxy_url = 'http://127.0.0.1:%s' % env.gunicorn_port
-
-    if redirect_port_80:
-        template_contents = DJANGO_HTTPS + DJANGO_NGINX
-    else:
-        template_contents = DJANGO_HTTP + DJANGO_NGINX
-
-    fabtools.require.nginx.site(env.virtualhost,
-                                template_contents=template_contents, **env)
-
-
-DJANGO_HTTPS = """\
-server {
-    listen 80;
-    server_name %(virtualhost)s;
-
-    return 301 https://$hosts$request_uri;
-}
-
-server {
-    listen %(http_port)s;
-    server_name %(virtualhost)s;
-
-    ssl                 on;
-    ssl_certificate     $(ssl_cert_file)$;
-    ssl_certificate_key $(ssl_cert_key)$;
-
-"""
-
-DJANGO_HTTP = """\
-server {
-    listen %(http_port)s;
-    server_name %(virtualhost)s;
-
-"""
-
-DJANGO_NGINX = """\
-    access_log  /var/log/nginx/%(virtualhost)s.access.log;
-    root   %(appdir)s;
-
-    gzip_vary on;
-
-    try_files $uri @proxied;
-
-    location /static {
-            if ($query_string) {
-                    expires max;
-            }
-    }
-
-    location /media {
-            root /var/www/data/%(virtualhost)s;
-            if ($query_string) {
-                    expires max;
-            }
-    }
-
-
-    location / {
-            proxy_pass_header Server;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header Host $http_host;
-            proxy_redirect off;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Scheme $scheme;
-            proxy_connect_timeout 10;
-            proxy_read_timeout 10;
-            proxy_pass %(proxy_url)s;
-            client_max_body_size 4M;
-    }
-
-    #error_page  404  /404.html;
-
-    # redirect server error pages to the static page /50x.html
-    #
-    error_page   500 502 503 504  /50x.html;
-    location = /50x.html {
-            root   /var/www/nginx-default;
-    }
-
-}
-"""
 
 
 def root_web():
@@ -124,12 +38,77 @@ def web_static_files():
 
 def web_configuration():
     """Setup webserver's configuration"""
+
+    APP_NGINX_CONF = """\
+    upstream {{ short_server_name }}  {
+    {% for backend in backends %}
+        server {{ backend }}:{{ socket_port }};
+    {% endfor %}
+    }
+
+    {% if server_ssl_on %}
+    server {
+        listen {% if server_ip %}{{ server_ip }}:{% endif %}80;
+        server_name {{ server_name }} {{ short_server_name }};
+
+        rewrite             ^ https://$server_name$request_uri? permanent;
+    }
+    {% endif %}
+
+    server {
+        listen {% if server_ip %}{{ server_ip }}:{% endif %}{% if server_ssl_on %}443{% else %}80{% endif %};
+        server_name {{ server_name }} {{ short_server_name }};
+
+    {% if server_ssl_on %}
+        ssl                  on;
+        ssl_certificate      /etc/ssl/certs/wildcard.u-strasbg.fr.pem;
+        ssl_certificate_key  /etc/ssl/private/wildcard.u-strasbg.fr.key;
+    {% endif %}
+
+        location = /favicon.ico {
+          log_not_found off;
+        }
+
+        location /site_media/ {
+                    alias {{ remote_current_path }}/assets/;
+                    autoindex on;
+                    allow all;
+
+        }
+
+
+        location / {
+            # Correspond au nom defini dans 'upstream'
+            proxy_pass      http://{{ short_server_name }}$request_uri;
+            proxy_redirect  off;
+
+        {% if server_ip %}
+            proxy_bind      {{ server_ip }};
+        {% endif %}
+            resolver        130.79.200.200;
+
+            proxy_set_header   Host             $host;
+            proxy_set_header   X-Real-IP        $remote_addr;
+            proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+            proxy_set_header   X-Forwarded-Protocol ssl;
+            proxy_set_header   X-Forwarded-Ssl on;
+        }
+        {% if server_ssl_on %}
+            access_log  /var/log/nginx/{{ short_server_name }}_ssl.access.log;
+            error_log  /var/log/nginx/{{ short_server_name }}_ssl.error.log warn;
+        {% else %}
+            access_log  /var/log/nginx/{{ short_server_name }}.log;
+            error_log  /var/log/nginx/{{ short_server_name }}.log warn;
+        {% endif %}
+    }
+    """
+
     nginx_root = '/etc/nginx'
     nginx_available = nginx_root + '/sites-available'
     nginx_enabled = nginx_root + '/sites-enabled'
-    cmscts_conf = '%s/%s.conf' % (nginx_available, env.server_name)
+    app_conf = '%s/%s.conf' % (nginx_available, env.server_name)
     fabtools.files.upload_template('fabfile/.cmscts.conf',
-                                   cmscts_conf,
+                                   app_conf,
                                    context=env,
                                    use_jinja=True,
                                    use_sudo=True,
@@ -140,5 +119,5 @@ def web_configuration():
     if not fabtools.files.is_link('%s/%s.conf' % (nginx_enabled,
                                                   env.server_name)):
         with cd(nginx_enabled):
-            sudo('ln -s %s .' % cmscts_conf)
+            sudo('ln -s %s .' % app_conf)
             sudo('rm default')

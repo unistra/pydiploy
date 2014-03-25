@@ -41,7 +41,7 @@ def set_locale():
         sudo('/usr/sbin/update-locale LANG=' + env.locale)
 
 
-def timezone():
+def set_timezone():
     """Set the timezone"""
     if fabtools.system.distrib_id() not in('Ubuntu', 'Debian'):
         print("Cannot deploy to non-debian/ubuntu host: %s" % env.server_name)

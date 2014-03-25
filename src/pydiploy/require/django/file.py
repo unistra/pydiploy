@@ -1,14 +1,12 @@
+# -*- coding: utf-8 -*-
+
 """
 """
 
 import os
 
 
-from fabric.api import cd
-from fabric.api import env
-from fabric.api import get
-from fabric.api import put
-from fabric.api import require
+from fabric.api import cd, env, get, put, require
 from fabric.context_managers import settings
 import fabtools
 
