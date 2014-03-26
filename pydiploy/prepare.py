@@ -13,81 +13,8 @@ d'une application Python. Les fonctions acessibles via les tâches `Fabric <http
 import os
 
 from string import Template
-from fabric.api import env, cd, require, run, sudo, task
-from fabric.api import cd
-from fabric.api import require
-from fabric.api import run
-from fabric.api import sudo
-from fabric.api import task
-
-
-# def setuptools():
-#     """ Installation des libraires d'installation de librairies Python depuis des dépôts centraux comme `Pypi
-#     <pypi.python.org>`_ ou locaux comme `repodipory <http://repodipory.u-strasbg.fr/lib/python>`_, ou des dépôts de
-#     code comme GitHub. Les commandes `pip <http://www.pip-installer.org/en/latest/usage.html>`_ et
-# `easy_install <http://peak.telecommunity.com/DevCenter/EasyInstall#using-easy-install>`_ seront alors disponibles.
-#     """
-#     sudo("aptitude install python-setuptools")
-#     sudo("easy_install pip")
-
-
-# def virtualenv():
-#     """ Installation ou mise jour des outils `virtualenv <http://www.virtualenv.org/en/latest/index.html>`_ et
-#     `virtualenvwrapper <http://www.doughellmann.com/projects/virtualenvwrapper/>`_
-#     """
-#     sudo("pip install -U virtualenv virtualenvwrapper")
-
-
-# def update_bashrc():
-#     """ Met à jour le fichier bashrc afin de prendre en compte le fichier .bash_profile dans le shell de l'utilisateur.
-#     """
-#     bashrc_profile = Template(""
-#                               "if [ -f ~/.bash_profile ]; then"
-#                               "    . ~/.bash_profile"
-#                               "fi")
-#     run('echo %s >> $HOME/.bashrc' % bashrc_profile)
-#     run('touch $HOME∕.bash_profile')
-#     run('source $HOME/.bashrc')
-
-
-# def generate_bash_profile():
-#     """ Génération du fichier de profil Bash pour permettre l'activation des fonctionnalités de virtualenwrapper.
-#     """
-#     require('virtualenvs_path')
-#     bash_profile = Template(
-#         "export WORKON_HOME=$env_root_path\n"
-#         "export PIP_RESPECT_VIRTUALENV=true\n"
-#         "source /usr/local/bin/virtualenvwrapper.sh"
-#     )
-#     run('echo "%s" >> $HOME/.bash_profile' %
-#         bash_profile.substitute(env_root_path=env.virtualenvs_path))
-
-
-# @task
-# def install_tools():
-#     """ Installation d'outils de base:
-
-#     * unzip
-#     """
-#     sudo('aptitude install unzip')
-
-
-# @task
-# def update_python_env():
-#     """ Mise à jour de l'environnement Python.
-#     """
-#     sudo("pip install -U pip")
-#     virtualenv()
-
-
-# @task
-# def create_python_env():
-#     """ Création de l'environnement Python.
-#     """
-#     setuptools()
-#     sudo('aptitude install python-dev')
-#     virtualenv()
-#     generate_bash_profile()
+from fabric.api import env, cd, require, run, sudo, task, prompt
+from fabtools import files as fabtoolsfiles
 
 
 @task
@@ -153,3 +80,46 @@ def sap_client():
     with cd('/usr/sap'):
         sudo("tar xvf /tmp/rfcsdk_64.tar.gz")
     sudo('ln -s /usr/sap/rfcsdk/lib/librfccm.so /lib/')
+
+
+@task
+def tag(version):
+    """ """
+    env.tag = version
+
+
+def build_env():
+    # check if tag is specified if not prompt user
+    if "tag" not in env:
+        env.tag = prompt('Please specify target tag used: ')
+
+    env.remote_project_dir = os.path.join(env.remote_home, env.server_name)
+    env.local_tmp_root_app = os.path.join(env.local_tmp_dir,
+                                          '%(application_name)s-%(tag)s' % env)
+    env.local_tmp_root_app_package = os.path.join(env.local_tmp_root_app,
+                                                  env.root_package_name)
+
+    env.remote_current_path = os.path.join(env.remote_project_dir, 'current')
+    env.remote_releases_path = os.path.join(env.remote_project_dir, 'releases')
+    env.remote_shared_path = os.path.join(env.remote_project_dir, 'shared')
+    env.remote_base_package_dir = os.path.join(env.remote_current_path,
+                                               env.root_package_name)
+    env.remote_settings_dir = os.path.join(
+        env.remote_base_package_dir, 'settings')
+    env.remote_settings_file = os.path.join(env.remote_settings_dir,
+                                            '%s.py' % env.goal)
+
+    if not "releases" in env:
+        if fabtoolsfiles.is_dir(env.remote_releases_path):
+            env.releases = sorted(run('ls -x %(releases_path)s' %
+                                      {'releases_path': env.remote_releases_path}).split())
+            if len(env.releases) >= 1:
+                env.current_revision = env.releases[-1]
+                env.current_release = "%(releases_path)s/%(current_revision)s" % \
+                                      {'releases_path': env.remote_releases_path,
+                                       'current_revision': env.current_revision}
+            if len(env.releases) > 1:
+                env.previous_revision = env.releases[-2]
+                env.previous_release = "%(releases_path)s/%(previous_revision)s" % \
+                                       {'releases_path': env.remote_releases_path,
+                                        'previous_revision': env.previous_revision}

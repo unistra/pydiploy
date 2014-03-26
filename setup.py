@@ -1,31 +1,40 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, find_packages
+from setuptools import setup
+from setuptools import find_packages
 
+with open('README') as readme:
+    long_description = readme.read()
+
+with open('requirements.txt') as requirements:
+    lines = requirements.readlines()
+    libraries = [lib for lib in lines if not lib.startswith('-')]
+    dependency_links = [link.split()[1] for link in lines if
+                        link.startswith('-f')]
 
 setup(
-    name="pydiploy",
-
-    version='0.2',
-    packages=find_packages(
-        'src', exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
-    package_dir={'': 'src'},
-
-    install_requires=[
-        'fabric',
-    ],
-    dependency_links=[
-        'http://repodipory.u-strasbg.fr/lib/python'
-    ],
-
-
-    author='dip',
+    name='pydiploy',
+    version='0.1.0',
+    author='di-dip-unistra',
     author_email='di-dip@unistra.fr',
-    description='Déploiement automatisé, gestion de l\'environnement de développement et gestion de la prodution'
-    'pour une application Python',
-    keywords="deploy development automatic production",
+    maintainer='di-dip-unistra',
+    maintainer_email='di-dip@unistra.fr',
     url='http://git.u-strasbg.fr/git/pydiploy',
-
-
+    license='PSF',
+    description='A tool to deploy applications, and automate processing with fabric',
+    long_description=long_description,
+    packages=find_packages(),
+    download_url='http://git.u-strasbg.fr/git/pydiploy',
+    install_requires=libraries,
+    dependency_links=dependency_links,
+    keywords=['deploy', 'fabric', 'automation'],
+    entry_points={},
+    classifiers=(
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 2.7'
+    )
 )

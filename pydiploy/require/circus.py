@@ -122,6 +122,7 @@ exec /usr/local/bin/circusd %(remote_home)s/.circus.ini
         owner='root',
         mode='644')
 
+
 def app_reload():
     """Start/Restart app using circus"""
     if not 'running' in sudo('status circus'):

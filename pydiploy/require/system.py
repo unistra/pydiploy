@@ -5,7 +5,6 @@
 
 
 import fabtools
-from pydiploy.require import groups
 from fabric.api import sudo, run, env
 
 

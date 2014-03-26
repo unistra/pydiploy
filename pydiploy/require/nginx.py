@@ -106,8 +106,7 @@ server {
     nginx_root = '/etc/nginx'
     nginx_available = os.path.join(nginx_root, 'sites-available')
     nginx_enabled = os.path.join(nginx_root, 'sites-enabled')
-    app_conf = os.path.join(nginx_available,'%s.conf' % env.server_name)
-
+    app_conf = os.path.join(nginx_available, '%s.conf' % env.server_name)
 
     with open('nginx.conf.tmp', 'w+t') as tmp_config:
         tmp_config.write(APP_NGINX_CONF)
@@ -122,8 +121,6 @@ server {
                                    mode='644')
 
     os.remove('nginx.conf.tmp')
-
-
 
     if not fabtools.files.is_link('%s/%s.conf' % (nginx_enabled,
                                                   env.server_name)):
