@@ -10,6 +10,8 @@ from fabric.api import sudo, run, env
 
 
 def django_user(commands=None):
+    """
+    """
     fabtools.require.group(env.remote_group)
     fabtools.require.user(env.remote_owner,
                           create_home=True,

@@ -40,74 +40,79 @@ def web_configuration():
     """Setup webserver's configuration"""
 
     APP_NGINX_CONF = """\
-    upstream {{ short_server_name }}  {
-    {% for backend in backends %}
-        server {{ backend }}:{{ socket_port }};
-    {% endfor %}
+upstream {{ short_server_name }}  {
+{% for backend in backends %}
+    server {{ backend }}:{{ socket_port }};
+{% endfor %}
+}
+
+{% if server_ssl_on %}
+server {
+    listen {% if server_ip %}{{ server_ip }}:{% endif %}80;
+    server_name {{ server_name }} {{ short_server_name }};
+
+    rewrite             ^ https://$server_name$request_uri? permanent;
+}
+{% endif %}
+
+server {
+    listen {% if server_ip %}{{ server_ip }}:{% endif %}{% if server_ssl_on %}443{% else %}80{% endif %};
+    server_name {{ server_name }} {{ short_server_name }};
+
+{% if server_ssl_on %}
+    ssl                  on;
+    ssl_certificate      /etc/ssl/certs/wildcard.u-strasbg.fr.pem;
+    ssl_certificate_key  /etc/ssl/private/wildcard.u-strasbg.fr.key;
+{% endif %}
+
+    location = /favicon.ico {
+      log_not_found off;
     }
 
-    {% if server_ssl_on %}
-    server {
-        listen {% if server_ip %}{{ server_ip }}:{% endif %}80;
-        server_name {{ server_name }} {{ short_server_name }};
+    location /site_media/ {
+                alias {{ remote_current_path }}/assets/;
+                autoindex on;
+                allow all;
 
-        rewrite             ^ https://$server_name$request_uri? permanent;
     }
+
+
+    location / {
+        # Correspond au nom defini dans 'upstream'
+        proxy_pass      http://{{ short_server_name }}$request_uri;
+        proxy_redirect  off;
+
+    {% if server_ip %}
+        proxy_bind      {{ server_ip }};
     {% endif %}
+        resolver        130.79.200.200;
 
-    server {
-        listen {% if server_ip %}{{ server_ip }}:{% endif %}{% if server_ssl_on %}443{% else %}80{% endif %};
-        server_name {{ server_name }} {{ short_server_name }};
-
-    {% if server_ssl_on %}
-        ssl                  on;
-        ssl_certificate      /etc/ssl/certs/wildcard.u-strasbg.fr.pem;
-        ssl_certificate_key  /etc/ssl/private/wildcard.u-strasbg.fr.key;
-    {% endif %}
-
-        location = /favicon.ico {
-          log_not_found off;
-        }
-
-        location /site_media/ {
-                    alias {{ remote_current_path }}/assets/;
-                    autoindex on;
-                    allow all;
-
-        }
-
-
-        location / {
-            # Correspond au nom defini dans 'upstream'
-            proxy_pass      http://{{ short_server_name }}$request_uri;
-            proxy_redirect  off;
-
-        {% if server_ip %}
-            proxy_bind      {{ server_ip }};
-        {% endif %}
-            resolver        130.79.200.200;
-
-            proxy_set_header   Host             $host;
-            proxy_set_header   X-Real-IP        $remote_addr;
-            proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
-            proxy_set_header   X-Forwarded-Protocol ssl;
-            proxy_set_header   X-Forwarded-Ssl on;
-        }
-        {% if server_ssl_on %}
-            access_log  /var/log/nginx/{{ short_server_name }}_ssl.access.log;
-            error_log  /var/log/nginx/{{ short_server_name }}_ssl.error.log warn;
-        {% else %}
-            access_log  /var/log/nginx/{{ short_server_name }}.log;
-            error_log  /var/log/nginx/{{ short_server_name }}.log warn;
-        {% endif %}
+        proxy_set_header   Host             $host;
+        proxy_set_header   X-Real-IP        $remote_addr;
+        proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Protocol ssl;
+        proxy_set_header   X-Forwarded-Ssl on;
     }
+    {% if server_ssl_on %}
+        access_log  /var/log/nginx/{{ short_server_name }}_ssl.access.log;
+        error_log  /var/log/nginx/{{ short_server_name }}_ssl.error.log warn;
+    {% else %}
+        access_log  /var/log/nginx/{{ short_server_name }}.log;
+        error_log  /var/log/nginx/{{ short_server_name }}.log warn;
+    {% endif %}
+}
     """
 
     nginx_root = '/etc/nginx'
-    nginx_available = nginx_root + '/sites-available'
-    nginx_enabled = nginx_root + '/sites-enabled'
-    app_conf = '%s/%s.conf' % (nginx_available, env.server_name)
-    fabtools.files.upload_template('fabfile/.cmscts.conf',
+    nginx_available = os.path.join(nginx_root, 'sites-available')
+    nginx_enabled = os.path.join(nginx_root, 'sites-enabled')
+    app_conf = os.path.join(nginx_available,'%s.conf' % env.server_name)
+
+
+    with open('nginx.conf.tmp', 'w+t') as tmp_config:
+        tmp_config.write(APP_NGINX_CONF)
+
+    fabtools.files.upload_template('nginx.conf.tmp',
                                    app_conf,
                                    context=env,
                                    use_jinja=True,
@@ -115,6 +120,10 @@ def web_configuration():
                                    user='root',
                                    chown=True,
                                    mode='644')
+
+    os.remove('nginx.conf.tmp')
+
+
 
     if not fabtools.files.is_link('%s/%s.conf' % (nginx_enabled,
                                                   env.server_name)):

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from fabric.api import env, execute
-from fabric.contrib.files import exists
+from fabric.api import execute
 from fabtools import require
 
 from pydiploy import require as dip_require
@@ -75,6 +74,7 @@ def rollback():
 def post_install():
     """Post installation of webapp"""
     execute(dip_require.circus.app_circus_conf)
+    execute(dip_require.circus.upstart)
     execute(dip_require.circus.app_reload)
     execute(dip_require.nginx.web_static_files)
     execute(dip_require.nginx.web_configuration)
