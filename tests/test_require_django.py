@@ -5,6 +5,7 @@ from unittest import TestCase
 from fabric.api import env
 from mock import patch, call, Mock
 from pydiploy.require.django.command import django_prepare
+from pydiploy.require.django.utils import generate_secret_key, extract_settings, app_settings
 
 
 class CommandCheck(TestCase):
@@ -65,4 +66,74 @@ class CommandCheck(TestCase):
                                 call('python manage.py collectstatic --noinput -i admin -i rest_framework -i django_extensions')])
          
 
+class UtilsCheck(TestCase):
+
+    """
+    utils test
+    """
+    def setUp(self):
+        env.remote_settings_file = "remote_settings_file"
+        env.local_tmp_dir = "tests/data"
+        env.goal = "settings"
+        env.map_settings = {"secret_key": "SECRET_KEY", "default_db_user": "DATABASES['default']['USER']"}
+        env.local_tmp_root_app_package = "local_tmp_root_app_package"
+        env.remote_owner = "owner"
+
+
+    def test_generate_secret_key(self):
+        generate_secret_key()
+        self.assertIsNotNone(env.secret_key)
+
+
+    @patch('fabric.api.get', return_value=Mock())
+    def test_extract_settings(self, api_get):
+        extract_settings()
+
+        self.assertTrue(api_get.called)
+        self.assertEqual(api_get.call_args, call('remote_settings_file', local_path='tests/data'))
+
+        self.assertEqual(env.secret_key, '{{ secret_key }}')
+        self.assertEqual(env.default_db_user, '{{ default_db_user }}')
+
+
+    @patch('fabtools.files.is_file', return_value=True)
+    @patch('fabric.api.execute', return_value=Mock())
+    @patch('fabric.api.require', return_value=Mock())
+    @patch('fabtools.files.upload_template', return_value=Mock())
+    def test_app_settings(self, upload_template, api_require, api_execute, is_file):
         
+        # is file true
+        app_settings(test1='toto')
+        
+        self.assertTrue(is_file.called)
+        self.assertEqual(is_file.call_args, call(path='remote_settings_file', use_sudo=True))
+
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args).find('extract_settings') > 0)
+
+        self.assertEqual(env.test1, 'toto')
+
+        self.assertTrue(api_require.called)
+        self.assertEqual(api_require.call_args, call('secret_key', 'default_db_user'))
+
+        self.assertTrue(upload_template.called)
+        self.assertTrue(str(upload_template.call_args).find('settings.py') > 0)
+
+
+        # is file false
+        is_file.return_value = False
+
+        app_settings()
+
+        self.assertTrue(is_file.called)
+        self.assertEqual(is_file.call_args, call(path='remote_settings_file', use_sudo=True))
+
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args).find('generate_secret_key') > 0)
+
+
+
+
+
+        
+

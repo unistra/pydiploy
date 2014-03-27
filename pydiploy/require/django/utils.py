@@ -4,8 +4,9 @@ import random
 import string
 import os
 import re
-from fabric.api import env, require, get, execute
+from fabric.api import env
 import fabtools
+import fabric
 
 
 def generate_secret_key():
@@ -27,7 +28,7 @@ def extract_settings():
 
     print('in')
     # get the remote file
-    get(env.remote_settings_file, local_path=env.local_tmp_dir)
+    fabric.api.get(env.remote_settings_file, local_path=env.local_tmp_dir)
 
     # open and read the data from the downloaded file
     with open(os.path.join(env.local_tmp_dir, '%s.py' % env.goal), 'r') as settings_fh:
@@ -52,17 +53,17 @@ def app_settings(**kwargs):
                                               use_sudo=True)
 
     if settings_present:
-        execute(extract_settings)
+        fabric.api.execute(extract_settings)
 
     else:
         if "secret_key" in env.map_settings:
-            execute(generate_secret_key)
+            fabric.api.execute(generate_secret_key)
 
     for map_setting, setting_value in kwargs.items():
         if setting_value:
             setattr(env, map_setting, setting_value)
 
-    require(*env.map_settings.keys())
+    fabric.api.require(*env.map_settings.keys())
     settings_dir = os.path.join(env.local_tmp_root_app_package, 'settings')
 
     fabtools.files.upload_template('%s.py' % env.goal,
