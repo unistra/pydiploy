@@ -21,6 +21,9 @@ def generate_secret_key():
 
 
 def extract_settings():
+    """
+    extracts settings from django settings files
+    """
 
     print('in')
     # get the remote file
@@ -42,6 +45,9 @@ def extract_settings():
 
 
 def app_settings(**kwargs):
+    """
+    Manages django settings file
+    """
     settings_present = fabtools.files.is_file(path=env.remote_settings_file,
                                               use_sudo=True)
 

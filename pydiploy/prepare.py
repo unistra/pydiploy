@@ -109,6 +109,8 @@ def build_env():
     env.remote_settings_file = os.path.join(env.remote_settings_dir,
                                             '%s.py' % env.goal)
 
+    env.lib_path = os.path.dirname(__file__)
+
     if not "releases" in env:
         if fabtoolsfiles.is_dir(env.remote_releases_path):
             env.releases = sorted(run('ls -x %(releases_path)s' %

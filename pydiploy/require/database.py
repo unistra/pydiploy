@@ -43,6 +43,7 @@ def sqlite3_pkg(use_sudo=False, user=None):
 
 def ldap_pkg(use_sudo=False, user=None):
     """
+    Installs ldap packages and dependencies
     """
 
     require.deb.package('libldap2-dev', update=True)
@@ -53,4 +54,7 @@ def ldap_pkg(use_sudo=False, user=None):
 
 
 def postgres_pkg(update=False):
+    """
+    Installs dependencies for postgresql
+    """
     require.deb.packages(['libpq-dev'], update=update)

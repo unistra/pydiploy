@@ -29,25 +29,17 @@ def circus_pkg(update=False):
     fabtools.require.python.install('circus-web', use_sudo=True)
 
     # base configuration file for circus
-
-    CIRCUS_BASE_CONFIG = """\
-[circus]
-httpd = 1
-httpd_host = %(host)s
-httpd_port = 8080
-stream_backend = gevent
-statsd = 1
-pidfile = %(remote_home)s/.circus.pid
-include_dir = %(remote_home)s/.circus.d
-    """
-    fabtools.require.files.template_file(path=os.path.join(
-                                         env.remote_home, '.circus.ini'),
-                                         template_contents=CIRCUS_BASE_CONFIG,
-                                         context=env,
-                                         use_sudo=True,
-                                         owner=env.remote_owner,
-                                         group=env.remote_group,
-                                         mode='644')
+    fabtools.files.upload_template(
+        'circus.ini.tpl',
+        os.path.join(env.remote_home,
+                     '.circus.ini'),
+        context=env,
+        template_dir=os.path.join(env.lib_path, 'templates'),
+        use_sudo=True,
+        user=env.remote_owner,
+        chown=True,
+        mode='644',
+        use_jinja=True)
 
     # root directory for circus applications configuration
     fabtools.require.files.directory(
@@ -62,65 +54,34 @@ def app_circus_conf():
     """
     """
 
-    CIRCUS_APP_CONFIG = """\
-[watcher:%(application_name)s]
-cmd = %(remote_virtualenv_dir)s/bin/chaussette --fd $(circus.sockets.%(application_name)s) %(root_package_name)s.wsgi.application
-working_dir = %(remote_current_path)s
-copy_env = 1
-numprocesses = 3
-use_sockets = 1
-virtualenv = %(remote_virtualenv_dir)s
-uid = django
-gid = di
-
-stderr_stream.class = FileStream
-stdout_stream.filename = %(remote_shared_path)s/log/circus_error.log
-stdout_stream.time_format = %%Y-%%m-%%d %%H:%%M:%%S
-stdout_stream.max_bytes = 209715200
-stdout_stream.backup_count = 5
-
-stdout_stream.class = FileStream
-stdout_stream.filename = %(remote_shared_path)s/log/circus.log
-stdout_stream.time_format = %%Y-%%m-%%d %%H:%%M:%%S
-stdout_stream.max_bytes = 209715200
-stdout_stream.backup_count = 5
-
-[socket:%(application_name)s]
-host = %(socket_host)s
-port = %(socket_port)s
-    """
-
-    fabtools.require.files.template_file(
-        path=os.path.join(env.remote_home, '.circus.d',
-                          'cmscts.ini'),
-        template_contents=CIRCUS_APP_CONFIG,
-        context=env,
-        use_sudo=True,
-        owner=env.remote_owner,
-        group=env.remote_group,
-        mode='644')
+    fabtools.files.upload_template('app.ini.tpl',
+                                   os.path.join(env.remote_home, '.circus.d',
+                                                '%s.ini' % env.application_name),
+                                   context=env,
+                                   template_dir=os.path.join(
+                                       env.lib_path, 'templates'),
+                                   use_sudo=True,
+                                   user=env.remote_owner,
+                                   chown=True,
+                                   mode='644',
+                                   use_jinja=True)
 
 
 def upstart():
     """
     """
 
-    UPSTART_CONFIG = """\
-start on filesystem and net-device-up IFACE=lo
-
-stop on started shutdown
-
-respawn
-exec /usr/local/bin/circusd %(remote_home)s/.circus.ini
-    """
-
-    fabtools.require.files.template_file(
-        path='/etc/init/circus.conf',
-        template_contents=UPSTART_CONFIG,
-        context=env,
-        use_sudo=True,
-        owner='root',
-        mode='644')
+    # init files to declare circus as an upstart daemon
+    fabtools.files.upload_template('upstart.conf.tpl',
+                                   '/etc/init/circus.conf',
+                                   context=env,
+                                   template_dir=os.path.join(
+                                       env.lib_path, 'templates'),
+                                   use_sudo=True,
+                                   user='root',
+                                   chown=True,
+                                   mode='644',
+                                   use_jinja=True)
 
 
 def app_reload():

@@ -5,19 +5,23 @@ import fabtools
 from time import time
 from fabric.api import sudo, execute, env, require, lcd, local
 from fabric.contrib.project import rsync_project
-from .system import permissions, symlink
+from .system import permissions
 from .git import archive
 
 
 def set_current():
-    """Use current directory for new release"""
+    """
+    Uses current directory for new release
+    """
     sudo("ln -nfs %(current_release)s %(current_path)s"
          % {'current_release': env.remote_current_release,
             'current_path': env.remote_current_path})
 
 
 def setup():
-    """Config stuff for deployement"""
+    """
+    Configs stuff for deployement
+    """
     sudo("mkdir -p %(remote_domain_path)s/{releases,shared}" %
          {'remote_domain_path': env.remote_project_dir})
     sudo("mkdir -p %(remote_shared_path)s/{config,log}" %
@@ -26,7 +30,9 @@ def setup():
 
 
 def cleanup():
-    """Tidy up old stuff on remote server"""
+    """
+    Cleans old stuff on remote server
+    """
     if len(env.releases) >= env.keep_releases:
         directories = env.releases
         directories.reverse()
@@ -39,6 +45,9 @@ def cleanup():
 
 
 def deploy_code():
+    """
+    Deploys code according to tag in env var
+    """
     require('tag', provided_by=['tag', 'head'])
     require('remote_project_dir', provided_by=['test', 'prod'])
     tarball = archive(env.application_name,
@@ -50,7 +59,8 @@ def deploy_code():
         local('tar xvf %s' % os.path.basename(tarball))
 
     exclude_files = ['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'data',
-                     'log', 'bin', 'manage.py', 'cmscts/wsgi.py', '*.db',
+                     'log', 'bin', 'manage.py',
+                     '%s/wsgi.py' % env.root_package_name, '*.db',
                      '.gitignore']
     exclude_files += ['%s/settings/%s.py' % (env.root_package_name, goal)
                       for goal in ('dev', 'test', 'prod')]
@@ -100,7 +110,9 @@ def deploy_code():
 
 
 def rollback_code():
-    """Rolls back to the previously deployed version"""
+    """
+    Rolls back to the previously deployed version
+    """
     if len(env.releases) >= 2:
         env.current_release = env.releases[-1]
         env.previous_revision = env.releases[-2]
@@ -112,3 +124,12 @@ def rollback_code():
              'previous_revision': env.previous_revision}
         sudo("rm %(current_path)s; ln -s %(previous_release)s %(current_path)s && rm -rf %(current_release)s" %
              {'current_release': env.current_release, 'previous_release': env.previous_release, 'current_path': env.remote_current_path})
+
+
+def symlink():
+    """
+    Updates symlink stuff to the current deployed version
+    """
+    sudo("ln -nfs %(shared_path)s/log %(current_release)s/log" %
+         {'shared_path': env.remote_shared_path,
+          'current_release': env.remote_current_release})

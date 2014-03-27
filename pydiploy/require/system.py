@@ -10,6 +10,17 @@ from fabric.api import sudo, run, env
 
 def django_user(commands=None):
     """
+    Creates django user on remote system
+
+    commands is a string parameter to add commands in a sudoers file so that
+    you could execute commands on remote system without PASSWORD:
+
+    ex :
+
+    execute(your_task,commands='/usr/bin/rsync,/usr/sbin/service ipsec restart')
+
+    here rsync and service ipsec restart are launch without password
+
     """
     fabtools.require.group(env.remote_group)
     fabtools.require.user(env.remote_owner,
@@ -26,16 +37,22 @@ def django_user(commands=None):
 
 def django_group(name):
     """
+    Creates user (name) group for the web app
     """
     fabtools.require.group(name)
 
 
 def update_pkg_index():
+    """
+    Updates packages on remote server (ubuntu/debian)
+    """
     fabtools.require.deb.uptodate_index(max_age={'day': 1})
 
 
 def set_locale():
-    """Set server's locales"""
+    """
+    Sets server's locales
+    """
     locale = run("echo $LANG")
     if(locale != env.locale):
         sudo('locale-gen ' + env.locale)
@@ -43,7 +60,9 @@ def set_locale():
 
 
 def set_timezone():
-    """Set the timezone"""
+    """
+    Sets the timezone
+    """
     if fabtools.system.distrib_id() not in('Ubuntu', 'Debian'):
         print("Cannot deploy to non-debian/ubuntu host: %s" % env.server_name)
         return
@@ -52,17 +71,12 @@ def set_timezone():
 
 
 def permissions():
-    """Make the release group-writable"""
+    """
+    Makes the release group-writable
+    """
     sudo("chown -R %(user)s:%(group)s %(domain_path)s" %
          {'domain_path': env.remote_project_dir,
           'user': env.remote_owner,
           'group': env.remote_group})
     sudo("chmod -R g+w %(domain_path)s" %
          {'domain_path': env.remote_project_dir})
-
-
-def symlink():
-    """Updates symlink stuff to the current deployed version"""
-    sudo("ln -nfs %(shared_path)s/log %(current_release)s/log" %
-         {'shared_path': env.remote_shared_path,
-          'current_release': env.remote_current_release})

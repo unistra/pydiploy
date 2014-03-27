@@ -5,6 +5,9 @@ from fabric.api import env
 
 
 def virtualenv(clear=False):
+    """
+    Creates virtualenv
+    """
     fabtools.require.files.directory(env.remote_virtualenv_dir,
                                      owner=env.remote_owner,
                                      group=env.remote_group,

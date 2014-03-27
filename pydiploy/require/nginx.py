@@ -10,6 +10,7 @@ import fabtools
 
 def root_web():
     """
+    Creates web root for webserver
     """
     fabtools.require.files.directory(env.remote_static_root, use_sudo=True,
                                      owner='root', group='root', mode='755')
@@ -17,12 +18,15 @@ def root_web():
 
 def nginx_pkg(update=False):
     """
+    Installs nginx package on remote server
     """
     fabtools.require.deb.packages(['nginx'], update=update)
 
 
 def nginx_reload():
-    """Start/Restart nginx"""
+    """
+    Starts/Restarts nginx
+    """
     if not fabtools.service.is_running('nginx'):
         fabtools.service.start('nginx')
     else:
@@ -30,6 +34,9 @@ def nginx_reload():
 
 
 def web_static_files():
+    """
+    syncs statics files
+    """
     rsync_project(os.path.join(env.remote_static_root, env.application_name),
                   os.path.join(env.local_tmp_dir, 'assets/'), delete=True,
                   extra_opts='--rsync-path="sudo rsync"',
@@ -37,70 +44,8 @@ def web_static_files():
 
 
 def web_configuration():
-    """Setup webserver's configuration"""
-
-    APP_NGINX_CONF = """\
-upstream {{ short_server_name }}  {
-{% for backend in backends %}
-    server {{ backend }}:{{ socket_port }};
-{% endfor %}
-}
-
-{% if server_ssl_on %}
-server {
-    listen {% if server_ip %}{{ server_ip }}:{% endif %}80;
-    server_name {{ server_name }} {{ short_server_name }};
-
-    rewrite             ^ https://$server_name$request_uri? permanent;
-}
-{% endif %}
-
-server {
-    listen {% if server_ip %}{{ server_ip }}:{% endif %}{% if server_ssl_on %}443{% else %}80{% endif %};
-    server_name {{ server_name }} {{ short_server_name }};
-
-{% if server_ssl_on %}
-    ssl                  on;
-    ssl_certificate      /etc/ssl/certs/wildcard.u-strasbg.fr.pem;
-    ssl_certificate_key  /etc/ssl/private/wildcard.u-strasbg.fr.key;
-{% endif %}
-
-    location = /favicon.ico {
-      log_not_found off;
-    }
-
-    location /site_media/ {
-                alias {{ remote_current_path }}/assets/;
-                autoindex on;
-                allow all;
-
-    }
-
-
-    location / {
-        # Correspond au nom defini dans 'upstream'
-        proxy_pass      http://{{ short_server_name }}$request_uri;
-        proxy_redirect  off;
-
-    {% if server_ip %}
-        proxy_bind      {{ server_ip }};
-    {% endif %}
-        resolver        130.79.200.200;
-
-        proxy_set_header   Host             $host;
-        proxy_set_header   X-Real-IP        $remote_addr;
-        proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Protocol ssl;
-        proxy_set_header   X-Forwarded-Ssl on;
-    }
-    {% if server_ssl_on %}
-        access_log  /var/log/nginx/{{ short_server_name }}_ssl.access.log;
-        error_log  /var/log/nginx/{{ short_server_name }}_ssl.error.log warn;
-    {% else %}
-        access_log  /var/log/nginx/{{ short_server_name }}.log;
-        error_log  /var/log/nginx/{{ short_server_name }}.log warn;
-    {% endif %}
-}
+    """
+    Setups webserver's configuration
     """
 
     nginx_root = '/etc/nginx'
@@ -108,19 +53,16 @@ server {
     nginx_enabled = os.path.join(nginx_root, 'sites-enabled')
     app_conf = os.path.join(nginx_available, '%s.conf' % env.server_name)
 
-    with open('nginx.conf.tmp', 'w+t') as tmp_config:
-        tmp_config.write(APP_NGINX_CONF)
-
-    fabtools.files.upload_template('nginx.conf.tmp',
+    fabtools.files.upload_template('nginx.conf.tpl',
                                    app_conf,
                                    context=env,
+                                   template_dir=os.path.join(
+                                       env.lib_path, 'templates'),
                                    use_jinja=True,
                                    use_sudo=True,
                                    user='root',
                                    chown=True,
                                    mode='644')
-
-    os.remove('nginx.conf.tmp')
 
     if not fabtools.files.is_link('%s/%s.conf' % (nginx_enabled,
                                                   env.server_name)):
