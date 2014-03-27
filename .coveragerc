@@ -1,0 +1,6 @@
+[run]
+source = 
+    pydiploy
+
+[report]
+omit = */tests/*

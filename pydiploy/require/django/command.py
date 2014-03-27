@@ -9,8 +9,6 @@ from fabric.api import (cd, env, get, put, require, run, sudo, shell_env,
                         settings)
 import fabtools
 
-from ...system import remote_home
-
 
 def django_prepare():
     with fabtools.python.virtualenv(env.remote_virtualenv_dir):

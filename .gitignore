@@ -46,3 +46,4 @@ docs/_build
 *.db
 *.sublime-*
 .fab_tasks~
+htmlcov
