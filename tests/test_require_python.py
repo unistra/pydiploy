@@ -3,6 +3,7 @@
 
 from unittest import TestCase
 from pydiploy.require.python.utils import python_pkg, application_dependencies
+from pydiploy.require.python.virtualenv import virtualenv
 from fabric.api import env
 from mock import patch, call, Mock
 
@@ -14,7 +15,6 @@ class UtilsCheck(TestCase):
     """
 
     def setUp(self):
-        # env
         env.remote_virtualenv_dir = "remote_virtualenv_dir"
         env.remote_current_path = "remote_current_path"
         env.goal = "goal"
@@ -22,8 +22,8 @@ class UtilsCheck(TestCase):
         env.host_string = 'hosttest'
 
 
-    @patch('fabtools.require.deb.packages', return_value=True)
-    @patch('fabtools.require.python.install', return_value=True)
+    @patch('fabtools.require.deb.packages', return_value=Mock())
+    @patch('fabtools.require.python.install', return_value=Mock())
     def test_python_pkg(self, python_install, deb_packages):
         python_pkg()
         self.assertTrue(deb_packages.called)
@@ -32,12 +32,10 @@ class UtilsCheck(TestCase):
         self.assertEqual(python_install.call_args, call('pip', upgrade=True, use_sudo=True))
         
         
-
-
     @patch('fabtools.python.virtualenv', return_value=Mock())
     @patch('fabric.api.cd', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
-    @patch('fabtools.python.install_requirements', return_value=True)
+    @patch('fabtools.python.install_requirements', return_value=Mock())
     def test_application_dependencies(self, install_requirements, api_sudo, api_cd, python_virtualenv):
 
         python_virtualenv.return_value.__exit__ = Mock()
@@ -61,3 +59,27 @@ class UtilsCheck(TestCase):
         self.assertEqual(install_requirements.call_args, call('requirements/goal.txt', use_sudo=True, upgrade=False, user='remote_owner'))
 
 
+class VirtualEnvCheck(TestCase):
+
+    """
+    class to test virtualenv
+    """
+
+    def setUp(self):
+        env.remote_group = "remote_group"
+        env.remote_python_version = "2.7"
+
+    @patch('fabtools.require.files.directory', return_value=Mock())
+    @patch('fabtools.require.python.virtualenv', return_value=Mock())
+    def test_virtualenv(self, python_virtualenv, files_directory):
+
+        virtualenv()
+
+        self.assertTrue(python_virtualenv.called)
+        self.assertEqual(python_virtualenv.call_args, 
+            call('remote_virtualenv_dir', clear=False, use_sudo=True, venv_python='/usr/bin/python2.7', user='remote_owner'))
+
+        self.assertTrue(files_directory.called)
+        self.assertEqual(files_directory.call_args, call('remote_virtualenv_dir', owner='remote_owner', use_sudo=True, group='remote_group'))
+
+        
