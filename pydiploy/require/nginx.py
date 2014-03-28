@@ -3,8 +3,8 @@
 """
 """
 import os
-from fabric.api import env, cd, sudo
-from fabric.contrib.project import rsync_project
+from fabric.api import env
+import fabric
 import fabtools
 
 
@@ -37,7 +37,7 @@ def web_static_files():
     """
     syncs statics files
     """
-    rsync_project(os.path.join(env.remote_static_root, env.application_name),
+    fabric.contrib.project.rsync_project(os.path.join(env.remote_static_root, env.application_name),
                   os.path.join(env.local_tmp_dir, 'assets/'), delete=True,
                   extra_opts='--rsync-path="sudo rsync"',
                   ssh_opts='-t')
@@ -66,6 +66,6 @@ def web_configuration():
 
     if not fabtools.files.is_link('%s/%s.conf' % (nginx_enabled,
                                                   env.server_name)):
-        with cd(nginx_enabled):
-            sudo('ln -s %s .' % app_conf)
-            sudo('rm default')
+        with fabric.api.cd(nginx_enabled):
+            fabric.api.sudo('ln -s %s .' % app_conf)
+            fabric.api.sudo('rm default')
