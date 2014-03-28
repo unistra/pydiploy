@@ -1,54 +1,52 @@
 # -*- coding: utf-8 -*-
 
-
-from fabric.api import execute
-from fabtools import require
-
-from pydiploy import require as dip_require
+import fabric
+import pydiploy
+import fabtools
 
 
 def application_packages(update=False):
-    require.deb.packages(['gettext'], update=update)
-    execute(dip_require.database.ldap_pkg, use_sudo=True)
-    execute(dip_require.database.postgres_pkg)
-    execute(dip_require.python.utils.python_pkg)
-    execute(dip_require.circus.circus_pkg)
+    fabtools.require.deb.packages(['gettext'], update=update)
+    fabric.api.execute(pydiploy.require.database.ldap_pkg, use_sudo=True)
+    fabric.api.execute(pydiploy.require.database.postgres_pkg)
+    fabric.api.execute(pydiploy.require.python.utils.python_pkg)
+    fabric.api.execute(pydiploy.require.circus.circus_pkg)
 
 
 def pre_install_django_app_nginx_circus(commands='/usr/bin/rsync'):
-    execute(dip_require.nginx.root_web)
-    execute(dip_require.system.django_user, commands=commands)
-    execute(dip_require.system.set_locale)
-    execute(dip_require.system.set_timezone)
-    execute(dip_require.system.update_pkg_index)
-    execute(application_packages)
-    execute(dip_require.python.virtualenv.virtualenv)
-    execute(dip_require.nginx.nginx_pkg)
+    fabric.api.execute(pydiploy.require.nginx.root_web)
+    fabric.api.execute(pydiploy.require.system.django_user, commands=commands)
+    fabric.api.execute(pydiploy.require.system.set_locale)
+    fabric.api.execute(pydiploy.require.system.set_timezone)
+    fabric.api.execute(pydiploy.require.system.update_pkg_index)
+    fabric.api.execute(application_packages)
+    fabric.api.execute(pydiploy.require.python.virtualenv.virtualenv)
+    fabric.api.execute(pydiploy.require.nginx.nginx_pkg)
 
 
 def deploy(upgrade_pkg=False, **kwargs):
     """Deploys django webapp"""
-    execute(dip_require.releases_manager.setup)
-    execute(dip_require.releases_manager.deploy_code)
-    execute(dip_require.python.utils.application_dependencies, upgrade_pkg)
-    execute(dip_require.django.utils.app_settings, **kwargs)
-    execute(dip_require.django.command.django_prepare)
-    execute(dip_require.system.permissions)
-    execute(dip_require.nginx.nginx_reload)
-    execute(dip_require.releases_manager.cleanup)
+    fabric.api.execute(pydiploy.require.releases_manager.setup)
+    fabric.api.execute(pydiploy.require.releases_manager.deploy_code)
+    fabric.api.execute(pydiploy.require.python.utils.application_dependencies, upgrade_pkg)
+    fabric.api.execute(pydiploy.require.django.utils.app_settings, **kwargs)
+    fabric.api.execute(pydiploy.require.django.command.django_prepare)
+    fabric.api.execute(pydiploy.require.system.permissions)
+    fabric.api.execute(pydiploy.require.nginx.nginx_reload)
+    fabric.api.execute(pydiploy.require.releases_manager.cleanup)
 
 
 def rollback():
     """Rollback django webapp"""
-    execute(dip_require.releases_manager.rollback_code)
-    execute(dip_require.nginx.nginx_reload)
+    fabric.api.execute(pydiploy.require.releases_manager.rollback_code)
+    fabric.api.execute(pydiploy.require.nginx.nginx_reload)
 
 
 def post_install():
     """Post installation of webapp"""
-    execute(dip_require.circus.app_circus_conf)
-    execute(dip_require.circus.upstart)
-    execute(dip_require.circus.app_reload)
-    execute(dip_require.nginx.web_static_files)
-    execute(dip_require.nginx.web_configuration)
-    execute(dip_require.nginx.nginx_reload)
+    fabric.api.execute(pydiploy.require.circus.app_circus_conf)
+    fabric.api.execute(pydiploy.require.circus.upstart)
+    fabric.api.execute(pydiploy.require.circus.app_reload)
+    fabric.api.execute(pydiploy.require.nginx.web_static_files)
+    fabric.api.execute(pydiploy.require.nginx.web_configuration)
+    fabric.api.execute(pydiploy.require.nginx.nginx_reload)
