@@ -5,7 +5,8 @@
 
 
 import fabtools
-from fabric.api import sudo, run, env
+import fabric
+from fabric.api import env
 
 
 def django_user(commands=None):
@@ -53,10 +54,10 @@ def set_locale():
     """
     Sets server's locales
     """
-    locale = run("echo $LANG")
+    locale = fabric.api.run("echo $LANG")
     if(locale != env.locale):
-        sudo('locale-gen ' + env.locale)
-        sudo('/usr/sbin/update-locale LANG=' + env.locale)
+        fabric.api.sudo('locale-gen ' + env.locale)
+        fabric.api.sudo('/usr/sbin/update-locale LANG=' + env.locale)
 
 
 def set_timezone():
@@ -67,16 +68,16 @@ def set_timezone():
         print("Cannot deploy to non-debian/ubuntu host: %s" % env.server_name)
         return
 
-    return sudo("cp -f /usr/share/zoneinfo/%s /etc/localtime" % env.timezone)
+    return fabric.api.sudo("cp -f /usr/share/zoneinfo/%s /etc/localtime" % env.timezone)
 
 
 def permissions():
     """
     Makes the release group-writable
     """
-    sudo("chown -R %(user)s:%(group)s %(domain_path)s" %
+    fabric.api.sudo("chown -R %(user)s:%(group)s %(domain_path)s" %
          {'domain_path': env.remote_project_dir,
           'user': env.remote_owner,
           'group': env.remote_group})
-    sudo("chmod -R g+w %(domain_path)s" %
+    fabric.api.sudo("chmod -R g+w %(domain_path)s" %
          {'domain_path': env.remote_project_dir})
