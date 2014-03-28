@@ -3,17 +3,16 @@
 import os
 import fabtools
 from time import time
-from fabric.api import sudo, execute, env, require, lcd, local
-from fabric.contrib.project import rsync_project
-from .system import permissions
-from .git import archive
+import fabric
+from fabric.api import env
+import pydiploy
 
 
 def set_current():
     """
     Uses current directory for new release
     """
-    sudo("ln -nfs %(current_release)s %(current_path)s"
+    fabric.api.sudo("ln -nfs %(current_release)s %(current_path)s"
          % {'current_release': env.remote_current_release,
             'current_path': env.remote_current_path})
 
@@ -22,11 +21,11 @@ def setup():
     """
     Configs stuff for deployement
     """
-    sudo("mkdir -p %(remote_domain_path)s/{releases,shared}" %
+    fabric.api.sudo("mkdir -p %(remote_domain_path)s/{releases,shared}" %
          {'remote_domain_path': env.remote_project_dir})
-    sudo("mkdir -p %(remote_shared_path)s/{config,log}" %
+    fabric.api.sudo("mkdir -p %(remote_shared_path)s/{config,log}" %
          {'remote_shared_path': env.remote_shared_path})
-    execute(permissions)
+    fabric.api.execute(pydiploy.require.system.permissions)
 
 
 def cleanup():
@@ -41,22 +40,22 @@ def cleanup():
                                    {'releases_path': env.remote_releases_path,
                                     'release': release} for release in directories])
 
-        sudo("rm -rf %(directories)s" % {'directories': env.directories})
+        fabric.api.sudo("rm -rf %(directories)s" % {'directories': env.directories})
 
 
 def deploy_code():
     """
     Deploys code according to tag in env var
     """
-    require('tag', provided_by=['tag', 'head'])
-    require('remote_project_dir', provided_by=['test', 'prod'])
-    tarball = archive(env.application_name,
+    fabric.api.require('tag', provided_by=['tag', 'head'])
+    fabric.api.require('remote_project_dir', provided_by=['test', 'prod'])
+    tarball = pydiploy.require.git.archive(env.application_name,
                       prefix='%s-%s/' % (env.application_name,
                                          env.tag.lower()),
                       tag=env.tag,
                       remote=env.remote_repo_url)
-    with lcd('/tmp'):
-        local('tar xvf %s' % os.path.basename(tarball))
+    with fabric.api.lcd('/tmp'):
+        fabric.api.lcd('tar xvf %s' % os.path.basename(tarball))
 
     exclude_files = ['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'data',
                      'log', 'bin', 'manage.py',
@@ -68,20 +67,20 @@ def deploy_code():
     env.remote_current_release = "%(releases_path)s/%(time).0f" % {
         'releases_path': env.remote_releases_path, 'time': time()}
 
-    rsync_project(env.remote_current_release,
+    fabric.contrib.project.rsync_project(env.remote_current_release,
                   '/tmp/%s-%s/' % (env.application_name, env.tag.lower()),
                   delete=True,
                   extra_opts='--rsync-path="sudo -u %s rsync"' % env.remote_owner,
                   exclude=exclude_files)
 
-    sudo(
+    fabric.api.sudo(
         'chown -R %(user)s:%(group)s %(project_dir)s' % {'user': env.remote_owner,
                                                          'group': env.remote_group,
                                                          'project_dir': env.remote_current_release})
     # symlink with new release
-    execute(symlink)
+    fabric.api.execute(symlink)
     # set current directory with new release
-    execute(set_current)
+    fabric.api.execute(set_current)
 
     # uploading manage.py template
     fabtools.files.upload_template('manage.py',
@@ -106,7 +105,7 @@ def deploy_code():
                                    chown=True,
                                    mode='644',
                                    use_jinja=True)
-    local('rm %s' % tarball)
+    fabric.api.lcd('rm %s' % tarball)
 
 
 def rollback_code():
@@ -122,7 +121,7 @@ def rollback_code():
         env.remote_previous_release = "%(releases_path)s/%(previous_revision)s" % \
             {'releases_path': env.remote_releases_path,
              'previous_revision': env.previous_revision}
-        sudo("rm %(current_path)s; ln -s %(previous_release)s %(current_path)s && rm -rf %(current_release)s" %
+        fabric.api.sudo("rm %(current_path)s; ln -s %(previous_release)s %(current_path)s && rm -rf %(current_release)s" %
              {'current_release': env.current_release, 'previous_release': env.previous_release, 'current_path': env.remote_current_path})
 
 
@@ -130,6 +129,6 @@ def symlink():
     """
     Updates symlink stuff to the current deployed version
     """
-    sudo("ln -nfs %(shared_path)s/log %(current_release)s/log" %
+    fabric.api.sudo("ln -nfs %(shared_path)s/log %(current_release)s/log" %
          {'shared_path': env.remote_shared_path,
           'current_release': env.remote_current_release})
