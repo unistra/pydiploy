@@ -7,7 +7,7 @@ Git
 Create an archive from a remote or directly from a project
 """
 
-from fabric.api import abort, lcd, local
+import fabric
 import os
 
 
@@ -50,7 +50,7 @@ def archive(filename, path='/tmp', format="tar.gz", tag="HEAD", remote="",
     """
 
     if format not in ('tar', 'tar.gz', 'zip'):
-        abort('Git archive format not supported: %s' % format)
+        fabric.api.abort('Git archive format not supported: %s' % format)
 
     gzip = format == 'tar.gz'
 
@@ -71,9 +71,9 @@ def archive(filename, path='/tmp', format="tar.gz", tag="HEAD", remote="",
     options_build = ' '.join(options)
 
     if not remote and project_path:
-        with lcd(project_path):
-            local(command % (options_build, tag))
+        with fabric.api.lcd(project_path):
+            fabric.api.local(command % (options_build, tag))
     else:
-        local(command % (options_build, tag))
+        fabric.api.local(command % (options_build, tag))
 
     return os.path.join(path, filename)
