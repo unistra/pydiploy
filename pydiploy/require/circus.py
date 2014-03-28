@@ -8,7 +8,8 @@ Circus
 """
 
 import os
-from fabric.api import env, sudo, settings
+import fabric
+from fabric.api import env
 import fabtools
 
 
@@ -86,8 +87,8 @@ def upstart():
 
 def app_reload():
     """Start/Restart app using circus"""
-    if not 'running' in sudo('status circus'):
-        sudo('start circus')
+    if not 'running' in fabric.api.sudo('status circus'):
+        fabric.api.sudo('start circus')
     else:
-        with settings(sudo_user=env.remote_owner):
-            sudo('circusctl restart %s' % env.application_name)
+        with fabric.api.settings(sudo_user=env.remote_owner):
+            fabric.api.sudo('circusctl restart %s' % env.application_name)
