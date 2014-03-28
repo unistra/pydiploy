@@ -20,6 +20,10 @@ class CircusCheck(TestCase):
         env.application_name = "application_name"
 
 
+    def tearDown(self):
+        env.clear()
+
+
     @patch('fabtools.system.distrib_id', return_value='Ubuntu')
     @patch('fabtools.system.distrib_release', return_value='10.04')
     @patch('fabtools.require.deb.packages', return_value=Mock())

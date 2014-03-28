@@ -19,6 +19,11 @@ class SystemCheck(TestCase):
         env.timezone = "mytimezone"
         env.remote_project_dir = "remote_project_dir"
 
+
+    def tearDown(self):
+        env.clear()
+
+
     @patch('fabtools.require.group', return_value=Mock())
     @patch('fabtools.require.user', return_value=Mock())
     @patch('fabtools.require.sudoer', return_value=Mock())

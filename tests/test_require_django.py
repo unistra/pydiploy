@@ -21,6 +21,9 @@ class CommandCheck(TestCase):
         env.remote_owner = "remote_owner"
         env.remote_base_package_dir = "remote_base_package_dir"
 
+    def tearDown(self):
+        env.clear()
+
 
     @patch('fabtools.python.virtualenv', return_value=Mock())
     @patch('fabric.api.cd', return_value=Mock())
@@ -78,6 +81,10 @@ class UtilsCheck(TestCase):
         env.map_settings = {"secret_key": "SECRET_KEY", "default_db_user": "DATABASES['default']['USER']"}
         env.local_tmp_root_app_package = "local_tmp_root_app_package"
         env.remote_owner = "owner"
+
+
+    def tearDown(self):
+        env.clear()
 
 
     def test_generate_secret_key(self):

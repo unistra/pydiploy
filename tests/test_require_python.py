@@ -22,6 +22,10 @@ class UtilsCheck(TestCase):
         env.host_string = 'hosttest'
 
 
+    def tearDown(self):
+        env.clear()
+
+
     @patch('fabtools.require.deb.packages', return_value=Mock())
     @patch('fabtools.require.python.install', return_value=Mock())
     def test_python_pkg(self, python_install, deb_packages):
@@ -68,6 +72,13 @@ class VirtualEnvCheck(TestCase):
     def setUp(self):
         env.remote_group = "remote_group"
         env.remote_python_version = "2.7"
+        env.remote_virtualenv_dir = "remote_virtualenv_dir"
+        env.remote_owner = "remote_owner"
+
+
+    def tearDown(self):
+        env.clear()
+
 
     @patch('fabtools.require.files.directory', return_value=Mock())
     @patch('fabtools.require.python.virtualenv', return_value=Mock())

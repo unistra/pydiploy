@@ -16,6 +16,13 @@ class NginxCheck(TestCase):
     def setUp(self):
         env.remote_static_root = "remote_static_root"
         env.local_tmp_dir = 'local_tmp_dir'
+        env.server_name = "server_name"
+        env.lib_path = "lib_path"
+        env.application_name = "application_name"
+
+
+    def tearDown(self):
+        env.clear()
 
 
     @patch('fabtools.require.files.directory', return_value=Mock())

@@ -17,6 +17,10 @@ class GitCheck(TestCase):
         self.prefix = "prefix"
 
 
+    def tearDown(self):
+        env.clear()
+
+
     @patch('fabric.api.abort', return_value=Mock())
     @patch('fabric.api.lcd', return_value=Mock())
     @patch('fabric.api.local', return_value=Mock())

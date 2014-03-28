@@ -13,6 +13,9 @@ class DatabaseCheck(TestCase):
     test database
     """
 
+    def tearDown(self):
+        env.clear()
+
     @patch("fabtools.require.deb.package", return_value=Mock())
     @patch("fabtools.require.python.package", return_value=Mock())
     def test_sqlite3_pkg(self, python_package, deb_package):

@@ -12,8 +12,8 @@ class ReleasesManagerCheck(TestCase):
     test for circus
     """
 
-    def setUp(self):
-        pass
+    def tearDown(self):
+        env.clear()
 
 
     @patch('fabtools.require.deb.packages', return_value=Mock())

@@ -33,6 +33,10 @@ class ReleasesManagerCheck(TestCase):
         env.local_tmp_root_app_package = "local_tmp_root_app_package"
 
 
+    def tearDown(self):
+        env.clear()
+
+
     @patch('fabric.api.sudo', return_value=Mock())
     def test_set_current(self, api_sudo):
         set_current()
