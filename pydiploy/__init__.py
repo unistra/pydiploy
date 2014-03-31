@@ -7,3 +7,4 @@ dans des environnements multiples comme le test, la pre-production, la prodcutio
 
 from pydiploy import django
 from pydiploy import require
+from pydiploy import prepare
