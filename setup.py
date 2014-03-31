@@ -15,7 +15,7 @@ with open('requirements.txt') as requirements:
 
 setup(
     name='pydiploy',
-    version='0.1.0',
+    version='0.1.2',
     author='di-dip-unistra',
     author_email='di-dip@unistra.fr',
     maintainer='di-dip-unistra',
