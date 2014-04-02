@@ -62,7 +62,7 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(api_sudo.called)
         self.assertEqual(api_sudo.call_args, call('rm -rf remote_releases_path/1.0'))
 
-
+    @patch('fabric.api.local', return_value=Mock())
     @patch('fabric.api.require', return_value=Mock())
     @patch('fabric.api.lcd', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
@@ -70,7 +70,7 @@ class ReleasesManagerCheck(TestCase):
     @patch('fabtools.files.upload_template', return_value=Mock())
     @patch('pydiploy.require.git.archive', return_value="myarchive")
     @patch('fabric.contrib.project.rsync_project', return_value=Mock())
-    def test_deploy_code(self, rsync_project, git_archive, upload_template, api_execute, api_sudo, api_lcd, api_require):
+    def test_deploy_code(self, rsync_project, git_archive, upload_template, api_execute, api_sudo, api_lcd, api_require, api_local):
         api_lcd.return_value.__exit__ = Mock()
         api_lcd.return_value.__enter__ = Mock()
 
@@ -102,6 +102,9 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(api_lcd.called)
         self.assertEqual(api_lcd.call_args, call('rm myarchive'))
 
+        self.assertTrue(api_local.called)
+        self.assertEqual(api_local.call_args, call('tar xvf myarchive'))
+
         self.assertTrue(api_require.called)
         self.assertEqual(api_require.call_args_list, [call('tag', provided_by=['tag', 'head']),
             call('remote_project_dir', provided_by=['test', 'prod'])])
@@ -111,7 +114,7 @@ class ReleasesManagerCheck(TestCase):
     def test_rollback_code(self, api_sudo):
         rollback_code()
         self.assertTrue(api_sudo.called)
-        self.assertEqual(api_sudo.call_args, 
+        self.assertEqual(api_sudo.call_args,
             call('rm remote_current_path; ln -s 3.0 remote_current_path && rm -rf remote_releases_path/4.0'))
 
 
@@ -119,6 +122,6 @@ class ReleasesManagerCheck(TestCase):
     def test_symlink(self, api_sudo):
         symlink()
         self.assertTrue(api_sudo.called)
-        self.assertEqual(api_sudo.call_args, 
+        self.assertEqual(api_sudo.call_args,
             call('ln -nfs remote_shared_path/log remote_current_release/log'))
 

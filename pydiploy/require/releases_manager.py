@@ -55,7 +55,7 @@ def deploy_code():
                       tag=env.tag,
                       remote=env.remote_repo_url)
     with fabric.api.lcd('/tmp'):
-        fabric.api.lcd('tar xvf %s' % os.path.basename(tarball))
+        fabric.api.local('tar xvf %s' % os.path.basename(tarball))
 
     exclude_files = ['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'data',
                      'log', 'bin', 'manage.py',
