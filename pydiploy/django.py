@@ -54,3 +54,8 @@ def post_install():
     fabric.api.execute(pydiploy.require.nginx.web_static_files)
     fabric.api.execute(pydiploy.require.nginx.web_configuration)
     fabric.api.execute(pydiploy.require.nginx.nginx_reload)
+
+
+def dump_database():
+    """Dump database in json"""
+    fabric.api.execute(pydiploy.require.django.command.django_dump_database)

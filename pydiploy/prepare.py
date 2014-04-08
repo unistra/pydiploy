@@ -14,7 +14,7 @@ import os
 
 from fabric.api import env
 import fabric
-import fabtools 
+import fabtools
 
 
 @fabric.api.task
@@ -27,6 +27,9 @@ def build_env():
     # check if tag is specified if not fabric.api.prompt user
     if "tag" not in env:
         env.tag = fabric.api.prompt('Please specify target tag used: ')
+
+    if "dest_path" not in env:
+        env.dest_path = env.local_tmp_dir
 
     env.remote_project_dir = os.path.join(env.remote_home, env.server_name)
     env.local_tmp_root_app = os.path.join(env.local_tmp_dir,

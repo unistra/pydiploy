@@ -5,6 +5,7 @@
 
 import os
 import fabric
+import datetime
 from fabric.api import env
 import fabtools
 
@@ -24,3 +25,12 @@ def django_prepare():
                      ' -i '.join(ignore))
     fabric.api.get(os.path.join(env.remote_current_path, 'assets'),
         local_path=env.local_tmp_dir)
+
+
+def django_dump_database():
+    with fabtools.python.virtualenv(env.remote_virtualenv_dir):
+        with fabric.api.cd(env.remote_current_path):
+            with fabric.api.settings(sudo_user=env.remote_owner):
+                dump_name = '%s.json' % datetime.datetime.today().strftime("%Y_%m_%d-%H%M")
+                fabric.api.sudo('python manage.py dumpdata --indent=4 > /tmp/%s ' % dump_name )
+    fabric.api.get('/tmp/%s' % dump_name,local_path=env.dest_path)
