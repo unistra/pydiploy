@@ -25,6 +25,7 @@ setup(
     description='A tool to deploy applications, and automate processing with fabric',
     long_description=long_description,
     packages=find_packages(),
+    include_package_data=True,
     download_url='http://git.u-strasbg.fr/git/pydiploy',
     install_requires=libraries,
     dependency_links=dependency_links,
