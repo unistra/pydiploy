@@ -1,4 +1,4 @@
-include pydiploy/templates/*.tpl
+recursive-include pydiploy/templates *.tpl
 include requirements.txt
 include README
 include INSTALL

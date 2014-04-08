@@ -4,6 +4,8 @@ import fabric
 import pydiploy
 import fabtools
 
+from fabric.api import env
+
 
 def application_packages(update=False):
     fabtools.require.deb.packages(['gettext'], update=update)
@@ -19,6 +21,8 @@ def pre_install_django_app_nginx_circus(commands='/usr/bin/rsync'):
     fabric.api.execute(pydiploy.require.system.set_locale)
     fabric.api.execute(pydiploy.require.system.set_timezone)
     fabric.api.execute(pydiploy.require.system.update_pkg_index)
+    if env.remote_python_version == 3:
+        fabric.api.execute(pydiploy.require.system.check_python3_install)
     fabric.api.execute(application_packages)
     fabric.api.execute(pydiploy.require.python.virtualenv.virtualenv)
     fabric.api.execute(pydiploy.require.nginx.nginx_pkg)

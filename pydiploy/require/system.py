@@ -81,3 +81,24 @@ def permissions():
           'group': env.remote_group})
     fabric.api.sudo("chmod -R g+w %(domain_path)s" %
          {'domain_path': env.remote_project_dir})
+
+
+def package_installed(pkg_name):
+    """
+    check if a debian/ubuntu package is installed
+    ref: http:superuser.com/questions/427318/#comment490784_427339
+    """
+    cmd_f = 'dpkg-query -l "%s" | grep -q ^.i'
+    cmd = cmd_f % (pkg_name)
+    with fabric.api.settings(warn_only=True):
+        with fabric.api.quiet():
+            result = fabric.api.sudo(cmd)
+    return result.succeeded
+
+
+def check_python3_install():
+    """
+    Install python 3 on ubuntu remote server
+    """
+    if not package_installed('python3'):
+        fabtools.require.deb.package('python3', update=True)
