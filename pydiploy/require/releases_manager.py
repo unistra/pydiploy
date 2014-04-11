@@ -57,7 +57,9 @@ def deploy_code():
     with fabric.api.lcd('/tmp'):
         fabric.api.local('tar xvf %s' % os.path.basename(tarball))
 
-    exclude_files = ['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'data',
+    # TODO: see if some excluded files / dir
+    # are not in fact usefull in certain projects
+    exclude_files = ['fabfile', 'MANIFEST.in', '*.ignore', 'docs',
                      'log', 'bin', 'manage.py',
                      '%s/wsgi.py' % env.root_package_name, '*.db',
                      '.gitignore']

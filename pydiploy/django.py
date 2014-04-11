@@ -11,6 +11,8 @@ def application_packages(update=False):
     fabtools.require.deb.packages(['gettext'], update=update)
     fabric.api.execute(pydiploy.require.database.ldap_pkg, use_sudo=True)
     fabric.api.execute(pydiploy.require.database.postgres_pkg)
+    if env.remote_python_version >= 3:
+        fabric.api.execute(pydiploy.require.system.check_python3_install,version='python%s' % env.remote_python_version)
     fabric.api.execute(pydiploy.require.python.utils.python_pkg)
     fabric.api.execute(pydiploy.require.circus.circus_pkg)
 
@@ -21,8 +23,6 @@ def pre_install_django_app_nginx_circus(commands='/usr/bin/rsync'):
     fabric.api.execute(pydiploy.require.system.set_locale)
     fabric.api.execute(pydiploy.require.system.set_timezone)
     fabric.api.execute(pydiploy.require.system.update_pkg_index)
-    if env.remote_python_version == 3:
-        fabric.api.execute(pydiploy.require.system.check_python3_install)
     fabric.api.execute(application_packages)
     fabric.api.execute(pydiploy.require.python.virtualenv.virtualenv)
     fabric.api.execute(pydiploy.require.nginx.nginx_pkg)

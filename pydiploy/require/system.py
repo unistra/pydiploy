@@ -85,7 +85,7 @@ def permissions():
 
 def package_installed(pkg_name):
     """
-    check if a debian/ubuntu package is installed
+    checks if a debian/ubuntu package is installed
     ref: http:superuser.com/questions/427318/#comment490784_427339
     """
     cmd_f = 'dpkg-query -l "%s" | grep -q ^.i'
@@ -96,9 +96,13 @@ def package_installed(pkg_name):
     return result.succeeded
 
 
-def check_python3_install():
+def check_python3_install(version='python3',update=False):
     """
-    Install python 3 on ubuntu remote server
+    Installs python 3 on ubuntu remote server
     """
-    if not package_installed('python3'):
-        fabtools.require.deb.package('python3', update=True)
+    if not package_installed(version):
+        if fabtools.system.distrib_id() == 'Ubuntu' and float(fabtools.system.distrib_release()) < 13.10:
+            fabtools.require.deb.packages(['python-software-properties'],
+                                          update=update)
+            fabtools.require.deb.ppa('ppa:fkrull/deadsnakes')
+        fabtools.require.deb.package(version, update=True)
