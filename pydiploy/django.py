@@ -4,11 +4,15 @@ import fabric
 import pydiploy
 import fabtools
 
+from fabric.api import env
+
 
 def application_packages(update=False):
     fabtools.require.deb.packages(['gettext'], update=update)
     fabric.api.execute(pydiploy.require.database.ldap_pkg, use_sudo=True)
     fabric.api.execute(pydiploy.require.database.postgres_pkg)
+    if env.remote_python_version >= 3:
+        fabric.api.execute(pydiploy.require.system.check_python3_install,version='python%s' % env.remote_python_version)
     fabric.api.execute(pydiploy.require.python.utils.python_pkg)
     fabric.api.execute(pydiploy.require.circus.circus_pkg)
 
@@ -50,3 +54,8 @@ def post_install():
     fabric.api.execute(pydiploy.require.nginx.web_static_files)
     fabric.api.execute(pydiploy.require.nginx.web_configuration)
     fabric.api.execute(pydiploy.require.nginx.nginx_reload)
+
+
+def dump_database():
+    """Dump database in json"""
+    fabric.api.execute(pydiploy.require.django.command.django_dump_database)

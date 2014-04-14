@@ -11,22 +11,32 @@ d'une application Python. Les fonctions acessibles via les tâches `Fabric <http
 """
 
 import os
+import fabric
+import fabtools
 
 from fabric.api import env
-import fabric
-import fabtools 
 
 
 @fabric.api.task
 def tag(version):
-    """ """
+    """
+    Defines tag to deploy
+    """
     env.tag = version
 
 
 def build_env():
-    # check if tag is specified if not fabric.api.prompt user
+    """
+    Builds env vars
+    """
+
+    # checks if tag is specified if not fabric.api.prompt user
     if "tag" not in env:
         env.tag = fabric.api.prompt('Please specify target tag used: ')
+
+    # defines destination path for fetched file(s)
+    if "dest_path" not in env:
+        env.dest_path = env.local_tmp_dir
 
     env.remote_project_dir = os.path.join(env.remote_home, env.server_name)
     env.local_tmp_root_app = os.path.join(env.local_tmp_dir,
