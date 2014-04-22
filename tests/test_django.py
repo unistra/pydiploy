@@ -12,6 +12,9 @@ class ReleasesManagerCheck(TestCase):
     test for circus
     """
 
+    def setUp(self):
+        env.remote_python_version = 2.7
+
     def tearDown(self):
         env.clear()
 

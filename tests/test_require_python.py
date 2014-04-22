@@ -20,6 +20,7 @@ class UtilsCheck(TestCase):
         env.goal = "goal"
         env.remote_owner = "remote_owner"
         env.host_string = 'hosttest'
+        env.remote_python_version = 2.7
 
 
     def tearDown(self):
@@ -60,7 +61,7 @@ class UtilsCheck(TestCase):
         self.assertEqual(python_virtualenv.call_args, call('remote_virtualenv_dir'))
 
         self.assertTrue(install_requirements.called)
-        self.assertEqual(install_requirements.call_args, call('requirements/goal.txt', use_sudo=True, upgrade=False, user='remote_owner'))
+        self.assertEqual(install_requirements.call_args, call('requirements/goal.txt', pip_cmd='pip', use_sudo=True, upgrade=False, user='remote_owner'))
 
 
 class VirtualEnvCheck(TestCase):

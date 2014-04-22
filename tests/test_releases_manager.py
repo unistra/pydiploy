@@ -78,7 +78,7 @@ class ReleasesManagerCheck(TestCase):
 
         self.assertTrue(rsync_project.called)
         self.assertTrue(str(rsync_project.call_args).find(
-            "/tmp/appliname-mytag/', extra_opts='--rsync-path=\"sudo -u remote_owner rsync\"', delete=True, exclude=['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'data', 'log', 'bin', 'manage.py', 'root_package_name/wsgi.py', '*.db', '.gitignore', 'root_package_name/settings/dev.py', 'root_package_name/settings/test.py', 'root_package_name/settings/prod.py'") > 0)
+            "'/tmp/appliname-mytag/', extra_opts='--rsync-path=\"sudo -u remote_owner rsync\"', delete=True, exclude=['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'log', 'bin', 'manage.py', 'root_package_name/wsgi.py', '*.db', '.gitignore', 'root_package_name/settings/dev.py', 'root_package_name/settings/test.py', 'root_package_name/settings/prod.py'") > 0)
 
         self.assertTrue(git_archive.called)
         self.assertEqual(git_archive.call_args, call('appliname', prefix='appliname-mytag/', tag='mytag', remote='remote_repo_url'))
