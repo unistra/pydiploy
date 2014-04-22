@@ -5,7 +5,7 @@ pydiploy
 À propos
 ========
 
-.. include:: ../README
+.. include:: ../README.rst
 
 Installation
 ============
