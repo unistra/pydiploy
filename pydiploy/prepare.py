@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 
-""" Ce module contient toutes les tâches nécessaires à la préparation d'une machine virtuelle en vue du déploiement
-d'une application Python. Les fonctions acessibles via les tâches `Fabric <http://docs.fabfile.org/en/latest/>`_ sont:
+"""  This module builds env. vars used for the whole library methods are :
 
-* install_tools : installation d'outils standards
-* create_python_env : création de l'environnement Python
-* update_python_env : mise à jour de l'environnement Python
-* oracle_client : préparation de la machine à l'installation du client Oracle pour Python
-* sap_client : préparation de la machine à l'installation du client SAP pour Python
+* tag : get the tag used to deploy the app
+* build_env : inits all env. vars used by the library
+
 """
 
 import os
@@ -59,7 +56,7 @@ def build_env():
     if not "releases" in env:
         if fabtools.files.is_dir(env.remote_releases_path):
             env.releases = sorted(fabric.api.run('ls -x %(releases_path)s' %
-                                      {'releases_path': env.remote_releases_path}).split())
+                                                 {'releases_path': env.remote_releases_path}).split())
             if len(env.releases) >= 1:
                 env.current_revision = env.releases[-1]
                 env.current_release = "%(releases_path)s/%(current_revision)s" % \

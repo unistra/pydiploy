@@ -14,6 +14,7 @@ import fabtools
 
 
 def circus_pkg(update=False):
+    """ Installs packages relatives to circus """
     # install ubuntu ppa for libzmq-dev if ubuntu <= 10.04
     if fabtools.system.distrib_id() == 'Ubuntu' and fabtools.system.distrib_release() == '10.04':
         fabtools.require.deb.packages(['python-software-properties'],
@@ -52,8 +53,7 @@ def circus_pkg(update=False):
 
 
 def app_circus_conf():
-    """
-    """
+    """ Sets circus application's configuration using templates in templates dir """
 
     fabtools.files.upload_template('app.ini.tpl',
                                    os.path.join(env.remote_home, '.circus.d',
@@ -69,8 +69,7 @@ def app_circus_conf():
 
 
 def upstart():
-    """
-    """
+    """ Sets script to start circus at boot using templates in templates dir """
 
     # init files to declare circus as an upstart daemon
     fabtools.files.upload_template('upstart.conf.tpl',
@@ -86,7 +85,7 @@ def upstart():
 
 
 def app_reload():
-    """Start/Restart app using circus"""
+    """ Starts/Restarts app using circus """
     if not 'running' in fabric.api.sudo('status circus'):
         fabric.api.sudo('start circus')
     else:

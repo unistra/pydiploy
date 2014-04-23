@@ -13,8 +13,8 @@ def set_current():
     Uses current directory for new release
     """
     fabric.api.sudo("ln -nfs %(current_release)s %(current_path)s"
-         % {'current_release': env.remote_current_release,
-            'current_path': env.remote_current_path})
+                    % {'current_release': env.remote_current_release,
+                       'current_path': env.remote_current_path})
 
 
 def setup():
@@ -22,9 +22,9 @@ def setup():
     Configs stuff for deployement
     """
     fabric.api.sudo("mkdir -p %(remote_domain_path)s/{releases,shared}" %
-         {'remote_domain_path': env.remote_project_dir})
+                    {'remote_domain_path': env.remote_project_dir})
     fabric.api.sudo("mkdir -p %(remote_shared_path)s/{config,log}" %
-         {'remote_shared_path': env.remote_shared_path})
+                    {'remote_shared_path': env.remote_shared_path})
     fabric.api.execute(pydiploy.require.system.permissions)
 
 
@@ -40,7 +40,8 @@ def cleanup():
                                    {'releases_path': env.remote_releases_path,
                                     'release': release} for release in directories])
 
-        fabric.api.sudo("rm -rf %(directories)s" % {'directories': env.directories})
+        fabric.api.sudo("rm -rf %(directories)s" %
+                        {'directories': env.directories})
 
 
 def deploy_code():
@@ -50,10 +51,10 @@ def deploy_code():
     fabric.api.require('tag', provided_by=['tag', 'head'])
     fabric.api.require('remote_project_dir', provided_by=['test', 'prod'])
     tarball = pydiploy.require.git.archive(env.application_name,
-                      prefix='%s-%s/' % (env.application_name,
-                                         env.tag.lower()),
-                      tag=env.tag,
-                      remote=env.remote_repo_url)
+                                           prefix='%s-%s/' % (env.application_name,
+                                                              env.tag.lower()),
+                                           tag=env.tag,
+                                           remote=env.remote_repo_url)
     with fabric.api.lcd('/tmp'):
         fabric.api.local('tar xvf %s' % os.path.basename(tarball))
 
@@ -70,10 +71,12 @@ def deploy_code():
         'releases_path': env.remote_releases_path, 'time': time()}
 
     fabric.contrib.project.rsync_project(env.remote_current_release,
-                  '/tmp/%s-%s/' % (env.application_name, env.tag.lower()),
-                  delete=True,
-                  extra_opts='--rsync-path="sudo -u %s rsync"' % env.remote_owner,
-                  exclude=exclude_files)
+                                         '/tmp/%s-%s/' % (
+                                             env.application_name, env.tag.lower(
+                                             )),
+                                         delete=True,
+                                         extra_opts='--rsync-path="sudo -u %s rsync"' % env.remote_owner,
+                                         exclude=exclude_files)
 
     fabric.api.sudo(
         'chown -R %(user)s:%(group)s %(project_dir)s' % {'user': env.remote_owner,
@@ -124,7 +127,7 @@ def rollback_code():
             {'releases_path': env.remote_releases_path,
              'previous_revision': env.previous_revision}
         fabric.api.sudo("rm %(current_path)s; ln -s %(previous_release)s %(current_path)s && rm -rf %(current_release)s" %
-             {'current_release': env.current_release, 'previous_release': env.previous_release, 'current_path': env.remote_current_path})
+                        {'current_release': env.current_release, 'previous_release': env.previous_release, 'current_path': env.remote_current_path})
 
 
 def symlink():
@@ -132,5 +135,5 @@ def symlink():
     Updates symlink stuff to the current deployed version
     """
     fabric.api.sudo("ln -nfs %(shared_path)s/log %(current_release)s/log" %
-         {'shared_path': env.remote_shared_path,
-          'current_release': env.remote_current_release})
+                    {'shared_path': env.remote_shared_path,
+                     'current_release': env.remote_current_release})

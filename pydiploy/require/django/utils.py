@@ -11,7 +11,7 @@ import fabric
 
 def generate_secret_key():
     """
-    Generate the django's secret key
+    Generates the django's secret key
     """
 
     letters = string.ascii_letters + string.punctuation.replace('\'', '')
@@ -23,7 +23,7 @@ def generate_secret_key():
 
 def extract_settings():
     """
-    extracts settings from django settings files
+    Extracts settings from django settings files
     """
 
     print('in')

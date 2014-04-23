@@ -26,9 +26,12 @@ def application_dependencies(upgrade_pkg, staging=True):
                                              '%s.txt' % env.goal) if staging else 'requirements.txt'
             pip_cmd = 'pip'
             if 'oracle_client_version' in env:
-                oracle_dir = 'instantclient_%s' % '_'.join(env.oracle_client_version.split('.')[:2])
-                oracle_root_path = os.path.join(env.oracle_remote_dir, oracle_dir)
-                oracle_full_path = os.path.join(env.remote_home, oracle_root_path)
+                oracle_dir = 'instantclient_%s' % '_'.join(
+                    env.oracle_client_version.split('.')[:2])
+                oracle_root_path = os.path.join(
+                    env.oracle_remote_dir, oracle_dir)
+                oracle_full_path = os.path.join(
+                    env.remote_home, oracle_root_path)
                 pip_cmd = 'ORACLE_HOME=%s pip' % oracle_full_path
 
             fabtools.python.install_requirements(requirements_file,
@@ -37,5 +40,5 @@ def application_dependencies(upgrade_pkg, staging=True):
                                                  upgrade=upgrade_pkg,
                                                  pip_cmd=pip_cmd)
 
-
-            fabric.api.sudo('pip install -e .', user=env.remote_owner, pty=False)
+            fabric.api.sudo(
+                'pip install -e .', user=env.remote_owner, pty=False)

@@ -1,11 +1,6 @@
 ========================
-Init part of the library
+Circus relatives methods
 ========================
 
-.. automodule:: pydiploy.prepare
+.. automodule:: pydiploy.require.circus
     :members:
-
-
-
-
-

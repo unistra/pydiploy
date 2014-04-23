@@ -76,11 +76,11 @@ def permissions():
     Makes the release group-writable
     """
     fabric.api.sudo("chown -R %(user)s:%(group)s %(domain_path)s" %
-         {'domain_path': env.remote_project_dir,
-          'user': env.remote_owner,
-          'group': env.remote_group})
+                    {'domain_path': env.remote_project_dir,
+                     'user': env.remote_owner,
+                     'group': env.remote_group})
     fabric.api.sudo("chmod -R g+w %(domain_path)s" %
-         {'domain_path': env.remote_project_dir})
+                    {'domain_path': env.remote_project_dir})
 
 
 def package_installed(pkg_name):
@@ -96,7 +96,7 @@ def package_installed(pkg_name):
     return result.succeeded
 
 
-def check_python3_install(version='python3',update=False):
+def check_python3_install(version='python3', update=False):
     """
     Installs python 3 on ubuntu remote server
     """

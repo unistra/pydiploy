@@ -9,24 +9,21 @@ import fabtools
 
 
 def root_web():
-    """
-    Creates web root for webserver
-    """
+    """ Creates web root for webserver """
+
     fabtools.require.files.directory(env.remote_static_root, use_sudo=True,
                                      owner='root', group='root', mode='755')
 
 
 def nginx_pkg(update=False):
-    """
-    Installs nginx package on remote server
-    """
+    """ Installs nginx package on remote server """
+
     fabtools.require.deb.packages(['nginx'], update=update)
 
 
 def nginx_reload():
-    """
-    Starts/Restarts nginx
-    """
+    """ Starts/Restarts nginx """
+
     if not fabtools.service.is_running('nginx'):
         fabtools.service.start('nginx')
     else:
@@ -34,19 +31,17 @@ def nginx_reload():
 
 
 def web_static_files():
-    """
-    syncs statics files
-    """
-    fabric.contrib.project.rsync_project(os.path.join(env.remote_static_root, env.application_name),
-                  os.path.join(env.local_tmp_dir, 'assets/'), delete=True,
-                  extra_opts='--rsync-path="sudo rsync"',
-                  ssh_opts='-t')
+    """ Syncs statics files """
+
+    fabric.contrib.project.rsync_project(
+        os.path.join(env.remote_static_root, env.application_name),
+        os.path.join(env.local_tmp_dir, 'assets/'), delete=True,
+        extra_opts='--rsync-path="sudo rsync"',
+        ssh_opts='-t')
 
 
 def web_configuration():
-    """
-    Setups webserver's configuration
-    """
+    """ Setups webserver's configuration """
 
     nginx_root = '/etc/nginx'
     nginx_available = os.path.join(nginx_root, 'sites-available')
