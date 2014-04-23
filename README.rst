@@ -1,5 +1,5 @@
 pydiploy
-=========
+========
 .. image:: https://secure.travis-ci.org/unistra/pydiploy.png?branch=master
     :target: https://travis-ci.org/unistra/pydiploy
 
@@ -20,9 +20,18 @@ Install
 Usage
 -----
 
-    - See documentation and examples to use the library.
+    - See the example in the doc to setup correctly a fabfile (fabric,fabtools and pydiploy should be installed)
+    - Use following command to install/deploy an application in test stage : ::
 
+        fab tag:master test setup_server deploy post_install
+    - Use following command to install/deploy an application in production stage : ::
 
+        fab tag:master prod setup_server deploy post_install
+    - To deploy a new tag/release on production stage : ::
 
+        fab tag:1.0.1 prod deploy
+    - if something went wrong during deploy process you could rollback previous release : ::
 
+        fab tag:master prod rollback
+    - See fabric documentation for more infos : http://fabric.readthedocs.org
 
