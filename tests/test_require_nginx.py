@@ -30,7 +30,7 @@ class NginxCheck(TestCase):
         root_web()
         self.assertTrue(files_directory.called)
         self.assertEqual(files_directory.call_args, call('remote_static_root', owner='root', use_sudo=True, group='root', mode='755'))
-        
+
 
     @patch('fabtools.require.deb.packages', return_value=Mock())
     def test_nginx_pkg(self, deb_packages):
@@ -62,14 +62,14 @@ class NginxCheck(TestCase):
         self.assertEqual(start.call_args, call('nginx'))
 
 
-        
+
     @patch('fabric.contrib.project.rsync_project', return_value=Mock())
     def test_web_static_files(self, rsync_project):
         web_static_files()
         self.assertTrue(rsync_project.called)
-        self.assertEqual(rsync_project.call_args, 
+        self.assertEqual(rsync_project.call_args,
             call('remote_static_root/application_name', 'local_tmp_dir/assets/', extra_opts='--rsync-path="sudo rsync"', delete=True, ssh_opts='-t'))
-        
+
 
     @patch('fabtools.files.upload_template', return_value=Mock())
     @patch('fabtools.files.is_link', return_value=True)
@@ -92,10 +92,10 @@ class NginxCheck(TestCase):
         web_configuration()
 
         self.assertTrue(api_cd.called)
-        self.assertEqual(api_cd.call_args, 
+        self.assertEqual(api_cd.call_args,
             call('/etc/nginx/sites-enabled'))
-        
+
         self.assertTrue(api_sudo.called)
-        self.assertEqual(api_sudo.call_args_list, 
-            [call('ln -s /etc/nginx/sites-available/server_name.conf .'), call('rm default')])
-        
+        self.assertEqual(api_sudo.call_args_list,
+            [call('ln -s /etc/nginx/sites-available/server_name.conf .'), call('rm -f default')])
+
