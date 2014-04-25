@@ -28,7 +28,7 @@ server {
     }
 
     location /site_media/ {
-                alias {{ remote_current_path }}/assets/;
+                alias {{ remote_static_root }}/{{ application_name }}/;
                 autoindex on;
                 allow all;
 
