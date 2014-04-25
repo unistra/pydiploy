@@ -90,4 +90,5 @@ def app_reload():
         fabric.api.sudo('start circus')
     else:
         with fabric.api.settings(sudo_user=env.remote_owner):
+            fabric.api.sudo('circusctl reloadconfig')
             fabric.api.sudo('circusctl restart %s' % env.application_name)
