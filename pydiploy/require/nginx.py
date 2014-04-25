@@ -63,4 +63,4 @@ def web_configuration():
                                                   env.server_name)):
         with fabric.api.cd(nginx_enabled):
             fabric.api.sudo('ln -s %s .' % app_conf)
-            fabric.api.sudo('rm default')
+            fabric.api.sudo('rm -f default')

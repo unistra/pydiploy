@@ -18,6 +18,8 @@ def django_prepare():
         with fabric.api.cd(env.remote_current_path):
             with fabric.api.settings(sudo_user=env.remote_owner):
                 fabric.api.sudo('python manage.py syncdb --noinput')
+                # TODO add point in documentation
+                # south needed with django < 1.7 !!!!!
                 fabric.api.sudo('python manage.py migrate')
                 if fabtools.files.is_dir(
                     os.path.join(env.remote_base_package_dir,
