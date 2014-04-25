@@ -87,7 +87,7 @@ class CircusCheck(TestCase):
         app_reload()
 
         self.assertTrue(api_sudo.called)
-        self.assertEqual(api_sudo.call_args_list, [call('status circus'), call('circusctl restart application_name')])
+        self.assertEqual(api_sudo.call_args_list, [call('status circus'), call('circusctl reloadconfig'), call('circusctl restart application_name')])
 
         self.assertTrue(api_settings.called)  
         self.assertEqual(api_settings.call_args, call(sudo_user='remote_owner')) 
