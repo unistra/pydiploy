@@ -82,9 +82,10 @@ class NginxCheck(TestCase):
         web_configuration()
 
         self.assertTrue(upload_template.called)
-        self.assertTrue(str(upload_template.call_args).find(
-            "'nginx.conf.tpl', '/etc/nginx/sites-available/server_name.conf', use_jinja=True, template_dir='lib_path/templates', use_sudo=True, chown=True, mode='644'") > 0)
-
+        self.assertTrue(str(upload_template.call_args).find("'nginx.conf.tpl'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("'/etc/nginx/sites-available/server_name.conf'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0)
+      
         self.assertTrue(upload_template.is_link)
 
         is_link.return_value = False

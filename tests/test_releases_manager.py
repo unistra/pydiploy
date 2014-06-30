@@ -77,8 +77,10 @@ class ReleasesManagerCheck(TestCase):
         deploy_code()
 
         self.assertTrue(rsync_project.called)
-        self.assertTrue(str(rsync_project.call_args).find(
-            "'/tmp/appliname-mytag/', extra_opts='--rsync-path=\"sudo -u remote_owner rsync\"', delete=True, exclude=['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'log', 'bin', 'manage.py', 'root_package_name/wsgi.py', '*.db', '.gitignore', 'root_package_name/settings/dev.py', 'root_package_name/settings/test.py', 'root_package_name/settings/prod.py'") > 0)
+        self.assertTrue(str(rsync_project.call_args).find("'/tmp/appliname-mytag/'") > 0)
+        self.assertTrue(str(rsync_project.call_args).find("extra_opts='--rsync-path=\"sudo -u remote_owner rsync\"'") > 0)
+        self.assertTrue(str(rsync_project.call_args).find("delete=True") > 0)
+        self.assertTrue(str(rsync_project.call_args).find("exclude=['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'log', 'bin', 'manage.py', 'root_package_name/wsgi.py', '*.db', '.gitignore', 'root_package_name/settings/dev.py', 'root_package_name/settings/test.py', 'root_package_name/settings/prod.py'") > 0)
 
         self.assertTrue(git_archive.called)
         self.assertEqual(git_archive.call_args, call('appliname', prefix='appliname-mytag/', tag='mytag', remote='remote_repo_url'))
@@ -87,8 +89,10 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(str(upload_template.call_args_list[0]).find(
             "'manage.py'") > 0)
 
-        self.assertTrue(str(upload_template.call_args_list[1]).find(
-            "'wsgi.py', 'remote_base_package_dir/wsgi.py', use_jinja=True, template_dir='local_tmp_root_app_package', use_sudo=True, chown=True, user='remote_owner'") > 0)
+        self.assertTrue(str(upload_template.call_args_list[1]).find("'wsgi.py'") > 0)
+        self.assertTrue(str(upload_template.call_args_list[1]).find("'remote_base_package_dir/wsgi.py'") > 0)
+        self.assertTrue(str(upload_template.call_args_list[1]).find("template_dir='local_tmp_root_app_package'") > 0)
+        self.assertTrue(str(upload_template.call_args_list[1]).find("user='remote_owner'") > 0)
 
         self.assertTrue(api_execute.called)
         self.assertTrue(str(api_execute.call_args_list[0]).find(

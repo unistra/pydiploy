@@ -121,12 +121,16 @@ class UtilsCheck(TestCase):
         self.assertEqual(env.test1, 'toto')
 
         self.assertTrue(api_require.called)
-        self.assertEqual(api_require.call_args, call('secret_key', 'default_db_user'))
+        self.assertTrue(str(api_require.call_args).find('secret_key') > 0)
+        self.assertTrue(str(api_require.call_args).find('default_db_user') > 0)
 
         self.assertTrue(upload_template.called)
-        self.assertTrue(str(upload_template.call_args).find(
-            "'settings.py', 'remote_settings_file', use_jinja=True, template_dir='local_tmp_root_app_package/settings', use_sudo=True, chown=True, user='owner'") > 0)
-
+        self.assertTrue(str(upload_template.call_args).find("template_dir='local_tmp_root_app_package/settings'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("'settings.py'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("'remote_settings_file'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("use_jinja=True") > 0)
+        self.assertTrue(str(upload_template.call_args).find("user='owner'") > 0)
+      
         # is file false
         is_file.return_value = False
 

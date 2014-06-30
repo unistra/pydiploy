@@ -49,9 +49,11 @@ class CircusCheck(TestCase):
             call('circus', use_sudo=True), call('circus-web', use_sudo=True)])
 
         self.assertTrue(upload_template.called)  
-        self.assertTrue(str(upload_template.call_args).find(
-            "'circus.ini.tpl', 'remote_home/.circus.ini', use_jinja=True, template_dir='lib_path/templates', use_sudo=True, chown=True, user='remote_owner'") > 0)
-
+        self.assertTrue(str(upload_template.call_args).find("'circus.ini.tpl'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("'remote_home/.circus.ini'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("user='remote_owner'") > 0)
+      
         self.assertTrue(files_directory.called)
         self.assertEqual(files_directory.call_args, 
             call(owner='remote_owner', path='remote_home/.circus.d', use_sudo=True, group='remote_group', mode='750'))
@@ -62,19 +64,20 @@ class CircusCheck(TestCase):
         app_circus_conf()
         
         self.assertTrue(upload_template.called)  
-        self.assertTrue(str(upload_template.call_args).find(
-            "'app.ini.tpl', 'remote_home/.circus.d/application_name.ini', use_jinja=True, template_dir='lib_path/templates', use_sudo=True, chown=True, user='remote_owner'") > 0)
-
-
+        self.assertTrue(str(upload_template.call_args).find("'app.ini.tpl'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("'remote_home/.circus.d/application_name.ini'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("user='remote_owner'") > 0)
 
     @patch('fabtools.files.upload_template', return_value=Mock())
     def test_upstart(self, upload_template):
         upstart()
         
         self.assertTrue(upload_template.called)  
-        self.assertTrue(str(upload_template.call_args).find(
-            "'upstart.conf.tpl', '/etc/init/circus.conf', use_jinja=True, template_dir='lib_path/templates', use_sudo=True, chown=True, user='root'") > 0)
-
+        self.assertTrue(str(upload_template.call_args).find("'upstart.conf.tpl'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("'/etc/init/circus.conf'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("user='root'") > 0)
 
     @patch('fabric.api.settings', return_value=Mock())
     @patch('fabric.api.sudo', return_value='running')
