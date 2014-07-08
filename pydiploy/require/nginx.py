@@ -22,12 +22,21 @@ def nginx_pkg(update=False):
 
 
 def nginx_reload():
-    """ Starts/Restarts nginx """
+    """ Starts/Reloads nginx """
 
     if not fabtools.service.is_running('nginx'):
         fabtools.service.start('nginx')
     else:
         fabtools.service.reload('nginx')
+
+
+def nginx_restart():
+    """ Starts/Restarts nginx """
+
+    if not fabtools.service.is_running('nginx'):
+        fabtools.service.start('nginx')
+    else:
+        fabtools.service.restart('nginx')
 
 
 def web_static_files():

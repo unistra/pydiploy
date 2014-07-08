@@ -13,10 +13,14 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     from os.path import join
 
     from pydiploy.prepare import tag, build_env as pydiploy_build_env
-    from pydiploy.django import (pre_install_django_app_nginx_circus,
-                                 deploy as diploy,
+    from pydiploy.django import (deploy as diploy,
                                  rollback as pydiploy_rollback,
-                                 post_install as pydiploy_postinstall)
+                                 post_install_backend as pydiploy_postinstall_backend,
+                                 post_install_frontend as pydiploy_postinstall_frontend,
+                                 pre_install_backend as pydiploy_preinstall_backend,
+                                 pre_install_frontend as pydiploy_preinstall_frontend,
+                                 reload_frontend as pydiploy_reload_frontend,
+                                 reload_backend as pydiploy_reload_backend)
 
     from pydiploy.require.database import (install_oracle_client as pydiploy_setup_oracle,
                                            install_postgres_server as pydiploy_setup_postgres)
@@ -60,11 +64,12 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         """Define test stage"""
         env.roledefs = {
             'web': ['192.168.1.2'],
+            'lb': ['192.168.1.3'],
         }
-        env.backends = ['127.0.0.1']
+        env.backends = env.roledefs['web']
         env.server_name = 'myapp-dev.net'
         env.short_server_name = 'myapp-dev'
-        env.server_ip = ''
+        env.server_ip = '192.168.1.3'
         env.server_ssl_on = False
         env.goal = 'test'
         env.socket_port = '8001'
@@ -81,6 +86,7 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         """Define prod stage"""
         env.roledefs = {
             'web': ['myapp.net'],
+            'lb': ['lb.myapp.net'],
         }
         env.backends = env.roledefs['web']
         env.server_name = 'myapp.net'
@@ -102,16 +108,29 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     # dont touch after that point if you don't know what you are doing !
 
 
-    @roles('web')
+    @roles(['web','lb'])
     def build_env():
         execute(pydiploy_build_env)
+
+    @task
+    def pre_install():
+        """Pre install of backend & frontend"""
+        execute(pre_install_backend)
+        execute(pre_install_frontend)
 
 
     @roles('web')
     @task
-    def setup_server(update_pkg=False, clear_venv=False):
-        """Setup server for futur deployement"""
-        execute(pre_install_django_app_nginx_circus, commands='/usr/bin/rsync')
+    def pre_install_backend():
+        """Setup server for backend"""
+        execute(pydiploy_preinstall_backend, commands='/usr/bin/rsync')
+
+
+    @roles('lb')
+    @task
+    def pre_install_frontend():
+        """Setup server for frontend"""
+        execute(pydiploy_preinstall_frontend, commands='/usr/bin/rsync')
 
 
     @roles('web')
@@ -128,11 +147,25 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         execute(pydiploy_rollback)
 
 
-    @roles('web')
     @task
     def post_install():
-        """Post installation"""
-        execute(pydiploy_postinstall)
+        """post install for backend & frontend"""
+        execute(post_install_backend)
+        execute(post_install_frontend)
+
+
+    @roles('web')
+    @task
+    def post_install_backend():
+        """Post installation of backend"""
+        execute(pydiploy_postinstall_backend)
+
+
+    @roles('lb')
+    @task
+    def post_install_frontend():
+        """Post installation of frontend"""
+        execute(pydiploy_postinstall_frontend)
 
 
     @roles('web')
@@ -147,3 +180,20 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     def install_postgres():
         """Install Postgres on remote"""
         execute(pydiploy_setup_postgres)
+
+
+    @task
+    def reload():
+        """Reload backend & frontend"""
+        execute(reload_frontend)e
+        execute(reload_backend)
+
+    @roles('lb')
+    @task
+    def reload_frontend():
+        execute(pydiploy_reload_frontend)
+
+    @roles('web')
+    @task
+    def reload_backend():
+        execute(pydiploy_reload_backend)

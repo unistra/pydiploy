@@ -114,3 +114,8 @@ def install_oracle_client():
         fabric.api.sudo(
             'echo %s > /etc/ld.so.conf.d/oracle.conf' % oracle_full_path)
         fabric.api.sudo('ldconfig')
+
+
+def install_mysql_client(update=False):
+    """ Installs dependencies for mysql """
+    fabtools.require.deb.packages(['libmysqlclient-dev'], update=update)

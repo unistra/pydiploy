@@ -49,7 +49,7 @@ def deploy_code():
     Deploys code according to tag in env var
     """
     fabric.api.require('tag', provided_by=['tag', 'head'])
-    fabric.api.require('remote_project_dir', provided_by=['test', 'prod'])
+    fabric.api.require('remote_project_dir', provided_by=['test', 'prod', 'dev'])
     tarball = pydiploy.require.git.archive(env.application_name,
                                            prefix='%s-%s/' % (env.application_name,
                                                               env.tag.lower()),
