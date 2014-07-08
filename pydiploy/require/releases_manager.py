@@ -32,7 +32,7 @@ def cleanup():
     """
     Cleans old stuff on remote server
     """
-    if len(env.releases) >= env.keep_releases:
+    if 'releases' in env and len(env.releases) >= env.keep_releases:
         directories = env.releases
         directories.reverse()
         del directories[:env.keep_releases]
