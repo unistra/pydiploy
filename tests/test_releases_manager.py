@@ -111,7 +111,7 @@ class ReleasesManagerCheck(TestCase):
 
         self.assertTrue(api_require.called)
         self.assertEqual(api_require.call_args_list, [call('tag', provided_by=['tag', 'head']),
-            call('remote_project_dir', provided_by=['test', 'prod'])])
+            call('remote_project_dir', provided_by=['test', 'prod', 'dev'])])
 
 
     @patch('fabric.api.sudo', return_value=Mock())
