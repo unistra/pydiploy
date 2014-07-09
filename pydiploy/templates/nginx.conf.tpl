@@ -1,4 +1,7 @@
 upstream {{ short_server_name }}  {
+{% if no_shared_sessions %}
+ip_hash;
+{% endif %}
 {% for backend in backends %}
     server {{ backend }}:{{ socket_port }};
 {% endfor %}
@@ -19,15 +22,15 @@ server {
 
 {% if server_ssl_on %}
     ssl                  on;
-    ssl_certificate      /etc/ssl/certs/wildcard.u-strasbg.fr.pem;
-    ssl_certificate_key  /etc/ssl/private/wildcard.u-strasbg.fr.key;
+    ssl_certificate      {{ path_to_cert }};
+    ssl_certificate_key  {{ path_to_cert_key }};
 {% endif %}
 
     location = /favicon.ico {
       log_not_found off;
     }
 
-    location /site_media/ {
+    location {{ static_folder }} {
                 alias {{ remote_static_root }}/{{ application_name }}/;
                 autoindex on;
                 allow all;

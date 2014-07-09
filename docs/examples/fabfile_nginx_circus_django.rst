@@ -69,7 +69,9 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         env.backends = env.roledefs['web']
         env.server_name = 'myapp-dev.net'
         env.short_server_name = 'myapp-dev'
+        env.static_folder = '/site_media/'
         env.server_ip = '192.168.1.3'
+        env.no_shared_sessions = False
         env.server_ssl_on = False
         env.goal = 'test'
         env.socket_port = '8001'
@@ -91,8 +93,12 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         env.backends = env.roledefs['web']
         env.server_name = 'myapp.net'
         env.short_server_name = 'myapp'
+        env.static_folder = '/site_media/'
         env.server_ip = ''
+        env.no_shared_sessions = False
         env.server_ssl_on = True
+        env.path_to_cert = '/etc/ssl/certs/myapp.net.pem'
+        env.path_to_cert_key = '/etc/ssl/private/mtapp.net.key'
         env.goal = 'prod'
         env.socket_port = '8001'
         env.socket_host = ''
