@@ -15,7 +15,7 @@ from pydiploy.django import (deploy as diploy,
                              post_install_backend as pydiploy_postinstall_backend,
                              post_install_frontend as pydiploy_postinstall_frontend,
                              pre_install_backend as pydiploy_preinstall_backend,
-                             pre_install_frontend as pydiploy_preinstall_frontend
+                             pre_install_frontend as pydiploy_preinstall_frontend,
                              reload_frontend as pydiploy_reload_frontend,
                              reload_backend as pydiploy_reload_backend)
 
