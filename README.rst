@@ -23,10 +23,10 @@ Usage
     - See the example in the doc to setup correctly a fabfile (fabric,fabtools and pydiploy should be installed)
     - Use following command to install/deploy an application in test stage : ::
 
-        fab tag:master test setup_server deploy post_install
+        fab tag:master test pre_install deploy post_install
     - Use following command to install/deploy an application in production stage : ::
 
-        fab tag:master prod setup_server deploy post_install
+        fab tag:master prod pre_install deploy post_install
     - To deploy a new tag/release on production stage : ::
 
         fab tag:1.0.1 prod deploy
