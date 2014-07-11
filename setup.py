@@ -26,7 +26,7 @@ setup(
     long_description=long_description,
     packages=find_packages(),
     include_package_data=True,
-    download_url='https://github.com/unistra/pydiploy',
+    download_url='http://pypi.python.org/pypi/pydiploy',
     install_requires=libraries,
     dependency_links=dependency_links,
     keywords=['deploy', 'fabric', 'automation'],

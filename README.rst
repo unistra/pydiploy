@@ -38,5 +38,5 @@ Usage
 Tips
 ----
 
-    - django+sqlite3 : if you use sqlite3 with django, don't put your *.db file in the same folder as your application. It will be erased for each deployement !
+    - django+sqlite3 : if you use sqlite3 with django, don't put your .db file in the same folder as your application. It will be erased for each deployement !
 
