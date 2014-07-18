@@ -9,10 +9,10 @@ uid = {{ remote_owner }}
 gid = {{ remote_group }}
 
 stderr_stream.class = FileStream
-stdout_stream.filename = {{ remote_shared_path }}/log/circus_error.log
-stdout_stream.time_format = %Y-%m-%d %H:%M:%S
-stdout_stream.max_bytes = 209715200
-stdout_stream.backup_count = 5
+stderr_stream.filename = {{ remote_shared_path }}/log/circus_error.log
+stderr_stream.time_format = %Y-%m-%d %H:%M:%S
+stderr_stream.max_bytes = 209715200
+stderr_stream.backup_count = 5
 
 stdout_stream.class = FileStream
 stdout_stream.filename = {{ remote_shared_path }}/log/circus.log
