@@ -34,6 +34,7 @@ Usage
 
         fab tag:master prod rollback
     - To deploy with arguments : ::
+
         fab tag:master test --set default_db_host='localhost',default_db_name='mydb',default_db_user='myuser',default_db_password='mypass' deploy
 
     - See fabric documentation for more infos : http://fabric.readthedocs.org
