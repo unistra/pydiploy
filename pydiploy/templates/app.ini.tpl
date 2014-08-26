@@ -5,6 +5,7 @@ copy_env = 1
 numprocesses = 3
 use_sockets = 1
 virtualenv = {{ remote_virtualenv_dir }}
+virtualenv_py_ver = {{ remote_python_version }}
 uid = {{ remote_owner }}
 gid = {{ remote_group }}
 
