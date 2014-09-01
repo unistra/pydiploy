@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+""" Utilities for django settings. """
+
 import random
 import string
 import os
@@ -10,10 +12,7 @@ import fabric
 
 
 def generate_secret_key():
-    """
-    Generates the django's secret key
-    """
-
+    """ Generate the django's secret key. """
     letters = string.ascii_letters + string.punctuation.replace('\'', '')
     random_letters = map(lambda i: random.SystemRandom().choice(letters),
                          range(50))
@@ -22,35 +21,44 @@ def generate_secret_key():
 
 
 def extract_settings():
-    """
-    Extracts settings from django settings files
-    """
-
-    print('in')
+    """ Extract settings from django settings files. """
     # get the remote file
     fabric.api.get(env.remote_settings_file, local_path=env.local_tmp_dir)
+    settings_file = os.path.join(env.local_tmp_dir, '%s.py' % env.goal)
 
     # open and read the data from the downloaded file
-    with open(os.path.join(env.local_tmp_dir, '%s.py' % env.goal), 'r') as settings_fh:
+    with open(settings_file, 'r') as settings_fh:
         settings_data = settings_fh.readlines()
 
     # search data based on map_settings env attribute for the right goal
-    for key, pattern in env.map_settings.items():
+    default_pattern = re.compile(r'[ ]*[\'"]?(.*)[\'"]?')
+    for key, to_match in env.map_settings.items():
+        if len(to_match) == 2:
+            to_match, pattern = to_match[0], re.compile(to_match[1])
+        else:
+            pattern = default_pattern
+
         for line in settings_data:
-            real_pattern = pattern.replace('[', '\[').replace(']', '\]')
-            setting = re.match(r'%s[ ]*=[ ]*[\'"](.*)[\'"]' % real_pattern,
-                               line.strip())
-            if setting:
-                setattr(env, key, setting.group(1))
-                break
+            try:
+                settings_key, value = line.split('=')
+            except ValueError:
+                continue
+            if to_match == settings_key.strip():
+                setting_value = pattern.match(value.strip())
+                if setting_value:
+                    setattr(env, key, setting_value.group(1))
+                    break
 
 
 def app_settings(**kwargs):
-    """
-    Manages django settings file
-    """
+    """ Manage django settings file """
     settings_present = fabtools.files.is_file(path=env.remote_settings_file,
                                               use_sudo=True)
+
+    # if values are set within the --set option on command line
+    kwargs.update({
+        key: value for key, value in env.items() if key in env.map_settings
+    })
 
     if settings_present:
         fabric.api.execute(extract_settings)
