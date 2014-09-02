@@ -31,7 +31,7 @@ def extract_settings():
         settings_data = settings_fh.readlines()
 
     # search data based on map_settings env attribute for the right goal
-    default_pattern = re.compile(r'[ ]*[\'"]?(.*)[\'"]?')
+    default_pattern = re.compile(r'[ ]*[\'"]{1}(.*)[\'"]{1}')
     for key, to_match in env.map_settings.items():
         if len(to_match) == 2:
             to_match, pattern = to_match[0], re.compile(to_match[1])
@@ -44,6 +44,7 @@ def extract_settings():
             except ValueError:
                 continue
             if to_match == settings_key.strip():
+                print(value.strip())
                 setting_value = pattern.match(value.strip())
                 if setting_value:
                     setattr(env, key, setting_value.group(1))
