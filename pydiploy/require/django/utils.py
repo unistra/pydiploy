@@ -44,7 +44,6 @@ def extract_settings():
             except ValueError:
                 continue
             if to_match == settings_key.strip():
-                print(value.strip())
                 setting_value = pattern.match(value.strip())
                 if setting_value:
                     setattr(env, key, setting_value.group(1))
