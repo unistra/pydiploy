@@ -20,7 +20,8 @@ def django_prepare():
                 fabric.api.sudo('python manage.py syncdb --noinput')
                 # TODO add point in documentation
                 # south needed with django < 1.7 !!!!!
-                fabric.api.sudo('python manage.py migrate')
+                with fabric.api.settings(warn_only=True):
+                    fabric.api.sudo('python manage.py migrate')
                 if fabtools.files.is_dir(
                     os.path.join(env.remote_base_package_dir,
                                  'locale')):
