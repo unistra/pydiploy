@@ -51,10 +51,10 @@ class CommandCheck(TestCase):
         self.assertEqual(api_cd.call_args, call('remote_current_path'))
 
         self.assertTrue(api_settings.called)
-        self.assertEqual(api_settings.call_args, call(sudo_user='remote_owner'))
+        self.assertEqual(api_settings.call_args, call(warn_only=True))
 
         self.assertTrue(api_settings.called)
-        self.assertEqual(api_settings.call_args, call(sudo_user='remote_owner'))
+        self.assertEqual(api_settings.call_args, call(warn_only=True))
 
         self.assertTrue(files_is_dir.called)
         self.assertEqual(files_is_dir.call_args, call('remote_base_package_dir/locale'))
