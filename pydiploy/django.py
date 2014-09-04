@@ -23,6 +23,10 @@ def application_packages(update=False):
         fabric.api.execute(pydiploy.require.system.check_python3_install,
                            version='python%s' % env.remote_python_version)
     fabric.api.execute(pydiploy.require.python.utils.python_pkg)
+    if env.has_key('extra_ppa_to_install'):
+        fabric.api.execute(pydiploy.require.system.install_extra_ppa,env.extra_ppa_to_install)
+    if env.has_key('extra_pkg_to_install'):
+        fabric.api.execute(pydiploy.require.system.install_extra_packages,env.extra_pkg_to_install)
 
 
 def pre_install_backend(commands='/usr/bin/rsync'):
@@ -37,7 +41,7 @@ def pre_install_backend(commands='/usr/bin/rsync'):
     fabric.api.execute(pydiploy.require.circus.upstart)
 
 
-def pre_install_frontend(commands='/usr/bin/rsync'):
+def pre_install_frontend():
     """ Installs requirements for nginx """
     fabric.api.execute(pydiploy.require.nginx.root_web)
     fabric.api.execute(pydiploy.require.system.update_pkg_index)

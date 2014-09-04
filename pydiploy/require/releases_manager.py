@@ -67,6 +67,9 @@ def deploy_code():
     exclude_files += ['%s/settings/%s.py' % (env.root_package_name, goal)
                       for goal in ('dev', 'test', 'prod')]
 
+    if env.has_key('excluded_files'):
+        exclude_files += env.excluded_files
+
     env.remote_current_release = "%(releases_path)s/%(time).0f" % {
         'releases_path': env.remote_releases_path, 'time': time()}
 

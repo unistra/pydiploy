@@ -106,3 +106,18 @@ def check_python3_install(version='python3', update=False):
                                           update=update)
             fabtools.require.deb.ppa('ppa:fkrull/deadsnakes')
         fabtools.require.deb.package(version, update=True)
+
+
+def install_extra_packages(pkg, update=False):
+    """
+    Install extra packages on remote server
+    """
+    fabtools.require.deb.packages(pkg, update=update)
+
+
+def install_extra_ppa(extra_ppa):
+    """
+    Install extra ppa source on remote server
+    """
+    for ppa in extra_ppa:
+        fabtools.require.deb.ppa(ppa)

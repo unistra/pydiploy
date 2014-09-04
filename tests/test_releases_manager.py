@@ -31,6 +31,7 @@ class ReleasesManagerCheck(TestCase):
         env.local_tmp_root_app = "local_tmp_root_app"
         env.remote_base_package_dir = "remote_base_package_dir"
         env.local_tmp_root_app_package = "local_tmp_root_app_package"
+        env.excluded_files = ["fabhappening.jpg"]
 
 
     def tearDown(self):
