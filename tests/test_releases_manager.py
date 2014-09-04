@@ -32,6 +32,9 @@ class ReleasesManagerCheck(TestCase):
         env.remote_base_package_dir = "remote_base_package_dir"
         env.local_tmp_root_app_package = "local_tmp_root_app_package"
         env.excluded_files = ["fabhappening.jpg"]
+        env.extra_ppa_to_install = ["ppa:/encyclopedia/dramatica"]
+        env.extra_pkg_to_install = ["norton-utilities"]
+        env.extra_pkg_to_install = ["README"]
 
 
     def tearDown(self):

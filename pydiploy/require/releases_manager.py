@@ -69,6 +69,22 @@ def deploy_code():
 
     if env.has_key('excluded_files'):
         exclude_files += env.excluded_files
+    if env.has_key('cfg_shared_files'):
+        for cfg_shared_file in env.cfg_shared_files:
+          cfg_present = fabtools.files.is_file(path='%s/config/%s' % (env.remote_shared_path, os.path.basename(cfg_shared_file)),
+                                              use_sudo=True)
+          if cfg_present is None:
+            fabtools.files.upload_template('/tmp/%s-%s/%s' % (
+                                             env.application_name,
+                                             env.tag.lower(),
+                                             cfg_shared_file
+                                             ),
+                                            os.path.join(env.remote_shared_path,'config'),
+                                            use_sudo=True)
+
+          exclude_files += cfg_shared_file
+
+
 
     env.remote_current_release = "%(releases_path)s/%(time).0f" % {
         'releases_path': env.remote_releases_path, 'time': time()}
@@ -140,3 +156,11 @@ def symlink():
     fabric.api.sudo("ln -nfs %(shared_path)s/log %(current_release)s/log" %
                     {'shared_path': env.remote_shared_path,
                      'current_release': env.remote_current_release})
+    if env.has_key('cfg_shared_files'):
+        for cfg_shared_file in env.cfg_shared_files:
+          fabric.api.sudo("ln -nfs %(shared_path)s/config/%(file_name)s %(current_release)s/%(file)s" %
+                {'shared_path': env.remote_shared_path,
+                 'current_release': env.remote_current_release,
+                 'file': cfg_shared_file,
+                 'file_name':  os.path.basename(cfg_shared_file)})
+

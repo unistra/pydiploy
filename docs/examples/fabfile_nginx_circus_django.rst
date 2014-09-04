@@ -48,6 +48,7 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     env.excluded_files = ['pron.jpg'] # file(s) that rsync should exclude when deploying app
     env.extra_ppa_to_install = ['ppa:vincent-c/ponysay'] # extra ppa source(s) to use
     env.extra_pkg_to_install = ['ponysay'] # extra debian/ubuntu package(s) to install on remote
+    env.cfg_shared_files = ['config','/app/path/to/config/config_file'] # config files to be placed in shared config dir
 
     env.oracle_client_version = '11.2'
     env.oracle_download_url = 'http://librepo.net/lib/oracle/'
