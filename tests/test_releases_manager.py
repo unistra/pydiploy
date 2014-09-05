@@ -34,7 +34,7 @@ class ReleasesManagerCheck(TestCase):
         env.excluded_files = ["fabhappening.jpg"]
         env.extra_ppa_to_install = ["ppa:/encyclopedia/dramatica"]
         env.extra_pkg_to_install = ["norton-utilities"]
-        env.extra_pkg_to_install = ["README"]
+        env.cfg_shared_files = ["README"]
 
 
     def tearDown(self):
@@ -74,7 +74,8 @@ class ReleasesManagerCheck(TestCase):
     @patch('fabtools.files.upload_template', return_value=Mock())
     @patch('pydiploy.require.git.archive', return_value="myarchive")
     @patch('fabric.contrib.project.rsync_project', return_value=Mock())
-    def test_deploy_code(self, rsync_project, git_archive, upload_template, api_execute, api_sudo, api_lcd, api_require, api_local):
+    @patch('fabtools.files.is_file', return_value=None)
+    def test_deploy_code(self, is_file, rsync_project, git_archive, upload_template, api_execute, api_sudo, api_lcd, api_require, api_local):
         api_lcd.return_value.__exit__ = Mock()
         api_lcd.return_value.__enter__ = Mock()
 
@@ -88,15 +89,19 @@ class ReleasesManagerCheck(TestCase):
 
         self.assertTrue(git_archive.called)
         self.assertEqual(git_archive.call_args, call('appliname', prefix='appliname-mytag/', tag='mytag', remote='remote_repo_url'))
-
         self.assertTrue(upload_template.called)
         self.assertTrue(str(upload_template.call_args_list[0]).find(
+            "'/tmp/appliname-mytag/README'") > 0)
+        self.assertTrue(str(upload_template.call_args_list[0]).find(
+            "'remote_shared_path/config'") > 0)
+        self.assertTrue(str(upload_template.call_args_list[1]).find(
             "'manage.py'") > 0)
+        self.assertTrue(str(upload_template.call_args_list[2]).find("'wsgi.py'") > 0)
+        self.assertTrue(str(upload_template.call_args_list[2]).find("'remote_base_package_dir/wsgi.py'") > 0)
+        self.assertTrue(str(upload_template.call_args_list[2]).find("template_dir='local_tmp_root_app_package'") > 0)
+        self.assertTrue(str(upload_template.call_args_list[2]).find("user='remote_owner'") > 0)
 
-        self.assertTrue(str(upload_template.call_args_list[1]).find("'wsgi.py'") > 0)
-        self.assertTrue(str(upload_template.call_args_list[1]).find("'remote_base_package_dir/wsgi.py'") > 0)
-        self.assertTrue(str(upload_template.call_args_list[1]).find("template_dir='local_tmp_root_app_package'") > 0)
-        self.assertTrue(str(upload_template.call_args_list[1]).find("user='remote_owner'") > 0)
+
 
         self.assertTrue(api_execute.called)
         self.assertTrue(str(api_execute.call_args_list[0]).find(
@@ -117,6 +122,9 @@ class ReleasesManagerCheck(TestCase):
         self.assertEqual(api_require.call_args_list, [call('tag', provided_by=['tag', 'head']),
             call('remote_project_dir', provided_by=['test', 'prod', 'dev'])])
 
+        self.assertTrue(is_file.called)
+        self.assertEqual(is_file.call_args, call(path='remote_shared_path/config/README', use_sudo=True))
+
 
     @patch('fabric.api.sudo', return_value=Mock())
     def test_rollback_code(self, api_sudo):
@@ -131,5 +139,4 @@ class ReleasesManagerCheck(TestCase):
         symlink()
         self.assertTrue(api_sudo.called)
         self.assertEqual(api_sudo.call_args,
-            call('ln -nfs remote_shared_path/log remote_current_release/log'))
-
+            call('ln -nfs remote_shared_path/config/README remote_current_release/README'))
