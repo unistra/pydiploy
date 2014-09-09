@@ -196,7 +196,7 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     @task
     def reload():
         """Reload backend & frontend"""
-        execute(reload_frontend)e
+        execute(reload_frontend)
         execute(reload_backend)
 
     @roles('lb')
