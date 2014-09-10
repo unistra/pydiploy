@@ -67,3 +67,10 @@ def build_env():
                 env.previous_release = "%(releases_path)s/%(previous_revision)s" % \
                                        {'releases_path': env.remote_releases_path,
                                         'previous_revision': env.previous_revision}
+
+    # define main goals
+    env.goals = ['dev', 'test', 'prod']
+
+    # if set in fabfile add extra goals
+    if "extra_goals" in env:
+        env.goals += env.extra_goals

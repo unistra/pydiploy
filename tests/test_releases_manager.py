@@ -35,6 +35,7 @@ class ReleasesManagerCheck(TestCase):
         env.extra_ppa_to_install = ["ppa:/encyclopedia/dramatica"]
         env.extra_pkg_to_install = ["norton-utilities"]
         env.cfg_shared_files = ["README"]
+        env.goals = ['dev','test','prod']
 
 
     def tearDown(self):
@@ -120,7 +121,7 @@ class ReleasesManagerCheck(TestCase):
 
         self.assertTrue(api_require.called)
         self.assertEqual(api_require.call_args_list, [call('tag', provided_by=['tag', 'head']),
-            call('remote_project_dir', provided_by=['test', 'prod', 'dev'])])
+            call('remote_project_dir', provided_by=['dev', 'test', 'prod'])])
 
         self.assertTrue(is_file.called)
         self.assertEqual(is_file.call_args, call(path='remote_shared_path/config/README', use_sudo=True))

@@ -49,7 +49,7 @@ def deploy_code():
     Deploys code according to tag in env var
     """
     fabric.api.require('tag', provided_by=['tag', 'head'])
-    fabric.api.require('remote_project_dir', provided_by=['test', 'prod', 'dev'])
+    fabric.api.require('remote_project_dir', provided_by=env.goals)
     tarball = pydiploy.require.git.archive(env.application_name,
                                            prefix='%s-%s/' % (env.application_name,
                                                               env.tag.lower()),
@@ -65,7 +65,7 @@ def deploy_code():
                      '%s/wsgi.py' % env.root_package_name, '*.db',
                      '.gitignore']
     exclude_files += ['%s/settings/%s.py' % (env.root_package_name, goal)
-                      for goal in ('dev', 'test', 'prod')]
+                      for goal in env.goals]
 
     if env.has_key('excluded_files'):
         exclude_files += env.excluded_files
