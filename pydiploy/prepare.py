@@ -13,13 +13,40 @@ import fabtools
 
 from fabric.api import env
 
-
 @fabric.api.task
 def tag(version):
-    """
-    Defines tag to deploy
-    """
+    """ Defines tag to deploy """
+
     env.tag = version
+
+def init_required_params():
+    """ sets required params and its description """
+
+    # TODO use more descriptives values !!!!!
+    required_params = { 'user': "user for ssh",
+                        'remote_owner': "remote server user",
+                        'remote_group': "remote server user group",
+                        'application_name': "name of wepapp",
+                        'root_package_name': "name of app in webapp",
+                        'remote_home': "remote home root",
+                        'remote_python_version': "remote python version to use",
+                        'remote_virtualenv_root': "remote virtualenv root",
+                        'remote_virtualenv_dir': "remote virtualenv dir for wepapp",
+                        'remote_repo_url': "git repository url",
+                        'local_tmp_dir': "local tmp dir",
+                        'remote_static_root': "root of static files",
+                        'locale': "locale to use on remote",
+                        'timezone': "timezone used on remote",
+                        'keep_releases': "number of old releases to keep",
+                        'roledefs': "Role to use to deploy",
+                        'backends': "backend to use to deploy",
+                        'server_name': "name of webserver",
+                        'short_server_name': "short name of webserver",
+                        'static_folder': "path of static folder",
+                        'goal': "stage to use to deploy (dev,prod,test...)",
+                        'socket_port': "port to use for socket",
+                        'socket_host': "socket host"}
+    return required_params
 
 
 def build_env():
@@ -74,3 +101,39 @@ def build_env():
     # if set in fabfile add extra goals
     if "extra_goals" in env:
         env.goals += env.extra_goals
+
+    if not test_config():
+        if not fabric.contrib.console.confirm("Configuration test %s! Do you want to continue?" % fabric.colors.red('failed'), default=False):
+            fabric.api.abort("Aborting at user request.")
+
+
+@fabric.api.task
+def test_config(verbose=True):
+    err = []
+    parameters = []
+    returned_params = init_required_params()
+    max_param_length = max(map(len,returned_params.keys()))
+    max_desc_length = max(map(len,returned_params.values()))
+
+    for param, desc in returned_params.items():
+        if param not in env or not env[param]:
+            err.append("%s -> %s : missing" % (param.ljust(max_param_length), desc.ljust(max_desc_length)))
+        elif verbose:
+            parameters.append((param, env[param], desc))
+
+    if err:
+        err_nb = len(err)
+        if err_nb == len(returned_params):
+            fabric.api.puts('You need to configure correctly the fabfile please RTFM first !')
+        else:
+            fabric.api.puts('Config test failed (%s error%s) :' %(err_nb, 's' if err_nb > 1 else ''))
+            fabric.api.puts('%s\n\n* %s\n' % ('-' * 30, '\n* '.join(err)))
+            fabric.api.puts('Please fix them or continue with possible errors.')
+        return False
+    elif verbose:
+        for param, value, description in parameters:
+            fabric.api.puts('* %s %s' % (param.ljust(max_param_length), fabric.colors.green(value)))
+
+    fabric.api.puts('\n\nConfiguration OK!')
+    return True
+

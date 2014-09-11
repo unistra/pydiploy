@@ -4,7 +4,7 @@
 from unittest import TestCase
 from fabric.api import env
 from mock import patch, call, Mock
-from pydiploy.prepare import tag, build_env
+from pydiploy.prepare import tag, build_env, test_config
 
 
 class PrepareCheck(TestCase):
@@ -21,6 +21,8 @@ class PrepareCheck(TestCase):
         env.goal = "goal"
         env.releases = ["1.0", "2.0", "3.0", "4.0"]
         env.tag = "4.0"
+        env.output_prefix = ""
+        env.host_string = ""
 
 
     def tearDown(self):
@@ -36,10 +38,14 @@ class PrepareCheck(TestCase):
     @patch('fabric.api.prompt', return_value="4.0")
     @patch('fabtools.files.is_dir', return_value=True)
     @patch('fabric.api.run', return_value="4.0")
-    def test_build_env(self, api_run, is_dir, api_prompt):
+    @patch('fabric.api.execute', return_value=True)
+    @patch('fabric.contrib.console.confirm', return_value=Mock())
+    @patch('fabric.api.abort', return_value=Mock())
+    def test_build_env(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
         build_env()
         self.assertFalse(api_prompt.called)
         del env['tag']
+        #self.assertTrue(api_execute.called)
         build_env()
         self.assertTrue(api_prompt.called)
         # test env var
@@ -53,6 +59,12 @@ class PrepareCheck(TestCase):
         self.assertEqual(env.remote_settings_dir, "remote_home/server_name/current/root_package_name/settings")
         self.assertEqual(env.remote_settings_file, "remote_home/server_name/current/root_package_name/settings/goal.py")
         self.assertEqual(env.lib_path, "pydiploy")
+        self.assertEqual(env.goals, ['dev', 'test', 'prod'])
+
+        # test env.extra_goals
+        env.extra_goals = ['toto']
+        build_env()
+        self.assertEqual(env.goals, ['dev', 'test', 'prod', 'toto'])
 
         #test if no env release
         del env['releases']
@@ -69,7 +81,7 @@ class PrepareCheck(TestCase):
         self.assertEqual(env.current_revision, "4.0")
         self.assertEqual(env.current_release, "remote_home/server_name/releases/4.0")
 
-        #with 2 release
+        # with 2 release
         del env['releases']
         api_run.return_value = "4.0 3.0"
         build_env()
@@ -80,6 +92,71 @@ class PrepareCheck(TestCase):
         self.assertEqual(env.current_release, "remote_home/server_name/releases/4.0")
         self.assertEqual(env.previous_revision, "3.0")
         self.assertEqual(env.previous_release, "remote_home/server_name/releases/3.0")
+
+        # test misconfiguration and abort
+        api_execute.return_value = False
+        console_confirm.return_value = False
+        build_env()
+        self.assertTrue(console_confirm.called)
+        self.assertTrue(api_abort.called)
+        self.assertEqual(api_abort.call_args, call('Aborting at user request.'))
+
+        # test all required params are set
+        env.root_package_name = 'foo'
+        env.server_name = 'foo'
+        env.remote_static_root = 'foo'
+        env.goal = 'foo'
+        env.backends = 'foo'
+        env.locale = 'foo'
+        env.socket_host = 'foo'
+        env.remote_virtualenv_dir = 'foo'
+        env.user = 'foo'
+        env.roledefs  = 'foo'
+        env.remote_python_version = 'foo'
+        env.keep_releases = 'foo'
+        env.remote_home = 'foo'
+        env.remote_owner = 'foo'
+        env.timezone = 'foo'
+        env.application_name = 'foo'
+        env.remote_repo_url = 'foo'
+        env.short_server_name = 'foo'
+        env.remote_virtualenv_root = 'foo'
+        env.remote_group = 'foo'
+        env.static_folder = 'foo'
+        env.socket_port = 'foo'
+        env.local_tmp_dir = 'foo'
+        build_env()
+
+        # test no required params are set
+        env.root_package_name = ''
+        env.server_name = ''
+        env.remote_static_root = ''
+        env.goal = ''
+        env.backends = ''
+        env.locale = ''
+        env.socket_host = ''
+        env.remote_virtualenv_dir = ''
+        env.user = ''
+        env.roledefs  = ''
+        env.remote_python_version = ''
+        env.keep_releases = ''
+        env.remote_home = ''
+        env.remote_owner = ''
+        env.timezone = ''
+        env.application_name = ''
+        env.remote_repo_url = ''
+        env.short_server_name = ''
+        env.remote_virtualenv_root = ''
+        env.remote_group = ''
+        env.static_folder = ''
+        env.socket_port = ''
+        env.local_tmp_dir = ''
+        build_env()
+
+
+    @patch('fabric.api.puts', return_value=Mock())
+    def test_config(self, api_puts):
+        test_config()
 
 
 
