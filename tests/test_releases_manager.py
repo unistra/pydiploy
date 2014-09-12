@@ -8,6 +8,7 @@ from pydiploy.require.releases_manager import set_current, setup, cleanup, deplo
 
 
 class ReleasesManagerCheck(TestCase):
+
     """
     test for circus
     """
@@ -21,6 +22,7 @@ class ReleasesManagerCheck(TestCase):
         env.keep_releases = 3
         env.remote_releases_path = "remote_releases_path"
         env.current_revision = "4.0"
+        env.current_release = "remote_releases_path/4.0"
         env.previous_release = "3.0"
         env.application_name = "appliname"
         env.tag = "mytag"
@@ -35,19 +37,17 @@ class ReleasesManagerCheck(TestCase):
         env.extra_ppa_to_install = ["ppa:/encyclopedia/dramatica"]
         env.extra_pkg_to_install = ["norton-utilities"]
         env.cfg_shared_files = ["README"]
-        env.goals = ['dev','test','prod']
-
+        env.goals = ['dev', 'test', 'prod']
 
     def tearDown(self):
         env.clear()
-
 
     @patch('fabric.api.sudo', return_value=Mock())
     def test_set_current(self, api_sudo):
         set_current()
         self.assertTrue(api_sudo.called)
-        self.assertEqual(api_sudo.call_args, call('ln -nfs remote_current_release remote_current_path'))
-
+        self.assertEqual(api_sudo.call_args, call(
+            'ln -nfs remote_current_release remote_current_path'))
 
     @patch('fabric.api.sudo', return_value=Mock())
     @patch('fabric.api.execute', return_value=Mock())
@@ -57,15 +57,17 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(str(api_execute.call_args).find(
             "function permissions") > 0)
         self.assertTrue(api_sudo.called)
-        self.assertEqual(api_sudo.call_args_list, [call('mkdir -p remote_project_dir/{releases,shared}'),
-            call('mkdir -p remote_shared_path/{config,log}')])
-
+        self.assertEqual(
+            api_sudo.call_args_list, [call(
+                'mkdir -p remote_project_dir/{releases,shared}'),
+                call('mkdir -p remote_shared_path/{config,log}')])
 
     @patch('fabric.api.sudo', return_value=Mock())
     def test_cleanup(self, api_sudo):
         cleanup()
         self.assertTrue(api_sudo.called)
-        self.assertEqual(api_sudo.call_args, call('rm -rf remote_releases_path/1.0'))
+        self.assertEqual(
+            api_sudo.call_args, call('rm -rf remote_releases_path/1.0'))
 
     @patch('fabric.api.local', return_value=Mock())
     @patch('fabric.api.require', return_value=Mock())
@@ -83,13 +85,17 @@ class ReleasesManagerCheck(TestCase):
         deploy_code()
 
         self.assertTrue(rsync_project.called)
-        self.assertTrue(str(rsync_project.call_args).find("'/tmp/appliname-mytag/'") > 0)
-        self.assertTrue(str(rsync_project.call_args).find("extra_opts='--rsync-path=\"sudo -u remote_owner rsync\"'") > 0)
+        self.assertTrue(
+            str(rsync_project.call_args).find("'/tmp/appliname-mytag/'") > 0)
+        self.assertTrue(str(rsync_project.call_args).find(
+            "extra_opts='--rsync-path=\"sudo -u remote_owner rsync\"'") > 0)
         self.assertTrue(str(rsync_project.call_args).find("delete=True") > 0)
-        self.assertTrue(str(rsync_project.call_args).find("exclude=['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'log', 'bin', 'manage.py', 'root_package_name/wsgi.py', '*.db', '.gitignore', 'root_package_name/settings/dev.py', 'root_package_name/settings/test.py', 'root_package_name/settings/prod.py'") > 0)
+        self.assertTrue(str(rsync_project.call_args).find(
+            "exclude=['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'log', 'bin', 'manage.py', 'root_package_name/wsgi.py', '*.db', '.gitignore', 'root_package_name/settings/dev.py', 'root_package_name/settings/test.py', 'root_package_name/settings/prod.py'") > 0)
 
         self.assertTrue(git_archive.called)
-        self.assertEqual(git_archive.call_args, call('appliname', prefix='appliname-mytag/', tag='mytag', remote='remote_repo_url'))
+        self.assertEqual(git_archive.call_args, call(
+            'appliname', prefix='appliname-mytag/', tag='mytag', remote='remote_repo_url'))
         self.assertTrue(upload_template.called)
         self.assertTrue(str(upload_template.call_args_list[0]).find(
             "'/tmp/appliname-mytag/README'") > 0)
@@ -97,12 +103,14 @@ class ReleasesManagerCheck(TestCase):
             "'remote_shared_path/config'") > 0)
         self.assertTrue(str(upload_template.call_args_list[1]).find(
             "'manage.py'") > 0)
-        self.assertTrue(str(upload_template.call_args_list[2]).find("'wsgi.py'") > 0)
-        self.assertTrue(str(upload_template.call_args_list[2]).find("'remote_base_package_dir/wsgi.py'") > 0)
-        self.assertTrue(str(upload_template.call_args_list[2]).find("template_dir='local_tmp_root_app_package'") > 0)
-        self.assertTrue(str(upload_template.call_args_list[2]).find("user='remote_owner'") > 0)
-
-
+        self.assertTrue(
+            str(upload_template.call_args_list[2]).find("'wsgi.py'") > 0)
+        self.assertTrue(str(upload_template.call_args_list[2]).find(
+            "'remote_base_package_dir/wsgi.py'") > 0)
+        self.assertTrue(str(upload_template.call_args_list[2]).find(
+            "template_dir='local_tmp_root_app_package'") > 0)
+        self.assertTrue(
+            str(upload_template.call_args_list[2]).find("user='remote_owner'") > 0)
 
         self.assertTrue(api_execute.called)
         self.assertTrue(str(api_execute.call_args_list[0]).find(
@@ -111,7 +119,8 @@ class ReleasesManagerCheck(TestCase):
             "function set_current") > 0)
 
         self.assertTrue(api_sudo.called)
-        self.assertTrue(str(api_sudo.call_args).find("chown -R remote_owner:remote_group remote_releases_path/") > 0)
+        self.assertTrue(str(api_sudo.call_args).find(
+            "chown -R remote_owner:remote_group remote_releases_path/") > 0)
 
         self.assertTrue(api_lcd.called)
         self.assertEqual(api_lcd.call_args, call('rm myarchive'))
@@ -120,24 +129,25 @@ class ReleasesManagerCheck(TestCase):
         self.assertEqual(api_local.call_args, call('tar xvf myarchive'))
 
         self.assertTrue(api_require.called)
-        self.assertEqual(api_require.call_args_list, [call('tag', provided_by=['tag', 'head']),
-            call('remote_project_dir', provided_by=['dev', 'test', 'prod'])])
+        self.assertEqual(
+            api_require.call_args_list, [call(
+                'tag', provided_by=['tag', 'head']),
+                call('remote_project_dir', provided_by=['dev', 'test', 'prod'])])
 
         self.assertTrue(is_file.called)
-        self.assertEqual(is_file.call_args, call(path='remote_shared_path/config/README', use_sudo=True))
-
+        self.assertEqual(is_file.call_args, call(
+            path='remote_shared_path/config/README', use_sudo=True))
 
     @patch('fabric.api.sudo', return_value=Mock())
     def test_rollback_code(self, api_sudo):
         rollback_code()
         self.assertTrue(api_sudo.called)
         self.assertEqual(api_sudo.call_args,
-            call('rm remote_current_path; ln -s 3.0 remote_current_path && rm -rf remote_releases_path/4.0'))
-
+                         call('rm remote_current_path; ln -s 3.0 remote_current_path && rm -rf remote_releases_path/4.0'))
 
     @patch('fabric.api.sudo', return_value=Mock())
     def test_symlink(self, api_sudo):
         symlink()
         self.assertTrue(api_sudo.called)
         self.assertEqual(api_sudo.call_args,
-            call('ln -nfs remote_shared_path/config/README remote_current_release/README'))
+                         call('ln -nfs remote_shared_path/config/README remote_current_release/README'))

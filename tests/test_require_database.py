@@ -22,13 +22,12 @@ class DatabaseCheck(TestCase):
         sqlite3_pkg()
 
         self.assertTrue(python_package.called)
-        self.assertEqual(python_package.call_args, 
-            call('pysqlite', upgrade=True, use_sudo=False, user=None))
+        self.assertEqual(python_package.call_args,
+                         call('pysqlite', upgrade=True, use_sudo=False, user=None))
 
         self.assertTrue(deb_package.called)
-        self.assertEqual(deb_package.call_args, 
-            call('libsqlite3-dev', update=True))
-
+        self.assertEqual(deb_package.call_args,
+                         call('libsqlite3-dev', update=True))
 
     @patch("fabtools.require.deb.package", return_value=Mock())
     @patch("fabtools.require.python.package", return_value=Mock())
@@ -36,18 +35,17 @@ class DatabaseCheck(TestCase):
         ldap_pkg()
 
         self.assertTrue(python_package.called)
-        self.assertEqual(python_package.call_args, 
-            call('python-ldap', upgrade=True, use_sudo=False, user=None))
+        self.assertEqual(python_package.call_args,
+                         call('python-ldap', upgrade=True, use_sudo=False, user=None))
 
         self.assertTrue(deb_package.called)
-        self.assertEqual(deb_package.call_args_list, 
-            [call('libldap2-dev', update=True), call('libsasl2-dev', update=True), call('libssl-dev', update=True)])
-
+        self.assertEqual(deb_package.call_args_list,
+                         [call('libldap2-dev', update=True), call('libsasl2-dev', update=True), call('libssl-dev', update=True)])
 
     @patch("fabtools.require.deb.packages", return_value=Mock())
     def test_postgres_pkg(self, deb_packages):
         postgres_pkg()
 
         self.assertTrue(deb_packages.called)
-        self.assertEqual(deb_packages.call_args, call(['libpq-dev'], update=False))
-         
+        self.assertEqual(
+            deb_packages.call_args, call(['libpq-dev'], update=False))

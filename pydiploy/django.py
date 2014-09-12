@@ -24,9 +24,11 @@ def application_packages(update=False):
                            version='python%s' % env.remote_python_version)
     fabric.api.execute(pydiploy.require.python.utils.python_pkg)
     if env.has_key('extra_ppa_to_install'):
-        fabric.api.execute(pydiploy.require.system.install_extra_ppa,env.extra_ppa_to_install)
+        fabric.api.execute(
+            pydiploy.require.system.install_extra_ppa, env.extra_ppa_to_install)
     if env.has_key('extra_pkg_to_install'):
-        fabric.api.execute(pydiploy.require.system.install_extra_packages,env.extra_pkg_to_install)
+        fabric.api.execute(
+            pydiploy.require.system.install_extra_packages, env.extra_pkg_to_install)
 
 
 def pre_install_backend(commands='/usr/bin/rsync'):

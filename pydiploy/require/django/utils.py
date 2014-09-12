@@ -23,7 +23,7 @@ def generate_secret_key():
 def extract_settings():
     """ Extract settings from django settings files. """
     # get the remote file
-    fabric.api.get(env.remote_settings_file, local_path=env.local_tmp_dir)
+    fabric.api.get(env.previous_settings_file, local_path=env.local_tmp_dir)
     settings_file = os.path.join(env.local_tmp_dir, '%s.py' % env.goal)
 
     # open and read the data from the downloaded file
@@ -40,7 +40,7 @@ def extract_settings():
 
         for line in settings_data:
             try:
-                settings_key, value = line.split('=')
+                settings_key, value = line.split('=', 1)
             except ValueError:
                 continue
             if to_match == settings_key.strip():
@@ -52,7 +52,8 @@ def extract_settings():
 
 def app_settings(**kwargs):
     """ Manage django settings file """
-    settings_present = fabtools.files.is_file(path=env.remote_settings_file,
+
+    settings_present = fabtools.files.is_file(path=env.previous_settings_file,
                                               use_sudo=True)
 
     # if values are set within the --set option on command line
