@@ -79,14 +79,14 @@ def build_env():
         env.remote_base_package_dir, 'settings')
     env.remote_settings_file = os.path.join(env.remote_settings_dir,
                                             '%s.py' % env.goal)
-
     env.lib_path = os.path.dirname(__file__)
+    env.previous_settings_file = ""
 
     if not "releases" in env:
         if fabtools.files.is_dir(env.remote_releases_path):
             env.releases = sorted(fabric.api.run('ls -x %(releases_path)s' %
                                                  {'releases_path': env.remote_releases_path}).split())
-            env.previous_settings_file = ""
+
 
             if len(env.releases) >= 1:
                 env.current_revision = env.releases[-1]
