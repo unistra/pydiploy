@@ -103,7 +103,7 @@ def test_circus(pre_install):
     assert circusconf == "Found"
 
     start = run("status circus |cut -d '/' -f1")
-    assert start == "circus start"
+    assert start == "circus stop"
 
 
 def test_virtualenv(pre_install):
