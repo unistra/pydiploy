@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase
-from pydiploy.require.python.utils import python_pkg, application_dependencies
-from pydiploy.require.python.virtualenv import virtualenv
-from fabric.api import env
-from mock import patch, call, Mock
 import copy
+from unittest import TestCase
+
+from fabric.api import env
+from mock import call, Mock, patch
+from pydiploy.require.python.utils import application_dependencies, python_pkg
+from pydiploy.require.python.virtualenv import virtualenv
 
 
 class UtilsCheck(TestCase):

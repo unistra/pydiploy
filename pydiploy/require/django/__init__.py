@@ -1,4 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import command
-from . import utils
+from . import command, utils

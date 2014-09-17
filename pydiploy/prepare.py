@@ -8,9 +8,9 @@
 """
 
 import os
+
 import fabric
 import fabtools
-
 from fabric.api import env
 
 
@@ -81,6 +81,10 @@ def build_env():
                                             '%s.py' % env.goal)
     env.lib_path = os.path.dirname(__file__)
     env.previous_settings_file = ""
+
+    if "socket_host" not in env:
+        env.socket_host = env.host
+
 
     if not "releases" in env:
         if fabtools.files.is_dir(env.remote_releases_path):

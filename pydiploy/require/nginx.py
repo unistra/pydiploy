@@ -3,9 +3,10 @@
 """
 """
 import os
-from fabric.api import env
+
 import fabric
 import fabtools
+from fabric.api import env
 
 
 def root_web():

@@ -4,8 +4,8 @@
 """
 
 
-import fabtools
 import fabric
+import fabtools
 from fabric.api import env
 
 

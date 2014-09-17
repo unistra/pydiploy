@@ -7,9 +7,8 @@
 
 
 import fabric
-import pydiploy
 import fabtools
-
+import pydiploy
 from fabric.api import env
 
 

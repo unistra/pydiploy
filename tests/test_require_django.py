@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import copy
 import datetime
 import re
-import copy
-
 from unittest import TestCase
+
 from fabric.api import env
-from mock import patch, call, Mock
-from pydiploy.require.django.command import django_prepare, django_dump_database
-from pydiploy.require.django.utils import generate_secret_key, extract_settings, app_settings
+from mock import call, Mock, patch
+from pydiploy.require.django.command import django_dump_database, django_prepare
+from pydiploy.require.django.utils import (app_settings, extract_settings,
+                                           generate_secret_key)
 
 
 class CommandCheck(TestCase):

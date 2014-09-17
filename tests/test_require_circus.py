@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase
-from fabric.api import env
-from mock import patch, call, Mock
-from pydiploy.require.circus import circus_pkg, app_circus_conf, upstart, app_reload
 import copy
+from unittest import TestCase
+
+from fabric.api import env
+from mock import call, Mock, patch
+from pydiploy.require.circus import (app_circus_conf, app_reload, circus_pkg,
+                                     upstart)
 
 
 class CircusCheck(TestCase):

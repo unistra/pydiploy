@@ -83,7 +83,7 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         env.server_ssl_on = False
         env.goal = 'test'
         env.socket_port = '8001'
-        env.socket_host = '192.168.1.2'
+        # env.socket_host = '' # optional used only to force a specific ip
         env.map_settings = {
             #'ldap_user': "DATABASES['ldap']['USER']",
             #'ldap_password': "DATABASES['ldap']['PASSWORD']"
@@ -109,7 +109,7 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         env.path_to_cert_key = '/etc/ssl/private/mtapp.net.key'
         env.goal = 'prod'
         env.socket_port = '8001'
-        env.socket_host = ''
+        # env.socket_host = '' # optional used only to force a specific ip
         env.map_settings = {
             #'default_db_user': "DATABASES['default']['USER']",
             #'default_db_password': "DATABASES['default']['PASSWORD']",

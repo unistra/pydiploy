@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
-import fabtools
+
 import fabric
+import fabtools
 from fabric.api import env
 
 

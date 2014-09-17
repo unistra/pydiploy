@@ -5,6 +5,4 @@ Package contetant l'API pydiploy permettant l'automatisation des déploiements e
 dans des environnements multiples comme le test, la pre-production, la prodcution ou même le développement
 """
 
-from pydiploy import django
-from pydiploy import require
-from pydiploy import prepare
+from pydiploy import django, prepare, require

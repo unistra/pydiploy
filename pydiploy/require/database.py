@@ -14,10 +14,10 @@ Requires function to install database client for Python ::
 """
 
 import os
-import fabtools
-import fabric
-
 from string import Template
+
+import fabric
+import fabtools
 from fabric.api import env
 
 

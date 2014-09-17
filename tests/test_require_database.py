@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import copy
-
 from unittest import TestCase
+
 from fabric.api import env
-from mock import patch, call, Mock
-from pydiploy.require.database import sqlite3_pkg, ldap_pkg, postgres_pkg, \
-    install_postgres_server, install_mysql_client, install_oracle_client
+from mock import call, Mock, patch
+from pydiploy.require.database import (install_mysql_client,
+                                       install_oracle_client,
+                                       install_postgres_server, ldap_pkg,
+                                       postgres_pkg, sqlite3_pkg)
 
 
 class DatabaseCheck(TestCase):

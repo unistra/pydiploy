@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import copy
-
 from unittest import TestCase
+
 from fabric.api import env
-from mock import patch, call, Mock
-from pydiploy.require.nginx import root_web, nginx_pkg, nginx_reload, \
-    nginx_restart, web_static_files, web_configuration
+from mock import call, Mock, patch
+from pydiploy.require.nginx import (nginx_pkg, nginx_reload, nginx_restart,
+                                    root_web, web_configuration,
+                                    web_static_files)
 
 
 class NginxCheck(TestCase):

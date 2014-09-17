@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase
-from fabric.api import env
-from mock import patch, call, Mock
-from pydiploy.require.releases_manager import set_current, setup, cleanup, deploy_code, rollback_code, symlink
 import copy
+from unittest import TestCase
+
+from fabric.api import env
+from mock import call, Mock, patch
+from pydiploy.require.releases_manager import (cleanup, deploy_code,
+                                               rollback_code, set_current,
+                                               setup, symlink)
 
 
 class ReleasesManagerCheck(TestCase):
