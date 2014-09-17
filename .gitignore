@@ -34,6 +34,8 @@ unittest_settings.py
 .mr.developer.cfg
 .project
 .pydevproject
+tests/functional_tests/Vagrantfile
+tests/functional_tests/.vagrant
 
 # Sphinx
 docs/_build
