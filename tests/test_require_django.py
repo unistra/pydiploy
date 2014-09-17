@@ -6,6 +6,7 @@ from fabric.api import env
 from mock import patch, call, Mock
 from pydiploy.require.django.command import django_prepare
 from pydiploy.require.django.utils import generate_secret_key, extract_settings, app_settings
+import copy
 
 
 class CommandCheck(TestCase):
@@ -15,6 +16,7 @@ class CommandCheck(TestCase):
     """
 
     def setUp(self):
+        self.previous_env = copy.deepcopy(env)
         env.remote_virtualenv_dir = "remote_virtualenv_dir"
         env.remote_current_path = "remote_current_path"
         env.local_tmp_dir = "local_tmp_dir"
@@ -23,6 +25,7 @@ class CommandCheck(TestCase):
 
     def tearDown(self):
         env.clear()
+        env.update(self.previous_env)
 
     @patch('fabtools.python.virtualenv', return_value=Mock())
     @patch('fabric.api.cd', return_value=Mock())
@@ -80,6 +83,7 @@ class UtilsCheck(TestCase):
     """
 
     def setUp(self):
+        self.previous_env = copy.deepcopy(env)
         env.remote_settings_file = "remote_settings_file"
         env.local_tmp_dir = "tests/data"
         env.goal = "settings"
@@ -91,6 +95,7 @@ class UtilsCheck(TestCase):
 
     def tearDown(self):
         env.clear()
+        env.update(self.previous_env)
 
     def test_generate_secret_key(self):
         generate_secret_key()

@@ -5,6 +5,8 @@ from unittest import TestCase
 from fabric.api import env
 from mock import patch, call, Mock
 from pydiploy.prepare import tag, build_env, test_config
+import re
+import copy
 
 
 class PrepareCheck(TestCase):
@@ -14,6 +16,7 @@ class PrepareCheck(TestCase):
     """
 
     def setUp(self):
+        self.previous_env = copy.deepcopy(env)
         env.remote_home = "remote_home"
         env.server_name = "server_name"
         env.local_tmp_dir = "local_tmp_dir"
@@ -27,6 +30,7 @@ class PrepareCheck(TestCase):
 
     def tearDown(self):
         env.clear()
+        env.update(self.previous_env)
 
     def test_tag(self):
         tag("4.0")
@@ -63,7 +67,7 @@ class PrepareCheck(TestCase):
                          "remote_home/server_name/current/root_package_name/settings")
         self.assertEqual(env.remote_settings_file,
                          "remote_home/server_name/current/root_package_name/settings/goal.py")
-        self.assertEqual(env.lib_path, "pydiploy")
+        self.assertTrue(re.match("^.*pydiploy$", env.lib_path))
         self.assertEqual(env.goals, ['dev', 'test', 'prod'])
 
         # test env.extra_goals

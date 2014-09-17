@@ -5,6 +5,7 @@ from unittest import TestCase
 from fabric.api import env
 from mock import patch, call, Mock
 from pydiploy.require.system import django_user, django_group, update_pkg_index, set_locale, set_timezone, permissions
+import copy
 
 
 class SystemCheck(TestCase):
@@ -14,6 +15,7 @@ class SystemCheck(TestCase):
     """
 
     def setUp(self):
+        self.previous_env = copy.deepcopy(env)
         env.remote_group = "remote_group"
         env.remote_owner = "remote_owner"
         env.locale = "FR_fr"
@@ -23,6 +25,7 @@ class SystemCheck(TestCase):
 
     def tearDown(self):
         env.clear()
+        env.update(self.previous_env)
 
     @patch('fabtools.require.group', return_value=Mock())
     @patch('fabtools.require.user', return_value=Mock())

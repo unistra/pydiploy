@@ -5,6 +5,7 @@ from unittest import TestCase
 from fabric.api import env
 from mock import patch, call, Mock
 from pydiploy.require.git import archive
+import copy
 
 
 class GitCheck(TestCase):
@@ -14,12 +15,14 @@ class GitCheck(TestCase):
     """
 
     def setUp(self):
+        self.previous_env = copy.deepcopy(env)
         self.filename = "myfile"
         self.remote = "remote"
         self.prefix = "prefix"
 
     def tearDown(self):
         env.clear()
+        env.update(self.previous_env)
 
     @patch('fabric.api.abort', return_value=Mock())
     @patch('fabric.api.lcd', return_value=Mock())

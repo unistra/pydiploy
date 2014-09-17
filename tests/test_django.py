@@ -6,6 +6,7 @@ from fabric.api import env
 from mock import patch, call, Mock
 from pydiploy.django import application_packages, \
     pre_install_frontend, pre_install_backend, deploy, rollback, post_install_backend, post_install_frontend
+import copy
 
 
 class ReleasesManagerCheck(TestCase):
@@ -15,10 +16,12 @@ class ReleasesManagerCheck(TestCase):
     """
 
     def setUp(self):
+        self.previous_env = copy.deepcopy(env)
         env.remote_python_version = 2.7
 
     def tearDown(self):
         env.clear()
+        env.update(self.previous_env)
 
     @patch('fabtools.require.deb.packages', return_value=Mock())
     @patch('fabric.api.execute', return_value=Mock())

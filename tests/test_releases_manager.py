@@ -5,6 +5,7 @@ from unittest import TestCase
 from fabric.api import env
 from mock import patch, call, Mock
 from pydiploy.require.releases_manager import set_current, setup, cleanup, deploy_code, rollback_code, symlink
+import copy
 
 
 class ReleasesManagerCheck(TestCase):
@@ -14,6 +15,7 @@ class ReleasesManagerCheck(TestCase):
     """
 
     def setUp(self):
+        self.previous_env = copy.deepcopy(env)
         env.remote_current_release = "remote_current_release"
         env.remote_current_path = "remote_current_path"
         env.remote_project_dir = "remote_project_dir"
@@ -41,6 +43,7 @@ class ReleasesManagerCheck(TestCase):
 
     def tearDown(self):
         env.clear()
+        env.update(self.previous_env)
 
     @patch('fabric.api.sudo', return_value=Mock())
     def test_set_current(self, api_sudo):

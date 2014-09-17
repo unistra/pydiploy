@@ -6,6 +6,7 @@ from pydiploy.require.python.utils import python_pkg, application_dependencies
 from pydiploy.require.python.virtualenv import virtualenv
 from fabric.api import env
 from mock import patch, call, Mock
+import copy
 
 
 class UtilsCheck(TestCase):
@@ -15,6 +16,7 @@ class UtilsCheck(TestCase):
     """
 
     def setUp(self):
+        self.previous_env = copy.deepcopy(env)
         env.remote_virtualenv_dir = "remote_virtualenv_dir"
         env.remote_current_path = "remote_current_path"
         env.goal = "goal"
@@ -24,6 +26,7 @@ class UtilsCheck(TestCase):
 
     def tearDown(self):
         env.clear()
+        env.update(self.previous_env)
 
     @patch('fabtools.require.deb.packages', return_value=Mock())
     @patch('fabtools.require.python.install', return_value=Mock())
@@ -73,6 +76,7 @@ class VirtualEnvCheck(TestCase):
     """
 
     def setUp(self):
+        self.previous_env = copy.deepcopy(env)
         env.remote_group = "remote_group"
         env.remote_python_version = "2.7"
         env.remote_virtualenv_dir = "remote_virtualenv_dir"
@@ -80,6 +84,7 @@ class VirtualEnvCheck(TestCase):
 
     def tearDown(self):
         env.clear()
+        env.update(self.previous_env)
 
     @patch('fabtools.require.files.directory', return_value=Mock())
     @patch('fabtools.require.python.virtualenv', return_value=Mock())

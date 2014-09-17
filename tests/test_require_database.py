@@ -5,6 +5,7 @@ from unittest import TestCase
 from fabric.api import env
 from mock import patch, call, Mock
 from pydiploy.require.database import sqlite3_pkg, ldap_pkg, postgres_pkg
+import copy
 
 
 class DatabaseCheck(TestCase):
@@ -13,8 +14,12 @@ class DatabaseCheck(TestCase):
     test database
     """
 
+    def setUp(self):
+        self.previous_env = copy.deepcopy(env)
+
     def tearDown(self):
         env.clear()
+        env.update(self.previous_env)
 
     @patch("fabtools.require.deb.package", return_value=Mock())
     @patch("fabtools.require.python.package", return_value=Mock())

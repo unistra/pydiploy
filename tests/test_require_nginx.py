@@ -5,6 +5,7 @@ from unittest import TestCase
 from fabric.api import env
 from mock import patch, call, Mock
 from pydiploy.require.nginx import root_web, nginx_pkg, nginx_reload, web_static_files, web_configuration
+import copy
 
 
 class NginxCheck(TestCase):
@@ -14,6 +15,7 @@ class NginxCheck(TestCase):
     """
 
     def setUp(self):
+        self.previous_env = copy.deepcopy(env)
         env.remote_static_root = "remote_static_root"
         env.local_tmp_dir = 'local_tmp_dir'
         env.server_name = "server_name"
@@ -22,6 +24,7 @@ class NginxCheck(TestCase):
 
     def tearDown(self):
         env.clear()
+        env.update(self.previous_env)
 
     @patch('fabtools.require.files.directory', return_value=Mock())
     def test_root_web(self, files_directory):

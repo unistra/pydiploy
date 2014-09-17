@@ -5,6 +5,7 @@ from unittest import TestCase
 from fabric.api import env
 from mock import patch, call, Mock
 from pydiploy.require.circus import circus_pkg, app_circus_conf, upstart, app_reload
+import copy
 
 
 class CircusCheck(TestCase):
@@ -14,6 +15,7 @@ class CircusCheck(TestCase):
     """
 
     def setUp(self):
+        self.previous_env = copy.deepcopy(env)
         env.remote_home = 'remote_home'
         env.lib_path = 'lib_path'
         env.remote_owner = 'remote_owner'
@@ -22,6 +24,7 @@ class CircusCheck(TestCase):
 
     def tearDown(self):
         env.clear()
+        env.update(self.previous_env)
 
     @patch('fabtools.system.distrib_id', return_value='Ubuntu')
     @patch('fabtools.system.distrib_release', return_value='10.04')
