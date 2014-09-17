@@ -68,6 +68,14 @@ class UtilsCheck(TestCase):
         self.assertEqual(install_requirements.call_args, call(
             'requirements/goal.txt', pip_cmd='pip', use_sudo=True, upgrade=False, user='remote_owner'))
 
+        # test oracle
+
+        env.oracle_client_version = ''
+        env.oracle_remote_dir = ''
+        env.remote_home = ''
+
+        application_dependencies(False)
+
 
 class VirtualEnvCheck(TestCase):
 

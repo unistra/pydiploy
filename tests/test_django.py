@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import copy
+
 from unittest import TestCase
 from fabric.api import env
 from mock import patch, call, Mock
 from pydiploy.django import application_packages, \
-    pre_install_frontend, pre_install_backend, deploy, rollback, post_install_backend, post_install_frontend
-import copy
+    pre_install_frontend, pre_install_backend, deploy, \
+    rollback, post_install_backend, post_install_frontend, \
+    dump_database, reload_frontend, reload_backend
 
 
 class ReleasesManagerCheck(TestCase):
@@ -38,29 +41,50 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(
             str(api_execute.call_args_list[2]).find('call(<function python_pkg') == 0)
 
+        # env.remote_python_version >= 3
+        env.remote_python_version = 3
+        application_packages()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(
+            str(api_execute.call_args_list[5]).find('call(<function check_python3_install') == 0)
+
+        # test extra pppa
+        env.extra_ppa_to_install = "ppa:myppa/ppafromhell"
+        application_packages()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(
+            str(api_execute.call_args_list[11]).find('call(<function install_extra_ppa') == 0)
+
+        # test extra pkg
+        env.extra_pkg_to_install = "pkgfromhell"
+        application_packages()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(
+            str(api_execute.call_args_list[17]).find('call(<function install_extra_packages') == 0)
+
     @patch('fabric.api.execute', return_value=Mock())
-    def pre_install_backend(self, api_execute):
+    def test_pre_install_backend(self, api_execute):
         pre_install_backend()
         self.assertTrue(api_execute.called)
         self.assertTrue(
-            str(api_execute.call_args_list[1]).find('call(<function django_user') == 0)
+            str(api_execute.call_args_list[0]).find('call(<function django_user') == 0)
         self.assertTrue(
-            str(api_execute.call_args_list[2]).find('call(<function set_locale') == 0)
-        self.assertTrue(str(api_execute.call_args_list[3]).find(
+            str(api_execute.call_args_list[1]).find('call(<function set_locale') == 0)
+        self.assertTrue(str(api_execute.call_args_list[2]).find(
             'call(<function set_timezone') == 0)
-        self.assertTrue(str(api_execute.call_args_list[4]).find(
+        self.assertTrue(str(api_execute.call_args_list[3]).find(
             'call(<function update_pkg_index') == 0)
-        self.assertTrue(str(api_execute.call_args_list[5]).find(
+        self.assertTrue(str(api_execute.call_args_list[4]).find(
             'call(<function application_packages') == 0)
         self.assertTrue(
-            str(api_execute.call_args_list[6]).find('call(<function circus_pkg') == 0)
+            str(api_execute.call_args_list[5]).find('call(<function circus_pkg') == 0)
         self.assertTrue(
-            str(api_execute.call_args_list[7]).find('call(<function virtualenv') == 0)
+            str(api_execute.call_args_list[6]).find('call(<function virtualenv') == 0)
         self.assertTrue(
-            str(api_execute.call_args_list[8]).find('call(<function upstart') == 0)
+            str(api_execute.call_args_list[7]).find('call(<function upstart') == 0)
 
     @patch('fabric.api.execute', return_value=Mock())
-    def pre_install_frontend(self, api_execute):
+    def test_pre_install_frontend(self, api_execute):
         pre_install_frontend()
         self.assertTrue(api_execute.called)
         self.assertTrue(
@@ -119,3 +143,24 @@ class ReleasesManagerCheck(TestCase):
             'call(<function app_circus_conf') == 0)
         self.assertTrue(
             str(api_execute.call_args_list[1]).find('call(<function app_reload') == 0)
+
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_dump_database(self, api_execute):
+        dump_database()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function django_dump_database') == 0)
+
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_reload_frontend(self, api_execute):
+        reload_frontend()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function nginx_reload') == 0)
+
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_reload_backend(self, api_execute):
+        reload_backend()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function app_reload') == 0)

@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import copy
+
 from unittest import TestCase
 from fabric.api import env
 from mock import patch, call, Mock
-from pydiploy.require.nginx import root_web, nginx_pkg, nginx_reload, web_static_files, web_configuration
-import copy
+from pydiploy.require.nginx import root_web, nginx_pkg, nginx_reload, \
+    nginx_restart, web_static_files, web_configuration
 
 
 class NginxCheck(TestCase):
@@ -56,7 +58,28 @@ class NginxCheck(TestCase):
 
         nginx_reload()
 
+        self.assertTrue(is_running.called)
         self.assertFalse(reload.called)
+        self.assertTrue(start.called)
+        self.assertEqual(start.call_args, call('nginx'))
+
+    @patch('fabtools.service.is_running', return_value=True)
+    @patch('fabtools.service.start', return_value=Mock())
+    @patch('fabtools.service.restart', return_value=Mock())
+    def test_nginx_restart(self, restart, start, is_running):
+        nginx_restart()
+        self.assertTrue(is_running.called)
+        self.assertFalse(start.called)
+        self.assertTrue(restart.called)
+
+        is_running.return_value = False
+        restart.called = False
+        is_running.called = False
+        start.called = False
+
+        nginx_restart()
+
+        self.assertFalse(restart.called)
         self.assertTrue(is_running.called)
         self.assertTrue(start.called)
         self.assertEqual(start.call_args, call('nginx'))

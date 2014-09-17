@@ -14,6 +14,11 @@ def django_prepare():
     """
     Prepares django webapp (syncdb,migrate,collectstatic,and eventually compilemessages)
     """
+
+    # remove old statics from local tmp dir before collecting new ones
+    with fabric.api.lcd(env.local_tmp_dir):
+        fabric.api.local('rm -rf assets/*')
+
     with fabtools.python.virtualenv(env.remote_virtualenv_dir):
         with fabric.api.cd(env.remote_current_path):
             with fabric.api.settings(sudo_user=env.remote_owner):
@@ -29,6 +34,7 @@ def django_prepare():
                 ignore = ('admin',  'rest_framework',  'django_extensions')
                 fabric.api.sudo('python manage.py collectstatic --noinput -i %s' %
                                 ' -i '.join(ignore))
+
     fabric.api.get(os.path.join(env.remote_current_path, 'assets'),
                    local_path=env.local_tmp_dir)
 

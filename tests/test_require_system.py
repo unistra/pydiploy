@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import copy
+
 from unittest import TestCase
 from fabric.api import env
 from mock import patch, call, Mock
-from pydiploy.require.system import django_user, django_group, update_pkg_index, set_locale, set_timezone, permissions
-import copy
+
+from pydiploy.require.system import django_user, django_group, \
+    update_pkg_index, set_locale, set_timezone, permissions, \
+    package_installed, check_python3_install, install_extra_packages, \
+    install_extra_ppa
 
 
 class SystemCheck(TestCase):
@@ -96,3 +101,42 @@ class SystemCheck(TestCase):
         self.assertTrue(api_sudo.called)
         self.assertEqual(
             api_sudo.call_args, call('chmod -R g+w remote_project_dir'))
+
+    @patch('fabric.api.settings', return_value=Mock())
+    @patch('fabric.api.sudo', return_value=Mock())
+    def test_package_installed(self, api_sudo, api_settings):
+
+        api_settings.return_value.__exit__ = Mock()
+        api_settings.return_value.__enter__ = Mock()
+
+        package_installed("package")
+        self.assertTrue(api_sudo.called)
+        self.assertEqual(
+            api_sudo.call_args, call('dpkg-query -l "package" | grep -q ^.i'))
+
+    @patch('fabtools.require.deb.packages', return_value=Mock())
+    def test_install_extra_packages(self, deb_pkgs):
+
+        install_extra_packages('ponysays')
+        self.assertTrue(deb_pkgs.called)
+        self.assertEqual(deb_pkgs.call_args, call('ponysays', update=False))
+
+    @patch('fabtools.require.deb.ppa', return_value=Mock())
+    def test_install_extra_ppa(self, deb_ppa):
+
+        install_extra_ppa(['ppa:myppa/ppa', ])
+        self.assertTrue(deb_ppa.called)
+        self.assertEqual(deb_ppa.call_args, call('ppa:myppa/ppa'))
+
+    @patch('fabtools.require.deb.package', return_value=Mock())
+    @patch('fabtools.require.deb.ppa', return_value=Mock())
+    @patch('fabtools.require.deb.packages', return_value=Mock())
+    @patch('fabtools.system.distrib_release', return_value='13')
+    @patch('fabtools.system.distrib_id', return_value='Ubuntu')
+    @patch('pydiploy.require.system.package_installed', return_value=False)
+    def test_check_python3_install(self, pkg_installed, sys_distrib, sys_distrib_id, deb_pkgs, deb_ppa, deb_pkg):
+
+        check_python3_install()
+        self.assertTrue(deb_pkgs.called)
+        self.assertTrue(deb_ppa.called)
+        self.assertTrue(deb_pkg.called)
