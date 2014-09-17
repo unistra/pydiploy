@@ -1,4 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import virtualenv
-from . import utils
+from . import utils, virtualenv

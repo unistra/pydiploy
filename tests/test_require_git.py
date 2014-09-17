@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase
-from fabric.api import env
-from mock import patch, call, Mock
-from pydiploy.require.git import archive
 import copy
+from unittest import TestCase
+
+from fabric.api import env
+from mock import call, Mock, patch
+from pydiploy.require.git import archive
 
 
 class GitCheck(TestCase):

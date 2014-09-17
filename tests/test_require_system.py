@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import copy
-
 from unittest import TestCase
-from fabric.api import env
-from mock import patch, call, Mock
 
-from pydiploy.require.system import django_user, django_group, \
-    update_pkg_index, set_locale, set_timezone, permissions, \
-    package_installed, check_python3_install, install_extra_packages, \
-    install_extra_ppa
+from fabric.api import env
+from mock import call, Mock, patch
+from pydiploy.require.system import (check_python3_install, django_group,
+                                     django_user, install_extra_packages,
+                                     install_extra_ppa, package_installed,
+                                     permissions, set_locale, set_timezone,
+                                     update_pkg_index)
 
 
 class SystemCheck(TestCase):

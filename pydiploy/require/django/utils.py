@@ -2,13 +2,14 @@
 
 """ Utilities for django settings. """
 
-import random
-import string
 import os
+import random
 import re
-from fabric.api import env
-import fabtools
+import string
+
 import fabric
+import fabtools
+from fabric.api import env
 
 
 def generate_secret_key():

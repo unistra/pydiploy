@@ -8,9 +8,10 @@ Circus
 """
 
 import os
+
 import fabric
-from fabric.api import env
 import fabtools
+from fabric.api import env
 
 
 def circus_pkg(update=False):

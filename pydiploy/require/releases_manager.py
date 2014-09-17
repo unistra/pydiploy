@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os
-import fabtools
 from time import time
+
 import fabric
-from fabric.api import env
+import fabtools
 import pydiploy
+from fabric.api import env
 
 
 def set_current():

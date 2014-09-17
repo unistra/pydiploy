@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase
-from fabric.api import env
-from mock import patch, call, Mock
-from pydiploy.prepare import tag, build_env, test_config
-import re
 import copy
+import re
+from unittest import TestCase
+
+from fabric.api import env
+from mock import call, Mock, patch
+from pydiploy.prepare import build_env, tag, test_config
 
 
 class PrepareCheck(TestCase):

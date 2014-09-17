@@ -3,11 +3,12 @@
 """
 """
 
-import os
-import fabric
 import datetime
-from fabric.api import env
+import os
+
+import fabric
 import fabtools
+from fabric.api import env
 
 
 def django_prepare():

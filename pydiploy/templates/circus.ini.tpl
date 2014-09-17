@@ -1,6 +1,6 @@
 [circus]
 httpd = 1
-httpd_host = {{ host }}
+httpd_host = {{ socket_host }}
 httpd_port = 8080
 stream_backend = gevent
 statsd = 1

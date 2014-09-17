@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import copy
-
 from unittest import TestCase
+
 from fabric.api import env
-from mock import patch, call, Mock
-from pydiploy.django import application_packages, \
-    pre_install_frontend, pre_install_backend, deploy, \
-    rollback, post_install_backend, post_install_frontend, \
-    dump_database, reload_frontend, reload_backend
+from mock import call, Mock, patch
+from pydiploy.django import (application_packages, deploy, dump_database,
+                             post_install_backend, post_install_frontend,
+                             pre_install_backend, pre_install_frontend,
+                             reload_backend, reload_frontend, rollback)
 
 
 class ReleasesManagerCheck(TestCase):

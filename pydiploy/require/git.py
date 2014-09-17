@@ -7,8 +7,9 @@ Git
 Create an archive from a remote or directly from a project
 """
 
-import fabric
 import os
+
+import fabric
 
 
 def archive(filename, path='/tmp', format="tar.gz", tag="HEAD", remote="",
