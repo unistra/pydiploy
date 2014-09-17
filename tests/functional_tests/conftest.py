@@ -15,18 +15,14 @@ from fabtools.vagrant import version as _vagrant_version
 HERE = os.path.dirname(__file__)
 
 
-VAGRANT_VERSION = _vagrant_version()
-MIN_VAGRANT_VERSION = (1, 3)
-
-
 @pytest.fixture(scope='session', autouse=True)
 def setup_package(request):
-    _check_vagrant_version()
     vagrant_box = os.environ.get('FABTOOLS_TEST_BOX')
     if not vagrant_box:
         pytest.skip("Set FABTOOLS_TEST_BOX to choose a Vagrant base box for functional tests")
     vagrant_provider = os.environ.get('FABTOOLS_TEST_PROVIDER')
     reuse_vm = os.environ.get('FABTOOLS_TEST_REUSE_VM')
+    _check_vagrant_version()
     _configure_logging()
     _allow_fabric_to_access_the_real_stdin()
     if not reuse_vm:
@@ -41,6 +37,8 @@ def setup_package(request):
 
 
 def _check_vagrant_version():
+    VAGRANT_VERSION = _vagrant_version()
+    MIN_VAGRANT_VERSION = (1, 3)
     if VAGRANT_VERSION is None:
         pytest.skip("Vagrant is required for functional tests")
     elif VAGRANT_VERSION < MIN_VAGRANT_VERSION:
