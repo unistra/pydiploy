@@ -80,7 +80,9 @@ def build_env():
     env.remote_settings_file = os.path.join(env.remote_settings_dir,
                                             '%s.py' % env.goal)
     env.lib_path = os.path.dirname(__file__)
-    env.previous_settings_file = ""
+
+    if "previous_settings_file" not in env:
+        env.previous_settings_file = ""
 
     if "socket_host" not in env:
         env.socket_host = env.host
