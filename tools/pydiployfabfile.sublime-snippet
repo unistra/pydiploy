@@ -44,11 +44,13 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 
 # optionnal parameters
 
+env.dest_path = '' # if not set using env_local_tmp_dir
 env.excluded_files = [] # files that rsync should exclude when deploying app
 env.extra_ppa_to_install = [] # extra ppa source(s) to use
 env.extra_pkg_to_install = [] # extra debian/ubuntu package(s) to install on remote
 env.cfg_shared_files = [] # config files to be placed in shared config dir
 env.extra_goals = []
+env.verbose = True # verbose display for pydiploy
 
 env.oracle_client_version = '11.2'
 env.oracle_download_url = 'http://librepo.net/lib/oracle/'

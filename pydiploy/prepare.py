@@ -13,6 +13,8 @@ import fabric
 import fabtools
 from fabric.api import env
 
+from pydiploy.params import PARAMS
+
 
 @fabric.api.task
 def tag(version):
@@ -21,34 +23,10 @@ def tag(version):
     env.tag = version
 
 
-def init_required_params():
+def init_params():
     """ sets required params and its description """
 
-    # TODO use more descriptives values !!!!!
-    required_params = {'user': "user for ssh",
-                       'remote_owner': "remote server user",
-                       'remote_group': "remote server user group",
-                       'application_name': "name of wepapp",
-                       'root_package_name': "name of app in webapp",
-                       'remote_home': "remote home root",
-                       'remote_python_version': "remote python version to use",
-                       'remote_virtualenv_root': "remote virtualenv root",
-                       'remote_virtualenv_dir': "remote virtualenv dir for wepapp",
-                       'remote_repo_url': "git repository url",
-                       'local_tmp_dir': "local tmp dir",
-                       'remote_static_root': "root of static files",
-                       'locale': "locale to use on remote",
-                       'timezone': "timezone used on remote",
-                       'keep_releases': "number of old releases to keep",
-                       'roledefs': "Role to use to deploy",
-                       'backends': "backend to use to deploy",
-                       'server_name': "name of webserver",
-                       'short_server_name': "short name of webserver",
-                       'static_folder': "path of static folder",
-                       'goal': "stage to use to deploy (dev,prod,test...)",
-                       'socket_port': "port to use for socket",
-                       'socket_host': "socket host"}
-    return required_params
+    return PARAMS['default']['required_params'], PARAMS['default']['optional_params']
 
 
 def build_env():
@@ -87,12 +65,10 @@ def build_env():
     if "socket_host" not in env:
         env.socket_host = env.host
 
-
     if not "releases" in env:
         if fabtools.files.is_dir(env.remote_releases_path):
             env.releases = sorted(fabric.api.run('ls -x %(releases_path)s' %
                                                  {'releases_path': env.remote_releases_path}).split())
-
 
             if len(env.releases) >= 1:
                 env.current_revision = env.releases[-1]
@@ -120,7 +96,13 @@ def build_env():
     if "extra_goals" in env:
         env.goals += env.extra_goals
 
-    if not test_config():
+    # verbose display
+    if "verbose_output" in env:
+        verbose_value = env.verbose_output
+    else:
+        verbose_value = True
+
+    if not test_config(verbose=verbose_value):
         if not fabric.contrib.console.confirm("Configuration test %s! Do you want to continue?" % fabric.colors.red('failed'), default=False):
             fabric.api.abort("Aborting at user request.")
 
@@ -128,21 +110,35 @@ def build_env():
 @fabric.api.task
 def test_config(verbose=True):
     err = []
-    parameters = []
-    returned_params = init_required_params()
-    max_param_length = max(map(len, returned_params.keys()))
-    max_desc_length = max(map(len, returned_params.values()))
+    req_parameters = []
+    opt_parameters = []
+    req_params, opt_params = init_params()
+    max_req_param_length = max(map(len, req_params.keys()))
+    max_req_desc_length = max(map(len, req_params.values()))
+    max_opt_param_length = max(map(len, opt_params.keys()))
+    max_opt_desc_length = max(map(len, opt_params.values()))
 
-    for param, desc in returned_params.items():
-        if param not in env or not env[param]:
+    for param, desc in sorted(req_params.items()):
+        if param not in env:
             err.append("%s -> %s : missing" %
-                       (param.ljust(max_param_length), desc.ljust(max_desc_length)))
+                       (param.ljust(max_req_param_length), desc.ljust(max_req_desc_length)))
+        elif not bool(env[param]):
+            err.append("%s -> %s : not set" %
+                       (param.ljust(max_req_param_length), desc.ljust(max_req_desc_length)))
         elif verbose:
-            parameters.append((param, env[param], desc))
+            req_parameters.append((param, env[param], desc))
+
+    for param, desc in sorted(opt_params.items()):
+        if param in env and verbose:
+            if param == 'socket_host' and env.socket_host == env.host:
+                continue
+            elif param == 'dest_path' and env.dest_path == env.local_tmp_dir:
+                continue
+            opt_parameters.append((param, env[param], desc))
 
     if err:
         err_nb = len(err)
-        if err_nb == len(returned_params):
+        if err_nb == len(req_params):
             fabric.api.puts(
                 'You need to configure correctly the fabfile please RTFM first !')
         else:
@@ -153,9 +149,18 @@ def test_config(verbose=True):
                 'Please fix them or continue with possible errors.')
         return False
     elif verbose:
-        for param, value, description in parameters:
+        fabric.api.puts('Required parameters list : \n\n')
+        for param, value, description in req_parameters:
             fabric.api.puts('* %s %s' %
-                            (param.ljust(max_param_length), fabric.colors.green(value)))
-
+                            (param.ljust(max_req_param_length), fabric.colors.green(value)))
+        fabric.api.puts('\n\nOptional parameters list : \n\n')
+        if len(opt_parameters):
+            for param, value, description in opt_parameters:
+                value = "Warning initialized but not set" if not bool(
+                    value) else value
+                fabric.api.puts('* %s %s' %
+                                (param.ljust(max_opt_param_length), fabric.colors.green(value)))
+        else:
+            fabric.api.puts("No optionnal parameter found")
     fabric.api.puts('\n\nConfiguration OK!\n\n')
     return True

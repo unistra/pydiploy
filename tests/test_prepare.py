@@ -7,7 +7,7 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.prepare import build_env, tag, test_config
+from pydiploy.prepare import build_env, tag, test_config, init_params
 
 
 class PrepareCheck(TestCase):
@@ -123,7 +123,6 @@ class PrepareCheck(TestCase):
         env.goal = 'foo'
         env.backends = 'foo'
         env.locale = 'foo'
-        env.socket_host = 'foo'
         env.remote_virtualenv_dir = 'foo'
         env.user = 'foo'
         env.roledefs = 'foo'
@@ -140,6 +139,22 @@ class PrepareCheck(TestCase):
         env.static_folder = 'foo'
         env.socket_port = 'foo'
         env.local_tmp_dir = 'foo'
+        build_env()
+
+        # test env.verbose set
+        env.verbose_output = True
+        build_env()
+
+        # test env.verbose_output not set
+        env.socket_host = "toto"
+        del env['dest_path']
+        del env['verbose_output']
+        build_env()
+
+        # test optionnal params not set
+        del env['socket_host']
+        del env['dest_path']
+        del env['extra_goals']
         build_env()
 
         # test no required params are set
@@ -171,3 +186,4 @@ class PrepareCheck(TestCase):
     @patch('fabric.api.puts', return_value=Mock())
     def test_config(self, api_puts):
         test_config()
+        self.assertTrue(api_puts.called)
