@@ -65,6 +65,9 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     # change the package to use to install circus
     # env.circus_package_name = 'https://github.com/morganbohn/circus/archive/master.zip'
 
+    # add directive(s) to nginx config file in location part
+    # env.nginx_location_extra_directives = ['proxy_read_timeout 120']
+
     # fill and uncomment not to pass parameters in term
     # env.default_db_host = 'localhost'
     # env.default_db_name = 'myapp_db'
