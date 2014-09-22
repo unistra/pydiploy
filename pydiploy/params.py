@@ -51,6 +51,7 @@ PARAMS = {
                             'oracle_packages': "oracle packages to install",
                             'circus_package_name': "circus package name",
                             'dest_path': "destination path",
+                            'nginx_location_extra_directives': "nginx location extra directive(e)s",
                             'verbose_output': "verbose output"}
 
     }

@@ -53,6 +53,11 @@ server {
         proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
         proxy_set_header   X-Forwarded-Protocol ssl;
         proxy_set_header   X-Forwarded-Ssl on;
+        {% if nginx_location_extra_directives %}
+        {% for extra_directive in nginx_location_extra_directives %}
+        {{ extra_directive }};
+        {% endfor %}
+        {% endif %}
     }
     {% if server_ssl_on %}
         access_log  /var/log/nginx/{{ short_server_name }}_ssl.access.log;
