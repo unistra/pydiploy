@@ -15,8 +15,6 @@ from fabric.api import env
 
 from pydiploy.params import PARAMS
 
-
-@fabric.api.task
 def tag(version):
     """ Defines tag to deploy """
 
@@ -26,6 +24,8 @@ def tag(version):
 def init_params():
     """ sets required params and its description """
 
+    # TODO implement mechanism to deploy other technos with specific required
+    # and optionnal parameters !
     return PARAMS['default']['required_params'], PARAMS['default']['optional_params']
 
 
@@ -34,18 +34,16 @@ def build_env():
     Builds env vars
     """
 
-    # checks if tag is specified if not fabric.api.prompt user
-    if "tag" not in env:
-        env.tag = fabric.api.prompt('Please specify target tag used: ')
-
     # defines destination path for fetched file(s)
     if "dest_path" not in env:
         env.dest_path = env.local_tmp_dir
 
     env.remote_project_dir = os.path.join(env.remote_home, env.server_name)
-    env.local_tmp_root_app = os.path.join(env.local_tmp_dir,
+
+    if "tag" in env:
+        env.local_tmp_root_app = os.path.join(env.local_tmp_dir,
                                           '%(application_name)s-%(tag)s' % env)
-    env.local_tmp_root_app_package = os.path.join(env.local_tmp_root_app,
+        env.local_tmp_root_app_package = os.path.join(env.local_tmp_root_app,
                                                   env.root_package_name)
 
     env.remote_current_path = os.path.join(env.remote_project_dir, 'current')

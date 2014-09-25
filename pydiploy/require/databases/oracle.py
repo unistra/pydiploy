@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """
-Database
-========
+Oracle
+======
 
-Requires function to install database client for Python ::
-
-    sqlite3
-    oracle
-    postgresql
-    mysql
+Required functions for Oracle database
 
 """
 
@@ -21,29 +16,9 @@ import fabtools
 from fabric.api import env
 
 
-def sqlite3_pkg(use_sudo=False, user=None):
-    """ Installs sqlite3 package and requirements """
-
-    fabtools.require.deb.package('libsqlite3-dev', update=True)
-    fabtools.require.python.package(
-        'pysqlite', upgrade=True, use_sudo=use_sudo,
-        user=user)
-
-
-def ldap_pkg(use_sudo=False, user=None):
-    """ Installs ldap packages and dependencies """
-
-    fabtools.require.deb.package('libldap2-dev', update=True)
-    fabtools.require.deb.package('libsasl2-dev', update=True)
-    fabtools.require.deb.package('libssl-dev', update=True)
-    fabtools.require.python.package(
-        'python-ldap', upgrade=True, use_sudo=use_sudo,
-        user=user)
-
-
 def install_oracle_client():
     """
-    installs oracle's client for Python oracle_cx.
+    installs oracle's specif client for Python oracle_cx for example.
 
     needed env vars in fabfile:
 
@@ -96,3 +71,13 @@ def install_oracle_client():
         fabric.api.sudo(
             'echo %s > /etc/ld.so.conf.d/oracle.conf' % oracle_full_path)
         fabric.api.sudo('ldconfig')
+
+
+def install_oracle_jdk(version):
+    """ install oracle jdk from oracle website """
+    fabtools.oracle_jdk.install_from_oracle_site(version=version)
+
+
+def get_oracle_jdk_version():
+    """ get oracle jdk version returns null if not installed """
+    return fabtools.oracle_jdk.version()

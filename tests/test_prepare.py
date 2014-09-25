@@ -49,7 +49,7 @@ class PrepareCheck(TestCase):
         del env['tag']
         # self.assertTrue(api_execute.called)
         build_env()
-        self.assertTrue(api_prompt.called)
+        ##self.assertTrue(api_prompt.called)
         # test env var
         self.assertEqual(env.remote_project_dir, "remote_home/server_name")
         self.assertEqual(

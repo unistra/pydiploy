@@ -38,8 +38,8 @@ def cleanup():
         directories.reverse()
         del directories[:env.keep_releases]
         env.directories = ' '.join(["%(releases_path)s/%(release)s" %
-                                   {'releases_path': env.remote_releases_path,
-                                    'release': release} for release in directories])
+                                    {'releases_path': env.remote_releases_path,
+                                     'release': release} for release in directories])
 
         fabric.api.sudo("rm -rf %(directories)s" %
                         {'directories': env.directories})
@@ -49,6 +49,11 @@ def deploy_code():
     """
     Deploys code according to tag in env var
     """
+
+    # checks if tag is specified if not fabric.api.prompt user
+    if "tag" not in env:
+        env.tag = fabric.api.prompt('Please specify target tag used: ')
+
     fabric.api.require('tag', provided_by=['tag', 'head'])
     fabric.api.require('remote_project_dir', provided_by=env.goals)
     tarball = pydiploy.require.git.archive(env.application_name,
@@ -108,29 +113,6 @@ def deploy_code():
     # set current directory with new release
     fabric.api.execute(set_current)
 
-    # uploading manage.py template
-    fabtools.files.upload_template('manage.py',
-                                   os.path.join(
-                                       env.remote_current_release, 'manage.py'),
-                                   template_dir=env.local_tmp_root_app,
-                                   context=env,
-                                   use_sudo=True,
-                                   user=env.remote_owner,
-                                   chown=True,
-                                   mode='744',
-                                   use_jinja=True)
-
-    # uploading wsgi.py template
-    fabtools.files.upload_template('wsgi.py',
-                                   os.path.join(
-                                       env.remote_base_package_dir, 'wsgi.py'),
-                                   template_dir=env.local_tmp_root_app_package,
-                                   context=env,
-                                   use_sudo=True,
-                                   user=env.remote_owner,
-                                   chown=True,
-                                   mode='644',
-                                   use_jinja=True)
     fabric.api.lcd('rm %s' % tarball)
 
 

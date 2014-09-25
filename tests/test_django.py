@@ -21,6 +21,7 @@ class ReleasesManagerCheck(TestCase):
     def setUp(self):
         self.previous_env = copy.deepcopy(env)
         env.remote_python_version = 2.7
+        env.locale = 'fr_FR.UTF-8'
 
     def tearDown(self):
         env.clear()
@@ -98,22 +99,27 @@ class ReleasesManagerCheck(TestCase):
     def test_deploy(self, api_execute):
         deploy()
         self.assertTrue(api_execute.called)
-        self.assertTrue(
-            str(api_execute.call_args_list[0]).find('call(<function setup') == 0)
-        self.assertTrue(
-            str(api_execute.call_args_list[1]).find('call(<function deploy_code') == 0)
+        print("test ahahahah", api_execute.call_args_list)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function setup') == 0)
+        self.assertTrue(str(api_execute.call_args_list[1]).find(
+            'call(<function deploy_code') == 0)
         self.assertTrue(str(api_execute.call_args_list[2]).find(
-            'call(<function application_dependencies') == 0)
+            'call(<function deploy_manage_file') == 0)
         self.assertTrue(str(api_execute.call_args_list[3]).find(
-            'call(<function app_settings') == 0)
+            'call(<function deploy_wsgi_file') == 0)
         self.assertTrue(str(api_execute.call_args_list[4]).find(
+            'call(<function application_dependencies') == 0)
+        self.assertTrue(str(api_execute.call_args_list[5]).find(
+            'call(<function app_settings') == 0)
+        self.assertTrue(str(api_execute.call_args_list[6]).find(
             'call(<function django_prepare') == 0)
         self.assertTrue(
-            str(api_execute.call_args_list[5]).find('call(<function permissions') == 0)
+            str(api_execute.call_args_list[7]).find('call(<function permissions') == 0)
         self.assertTrue(
-            str(api_execute.call_args_list[6]).find('call(<function app_reload') == 0)
+            str(api_execute.call_args_list[8]).find('call(<function app_reload') == 0)
         self.assertTrue(
-            str(api_execute.call_args_list[7]).find('call(<function cleanup') == 0)
+            str(api_execute.call_args_list[9]).find('call(<function cleanup') == 0)
 
     @patch('fabric.api.execute', return_value=Mock())
     def test_rollback(self, api_execute):

@@ -85,3 +85,33 @@ def app_settings(**kwargs):
                                    mode='644',
                                    chown=True,
                                    use_jinja=True)
+
+
+def deploy_manage_file():
+    """ uploading manage.py template """
+
+    fabtools.files.upload_template('manage.py',
+                                   os.path.join(
+                                       env.remote_current_release, 'manage.py'),
+                                   template_dir=env.local_tmp_root_app,
+                                   context=env,
+                                   use_sudo=True,
+                                   user=env.remote_owner,
+                                   chown=True,
+                                   mode='744',
+                                   use_jinja=True)
+
+
+def deploy_wsgi_file():
+    """ uploading wsgi.py template """
+
+    fabtools.files.upload_template('wsgi.py',
+                                   os.path.join(
+                                       env.remote_base_package_dir, 'wsgi.py'),
+                                   template_dir=env.local_tmp_root_app_package,
+                                   context=env,
+                                   use_sudo=True,
+                                   user=env.remote_owner,
+                                   chown=True,
+                                   mode='644',
+                                   use_jinja=True)
