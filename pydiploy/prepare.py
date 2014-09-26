@@ -62,9 +62,6 @@ def build_env():
     if "previous_settings_file" not in env:
         env.previous_settings_file = ""
 
-    if "socket_host" not in env:
-        env.socket_host = env.host
-
     if not "releases" in env:
         if fabtools.files.is_dir(env.remote_releases_path):
             env.releases = sorted(fabric.api.run('ls -x %(releases_path)s' %
@@ -130,9 +127,7 @@ def test_config(verbose=True):
 
     for param, desc in sorted(opt_params.items()):
         if param in env and verbose:
-            if param == 'socket_host' and env.socket_host == env.host:
-                continue
-            elif param == 'dest_path' and env.dest_path == env.local_tmp_dir:
+            if param == 'dest_path' and env.dest_path == env.local_tmp_dir:
                 continue
             opt_parameters.append((param, env[param], desc))
 

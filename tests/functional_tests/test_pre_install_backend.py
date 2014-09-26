@@ -44,7 +44,6 @@ def buildmyenv():
     env.server_ssl_on = False
     env.goal = 'dev'
     env.socket_port = '8001'
-    env.socket_host = '127.0.0.1'
     env.map_settings = {
         #'ldap_user': "DATABASES['ldap']['USER']",
         #'ldap_password': "DATABASES['ldap']['PASSWORD']"

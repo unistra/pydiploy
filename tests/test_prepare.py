@@ -146,13 +146,11 @@ class PrepareCheck(TestCase):
         build_env()
 
         # test env.verbose_output not set
-        env.socket_host = "toto"
         del env['dest_path']
         del env['verbose_output']
         build_env()
 
         # test optionnal params not set
-        del env['socket_host']
         del env['dest_path']
         del env['extra_goals']
         build_env()
@@ -164,7 +162,6 @@ class PrepareCheck(TestCase):
         env.goal = ''
         env.backends = ''
         env.locale = ''
-        env.socket_host = ''
         env.remote_virtualenv_dir = ''
         env.user = ''
         env.roledefs = ''
