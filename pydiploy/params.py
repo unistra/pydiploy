@@ -39,8 +39,7 @@ PARAMS = {
                             'goal': "stage to use to deploy (dev,prod,test...)",
                             'socket_port': "port to use for socket"},
 
-        'optional_params': {'socket_host': "socket host",
-                            'excluded_files': "file(s) to exclude when deploying",
+        'optional_params': {'excluded_files': "file(s) to exclude when deploying",
                             'extra_ppa_to_install': "extra ppa(s) to install on remote",
                             'extra_pkg_to_install': "extra package(s) to install on remote",
                             'cfg_shared_files': "shared file(s) to deploy in shared dir",
@@ -52,7 +51,9 @@ PARAMS = {
                             'circus_package_name': "circus package name",
                             'dest_path': "destination path",
                             'nginx_location_extra_directives': "nginx location extra directive(s)",
-                            'verbose_output': "verbose output"}
+                            'verbose_output': "verbose output (True/False)",
+                            'no_config_test': "don't check config params (True/False)",
+                            'req_pydiploy_version': "pydiploy version required for checking fabfile syntax"}
 
     }
 }

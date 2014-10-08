@@ -73,6 +73,7 @@ def app_circus_conf():
 def upstart():
     """ Sets script to start circus at boot using templates in templates dir """
 
+    # TODO: implement as systemd service !!!
     # init files to declare circus as an upstart daemon
     fabtools.files.upload_template('upstart.conf.tpl',
                                    '/etc/init/circus.conf',

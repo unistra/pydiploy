@@ -12,9 +12,11 @@ with open('requirements.txt') as requirements:
     dependency_links = [link.split()[1] for link in lines if
                         link.startswith('-f')]
 
+exec(open('pydiploy/version.py').read())
+
 setup(
     name='pydiploy',
-    version='1.0.2.9',
+    version=__version__,
     author='di-dip-unistra',
     author_email='di-dip@unistra.fr',
     maintainer='di-dip-unistra',

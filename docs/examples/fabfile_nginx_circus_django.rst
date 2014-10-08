@@ -13,7 +13,8 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     from os.path import join
 
     from pydiploy.prepare import tag, build_env as pydiploy_build_env
-    from pydiploy.django import (deploy as diploy,
+    from pydiploy.django import (deploy_backend as pydiploy_deploy_backend,
+                                 deploy_frontend as pydiploy_deploy_frontend,
                                  rollback as pydiploy_rollback,
                                  post_install_backend as pydiploy_postinstall_backend,
                                  post_install_frontend as pydiploy_postinstall_frontend,
@@ -22,7 +23,7 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
                                  reload_frontend as pydiploy_reload_frontend,
                                  reload_backend as pydiploy_reload_backend)
 
-    from pydiploy.require.database import (install_oracle_client as pydiploy_setup_oracle,
+    from pydiploy.require.databases import (install_oracle_client as pydiploy_setup_oracle,
                                            install_postgres_server as pydiploy_setup_postgres)
     # edit config here !
     env.user = 'vagrant'  # user for ssh
@@ -91,7 +92,6 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         env.server_ssl_on = False
         env.goal = 'test'
         env.socket_port = '8001'
-        # env.socket_host = '' # optional used only to force a specific ip
         env.map_settings = {
             #'ldap_user': "DATABASES['ldap']['USER']",
             #'ldap_password': "DATABASES['ldap']['PASSWORD']"
@@ -117,7 +117,6 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         env.path_to_cert_key = '/etc/ssl/private/mtapp.net.key'
         env.goal = 'prod'
         env.socket_port = '8001'
-        # env.socket_host = '' # optional used only to force a specific ip
         env.map_settings = {
             #'default_db_user': "DATABASES['default']['USER']",
             #'default_db_password': "DATABASES['default']['PASSWORD']",
@@ -154,13 +153,24 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         """Setup server for frontend"""
         execute(pydiploy_preinstall_frontend)
 
+    @task
+    def deploy():
+        """Deploy code and sync static files"""
+        execute(pydiploy_deploy_backend)
+        execute(pydiploy_deploy_frontend)
+
 
     @roles('web')
     @task
-    def deploy(update_pkg=False):
+    def deploy_backend(update_pkg=False):
         """Deploy code on server"""
-        execute(diploy)
+        execute(pydiploy_deploy_backend)
 
+    @roles('lb')
+    @task
+    def deploy_frontend():
+        """Deploy static files on load balancer"""
+        execute(pydiploy_deploy_frontend)
 
     @roles('web')
     @task

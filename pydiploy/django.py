@@ -49,7 +49,7 @@ def pre_install_frontend():
     fabric.api.execute(pydiploy.require.nginx.nginx_pkg)
 
 
-def deploy(upgrade_pkg=False, **kwargs):
+def deploy_backend(upgrade_pkg=False, **kwargs):
     """ Deploys django webapp with required tag """
     fabric.api.execute(pydiploy.require.releases_manager.setup)
     fabric.api.execute(pydiploy.require.releases_manager.deploy_code)
@@ -62,6 +62,11 @@ def deploy(upgrade_pkg=False, **kwargs):
     fabric.api.execute(pydiploy.require.system.permissions)
     fabric.api.execute(pydiploy.require.circus.app_reload)
     fabric.api.execute(pydiploy.require.releases_manager.cleanup)
+
+
+def deploy_frontend():
+    """ synchronise static files after deploy """
+    fabric.api.execute(pydiploy.require.nginx.web_static_files)
 
 
 def rollback():
@@ -77,7 +82,6 @@ def post_install_backend():
 
 
 def post_install_frontend():
-    fabric.api.execute(pydiploy.require.nginx.web_static_files)
     fabric.api.execute(pydiploy.require.nginx.web_configuration)
     fabric.api.execute(pydiploy.require.nginx.nginx_restart)
 

@@ -7,7 +7,9 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.prepare import build_env, tag, test_config, init_params
+from pydiploy.prepare import (_get_current_role, build_env,
+                              check_req_pydiploy_version, init_params, tag,
+                              test_config)
 
 
 class PrepareCheck(TestCase):
@@ -28,6 +30,9 @@ class PrepareCheck(TestCase):
         env.tag = "4.0"
         env.output_prefix = ""
         env.host_string = ""
+        env.roledefs = {'web': ['192.168.1.2'], 'lb': ['192.168.1.3'], }
+        env.host = '192.168.1.2'
+        env.host_string = env.host
 
     def tearDown(self):
         env.clear()
@@ -43,13 +48,14 @@ class PrepareCheck(TestCase):
     @patch('fabric.api.execute', return_value=True)
     @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabric.api.abort', return_value=Mock())
-    def test_build_env(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+    @patch('fabtools.python_setuptools.package_version', return_value="1664")
+    def test_build_env(self, pkg_version, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+
         build_env()
         self.assertFalse(api_prompt.called)
         del env['tag']
         # self.assertTrue(api_execute.called)
         build_env()
-        ##self.assertTrue(api_prompt.called)
         # test env var
         self.assertEqual(env.remote_project_dir, "remote_home/server_name")
         self.assertEqual(
@@ -139,6 +145,7 @@ class PrepareCheck(TestCase):
         env.static_folder = 'foo'
         env.socket_port = 'foo'
         env.local_tmp_dir = 'foo'
+        env.roledefs = {'web': ['192.168.1.21'], 'lb': ['1164-web2'], }
         build_env()
 
         # test env.verbose set
@@ -146,13 +153,11 @@ class PrepareCheck(TestCase):
         build_env()
 
         # test env.verbose_output not set
-        env.socket_host = "toto"
         del env['dest_path']
         del env['verbose_output']
         build_env()
 
         # test optionnal params not set
-        del env['socket_host']
         del env['dest_path']
         del env['extra_goals']
         build_env()
@@ -164,7 +169,6 @@ class PrepareCheck(TestCase):
         env.goal = ''
         env.backends = ''
         env.locale = ''
-        env.socket_host = ''
         env.remote_virtualenv_dir = ''
         env.user = ''
         env.roledefs = ''
@@ -183,7 +187,24 @@ class PrepareCheck(TestCase):
         env.local_tmp_dir = ''
         build_env()
 
+        # check req_pydiploy_version
+        env.req_pydiploy_version = '0.9'
+        build_env()
+
+        env.req_pydiploy_version = '100.0'
+        build_env()
+
     @patch('fabric.api.puts', return_value=Mock())
     def test_config(self, api_puts):
         test_config()
         self.assertTrue(api_puts.called)
+
+        # no config check
+        env.no_config_test = True
+        test_config()
+
+    def test_get_current_role(self):
+        _get_current_role()
+
+    def test_check_req_pydiploy_version(self):
+        check_req_pydiploy_version()

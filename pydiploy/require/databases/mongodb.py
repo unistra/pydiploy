@@ -10,10 +10,12 @@ Requires functions for mongodb database
 
 import fabtools
 import fabric
+import pydiploy
+
 
 
 def install_mongodb():
-    if not fabric.core.check_pkg('mongodb-10gen'):
+    if not pydiploy.require.system.package_installed('mongodb-10gen'):
         fabtools.require.deb.source('mongodb',
                                     'http://downloads-distro.mongodb.org/repo/ubuntu-upstart',
                                     'dist', '10gen')

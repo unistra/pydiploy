@@ -35,8 +35,8 @@ def add_postgres_user(name, password, superuser=False, createdb=False,
     if "verbose_output" in env:
         verbose = env.verbose_output
     if verbose:
-        fabric.api.puts('Add %s user for postgresql !' % user)
-    if not fabtools.postgres.user_exists(user):
+        fabric.api.puts('Add %s user for postgresql !' % name)
+    if not fabtools.postgres.user_exists(name):
         fabtools.require.postgres.user(name, password, superuser, createdb,
                                        createrole, inherit, login,
                                        connection_limit, encrypted_password)

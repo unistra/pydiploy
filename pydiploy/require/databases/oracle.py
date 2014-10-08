@@ -73,7 +73,7 @@ def install_oracle_client():
         fabric.api.sudo('ldconfig')
 
 
-def install_oracle_jdk(version):
+def install_oracle_jdk(version='7u25-b15'):
     """ install oracle jdk from oracle website """
     fabtools.oracle_jdk.install_from_oracle_site(version=version)
 

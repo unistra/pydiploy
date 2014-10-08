@@ -8,9 +8,12 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.require.django.command import django_dump_database, django_prepare
+from pydiploy.require.django.command import (django_dump_database,
+                                             django_prepare)
 from pydiploy.require.django.utils import (app_settings, extract_settings,
-                                           generate_secret_key)
+                                           generate_secret_key,
+                                           deploy_manage_file,
+                                           deploy_wsgi_file)
 
 
 class CommandCheck(TestCase):
@@ -144,6 +147,9 @@ class UtilsCheck(TestCase):
         env.local_tmp_root_app_package = "local_tmp_root_app_package"
         env.remote_owner = "owner"
         env.previous_settings_file = "remote_settings_file"
+        env.remote_current_release = "remote_current_release"
+        env.remote_base_package_dir = "remove_base_package_dir"
+        env.local_tmp_root_app = "local_tmp_root_path"
 
     def tearDown(self):
         env.clear()
@@ -212,3 +218,35 @@ class UtilsCheck(TestCase):
         self.assertTrue(api_execute.called)
         self.assertTrue(
             str(api_execute.call_args).find('generate_secret_key') > 0)
+
+    @patch('fabtools.files.upload_template', return_value=Mock())
+    def test_deploy_manage_file(self, upload_template):
+
+        deploy_manage_file()
+        self.assertTrue(upload_template.called)
+        # self.assertTrue(str(upload_template.call_args).find(
+        #     "template_dir='local_tmp_root_app_package/settings'") > 0)
+        # self.assertTrue(
+        #     str(upload_template.call_args).find("'settings.py'") > 0)
+        # self.assertTrue(
+        #     str(upload_template.call_args).find("'remote_settings_file'") > 0)
+        # self.assertTrue(
+        #     str(upload_template.call_args).find("use_jinja=True") > 0)
+        # self.assertTrue(
+        #     str(upload_template.call_args).find("user='owner'") > 0)
+
+    @patch('fabtools.files.upload_template', return_value=Mock())
+    def test_deploy_wsgi_file(self, upload_template):
+
+        deploy_wsgi_file()
+        self.assertTrue(upload_template.called)
+        # self.assertTrue(str(upload_template.call_args).find(
+        #     "template_dir='local_tmp_root_app_package/settings'") > 0)
+        # self.assertTrue(
+        #     str(upload_template.call_args).find("'settings.py'") > 0)
+        # self.assertTrue(
+        #     str(upload_template.call_args).find("'remote_settings_file'") > 0)
+        # self.assertTrue(
+        #     str(upload_template.call_args).find("use_jinja=True") > 0)
+        # self.assertTrue(
+        #     str(upload_template.call_args).find("user='owner'") > 0)

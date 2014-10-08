@@ -6,10 +6,11 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.django import (application_packages, deploy, dump_database,
-                             post_install_backend, post_install_frontend,
-                             pre_install_backend, pre_install_frontend,
-                             reload_backend, reload_frontend, rollback)
+from pydiploy.django import (application_packages, deploy_backend, deploy_frontend,
+                             dump_database, post_install_backend,
+                             post_install_frontend,pre_install_backend,
+                             pre_install_frontend, reload_backend,
+                             reload_frontend, rollback)
 
 
 class ReleasesManagerCheck(TestCase):
@@ -96,10 +97,9 @@ class ReleasesManagerCheck(TestCase):
             str(api_execute.call_args_list[2]).find('call(<function nginx_pkg') == 0)
 
     @patch('fabric.api.execute', return_value=Mock())
-    def test_deploy(self, api_execute):
-        deploy()
+    def test_deploy_backend(self, api_execute):
+        deploy_backend()
         self.assertTrue(api_execute.called)
-        print("test ahahahah", api_execute.call_args_list)
         self.assertTrue(str(api_execute.call_args_list[0]).find(
             'call(<function setup') == 0)
         self.assertTrue(str(api_execute.call_args_list[1]).find(
@@ -122,6 +122,13 @@ class ReleasesManagerCheck(TestCase):
             str(api_execute.call_args_list[9]).find('call(<function cleanup') == 0)
 
     @patch('fabric.api.execute', return_value=Mock())
+    def test_deploy_frontend(self, api_execute):
+        deploy_frontend()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function web_static_files') == 0)
+
+    @patch('fabric.api.execute', return_value=Mock())
     def test_rollback(self, api_execute):
         rollback()
         self.assertTrue(api_execute.called)
@@ -135,10 +142,8 @@ class ReleasesManagerCheck(TestCase):
         post_install_frontend()
         self.assertTrue(api_execute.called)
         self.assertTrue(str(api_execute.call_args_list[0]).find(
-            'call(<function web_static_files') == 0)
-        self.assertTrue(str(api_execute.call_args_list[1]).find(
             'call(<function web_configuration') == 0)
-        self.assertTrue(str(api_execute.call_args_list[2]).find(
+        self.assertTrue(str(api_execute.call_args_list[1]).find(
             'call(<function nginx_restart') == 0)
 
     @patch('fabric.api.execute', return_value=Mock())
