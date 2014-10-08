@@ -10,7 +10,8 @@ from fabric.api import (env, roles, execute, task)
 from os.path import join
 
 from pydiploy.prepare import tag, build_env as pydiploy_build_env
-from pydiploy.django import (deploy as diploy,
+from pydiploy.django import (deploy_backend as pydiploy_deploy_backend,
+                             deploy_frontend as pydiploy_deploy_frontend,
                              rollback as pydiploy_rollback,
                              post_install_backend as pydiploy_postinstall_backend,
                              post_install_frontend as pydiploy_postinstall_frontend,
@@ -51,6 +52,8 @@ env.extra_pkg_to_install = [] # extra debian/ubuntu package(s) to install on rem
 env.cfg_shared_files = [] # config files to be placed in shared config dir
 env.extra_goals = []
 env.verbose = True # verbose display for pydiploy
+env.req_pydiploy_version = "0.9" # required pydiploy version for this fabfile
+env.no_config_test = False # avoid config checker if True
 
 env.oracle_client_version = '11.2'
 env.oracle_download_url = 'http://librepo.net/lib/oracle/'
@@ -150,11 +153,24 @@ def pre_install_frontend():
     execute(pydiploy_preinstall_frontend)
 
 
+@task
+def deploy():
+    """Deploy code and sync static files"""
+    execute(pydiploy_deploy_backend)
+    execute(pydiploy_deploy_frontend)
+
+
 @roles('web')
 @task
-def deploy(update_pkg=False):
+def deploy_backend(update_pkg=False):
     """Deploy code on server"""
-    execute(diploy)
+    execute(pydiploy_deploy_backend)
+
+@roles('lb')
+@task
+def deploy_frontend():
+    """Deploy static files on load balancer"""
+    execute(pydiploy_deploy_frontend)
 
 
 @roles('web')
