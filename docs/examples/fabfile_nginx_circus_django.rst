@@ -55,6 +55,8 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     env.cfg_shared_files = ['config','/app/path/to/config/config_file'] # config files to be placed in shared config dir
     env.extra_goals = ['preprod'] # add extra goal(s) to defaults (test,dev,prod)
     env.verbose = True # verbose display for pydiploy default value = True
+    env.req_pydiploy_version = "0.9" # required pydiploy version for this fabfile
+    env.no_config_test = False # avoid config checker if True
 
     env.oracle_client_version = '11.2'
     env.oracle_download_url = 'http://librepo.net/lib/oracle/'
