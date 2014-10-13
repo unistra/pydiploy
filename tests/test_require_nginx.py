@@ -92,28 +92,27 @@ class NginxCheck(TestCase):
         self.assertEqual(rsync_project.call_args,
                          call('remote_static_root/application_name', 'local_tmp_dir/assets/', extra_opts='--rsync-path="sudo rsync"', delete=True, ssh_opts='-t'))
 
+    @patch('fabtools.files.upload_template', return_value=Mock())
+    @patch('fabtools.files.is_link', return_value=True)
+    @patch('fabric.api.cd', return_value=Mock())
+    @patch('fabric.api.sudo', return_value=Mock())
+    def test_web_configuration(self, api_sudo, api_cd, is_link, upload_template):
+        api_cd.return_value.__exit__ = Mock()
+        api_cd.return_value.__enter__ = Mock()
 
-    # @patch('fabtools.files.is_link', return_value=True)
-    # @patch('fabric.api.cd', return_value=Mock())
-    # @patch('fabric.api.sudo', return_value=Mock())
-    # def test_web_configuration(self, api_sudo, api_cd, is_link):
-    #     api_cd.return_value.__exit__ = Mock()
-    #     api_cd.return_value.__enter__ = Mock()
+        web_configuration()
 
-    #     web_configuration()
+        is_link.return_value = False
 
-    #     is_link.return_value = False
+        web_configuration()
 
-    #     web_configuration()
+        self.assertTrue(api_cd.called)
+        self.assertEqual(api_cd.call_args,
+                         call('/etc/nginx/sites-enabled'))
 
-    #     self.assertTrue(api_cd.called)
-    #     self.assertEqual(api_cd.call_args,
-    #                      call('/etc/nginx/sites-enabled'))
-
-    #     self.assertTrue(api_sudo.called)
-    #     self.assertEqual(api_sudo.call_args_list,
-    #                      [call('ln -s /etc/nginx/sites-available/server_name.conf .'), call('rm -f default')])
-
+        self.assertTrue(api_sudo.called)
+        self.assertEqual(api_sudo.call_args,
+                         call('ln -s /etc/nginx/sites-available/server_name.conf .'))
 
     @patch('fabtools.files.upload_template', return_value=Mock())
     @patch('fabtools.files.is_link', return_value=True)
@@ -137,11 +136,44 @@ class NginxCheck(TestCase):
 
         is_link.return_value = False
 
-        web_configuration()
+        up_site_config()
 
         self.assertTrue(api_cd.called)
         self.assertEqual(api_cd.call_args,
                          call('/etc/nginx/sites-enabled'))
 
         self.assertTrue(api_sudo.called)
-        self.assertEqual(api_sudo.call_args,call('ln -s /etc/nginx/sites-available/server_name.conf .'))
+        self.assertEqual(api_sudo.call_args, call(
+            'ln -s /etc/nginx/sites-available/server_name.conf .'))
+
+    @patch('fabtools.files.upload_template', return_value=Mock())
+    @patch('fabtools.files.is_link', return_value=True)
+    @patch('fabric.api.cd', return_value=Mock())
+    @patch('fabric.api.sudo', return_value=Mock())
+    def test_down_site_conf(self, api_sudo, api_cd, is_link, upload_template):
+        api_cd.return_value.__exit__ = Mock()
+        api_cd.return_value.__enter__ = Mock()
+
+        down_site_config()
+
+        self.assertTrue(upload_template.called)
+        self.assertTrue(
+            str(upload_template.call_args).find("'nginx_down.conf.tpl'") > 0)
+        self.assertTrue(str(upload_template.call_args).find(
+            "'/etc/nginx/sites-available/server_name_down.conf'") > 0)
+        self.assertTrue(str(upload_template.call_args)
+                        .find("template_dir='lib_path/templates'") > 0)
+
+        self.assertTrue(upload_template.is_link)
+
+        is_link.return_value = False
+
+        down_site_config()
+
+        # self.assertTrue(api_cd.called)
+        # self.assertEqual(api_cd.call_args,
+        #                  call('/etc/nginx/sites-enabled'))
+
+        # self.assertTrue(api_sudo.called)
+        # self.assertEqual(api_sudo.call_args, call(
+        #     'ln -s /etc/nginx/sites-available/server_name.conf .'))

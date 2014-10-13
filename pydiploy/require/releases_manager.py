@@ -26,7 +26,6 @@ def setup():
                     {'remote_domain_path': env.remote_project_dir})
     fabric.api.sudo("mkdir -p %(remote_shared_path)s/{config,log}" %
                     {'remote_shared_path': env.remote_shared_path})
-    fabric.api.execute(pydiploy.require.system.permissions)
     # extra symlinks if present in settings
     if env.has_key('extra_symlink_dirs'):
         for extra_symlink_dir in env.extra_symlink_dirs:
@@ -34,6 +33,7 @@ def setup():
                             {'remote_shared_path': env.remote_shared_path,
                              'shared_dir': os.path.basename(extra_symlink_dir)})
 
+    fabric.api.execute(pydiploy.require.system.permissions)
 
 def cleanup():
     """

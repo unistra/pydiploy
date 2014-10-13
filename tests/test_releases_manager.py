@@ -69,6 +69,12 @@ class ReleasesManagerCheck(TestCase):
                 'mkdir -p remote_project_dir/{releases,shared}'),
                 call('mkdir -p remote_shared_path/{config,log}')])
 
+        # extra_symlinks_dirs provided
+        env.extra_symlink_dirs = ['symdir']
+        setup()
+        self.assertTrue(str(api_sudo.call_args_list[4]).find(
+            "mkdir -p remote_shared_path/symdir") > 0)
+
     @patch('fabric.api.sudo', return_value=Mock())
     def test_cleanup(self, api_sudo):
         cleanup()
@@ -135,6 +141,10 @@ class ReleasesManagerCheck(TestCase):
         self.assertEqual(is_file.call_args, call(
             path='remote_shared_path/config/README', use_sudo=True))
 
+        # extra_symlink_dirs provided
+        env.extra_symlink_dirs = ['symdir', ]
+        deploy_code()
+
         del env['tag']
         deploy_code()
         self.assertTrue(api_prompt.called)
@@ -152,3 +162,9 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(api_sudo.called)
         self.assertEqual(api_sudo.call_args,
                          call('ln -nfs remote_shared_path/config/README remote_current_release/README'))
+
+        # extra_symlink_dirs provided
+        env.extra_symlink_dirs = ['symdir', ]
+        symlink()
+        self.assertTrue(str(api_sudo.call_args_list[4]).find(
+            "ln -nfs remote_shared_path/symdir remote_current_release/symdir") > 0)
