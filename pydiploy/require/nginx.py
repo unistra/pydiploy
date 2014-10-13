@@ -58,6 +58,22 @@ def web_configuration():
     nginx_enabled = os.path.join(nginx_root, 'sites-enabled')
     app_conf = os.path.join(nginx_available, '%s.conf' % env.server_name)
 
+    fabric.api.execute(up_site_config)
+    fabric.api.execute(down_site_config)
+
+    if not fabtools.files.is_link('%s/%s.conf' % (nginx_enabled,
+                                                  env.server_name)):
+        with fabric.api.cd(nginx_enabled):
+            fabric.api.sudo('ln -s %s .' % app_conf)
+            fabric.api.sudo('rm -f default')
+
+
+def up_site_config():
+    """ upload site config for nginx """
+    nginx_root = '/etc/nginx'
+    nginx_available = os.path.join(nginx_root, 'sites-available')
+    app_conf = os.path.join(nginx_available, '%s.conf' % env.server_name)
+
     fabtools.files.upload_template('nginx.conf.tpl',
                                    app_conf,
                                    context=env,
@@ -69,8 +85,32 @@ def web_configuration():
                                    chown=True,
                                    mode='644')
 
+    if fabtools.files.is_link('%s/default' % nginx_enabled):
+        with fabric.api.cd(nginx_enabled):
+            fabric.api.sudo('rm -f default')
+
+
     if not fabtools.files.is_link('%s/%s.conf' % (nginx_enabled,
                                                   env.server_name)):
         with fabric.api.cd(nginx_enabled):
             fabric.api.sudo('ln -s %s .' % app_conf)
-            fabric.api.sudo('rm -f default')
+
+
+def down_site_config():
+    """ upload site_down config for nginx """
+
+    nginx_root = '/etc/nginx'
+    nginx_available = os.path.join(nginx_root, 'sites-available')
+    app_conf = os.path.join(nginx_available, '%s_down.conf' % env.server_name)
+
+    fabtools.files.upload_template('nginx_down.conf.tpl',
+                                   app_conf,
+                                   context=env,
+                                   template_dir=os.path.join(
+                                       env.lib_path, 'templates'),
+                                   use_jinja=True,
+                                   use_sudo=True,
+                                   user='root',
+                                   chown=True,
+                                   mode='644')
+
