@@ -6,9 +6,9 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.require.nginx import (nginx_pkg, nginx_reload, nginx_restart,
-                                    root_web, web_configuration,
-                                    web_static_files)
+from pydiploy.require.nginx import (down_site_config, nginx_pkg, nginx_reload,
+                                    nginx_restart, root_web, up_site_config,
+                                    web_configuration, web_static_files)
 
 
 class NginxCheck(TestCase):
@@ -92,15 +92,38 @@ class NginxCheck(TestCase):
         self.assertEqual(rsync_project.call_args,
                          call('remote_static_root/application_name', 'local_tmp_dir/assets/', extra_opts='--rsync-path="sudo rsync"', delete=True, ssh_opts='-t'))
 
+
+    # @patch('fabtools.files.is_link', return_value=True)
+    # @patch('fabric.api.cd', return_value=Mock())
+    # @patch('fabric.api.sudo', return_value=Mock())
+    # def test_web_configuration(self, api_sudo, api_cd, is_link):
+    #     api_cd.return_value.__exit__ = Mock()
+    #     api_cd.return_value.__enter__ = Mock()
+
+    #     web_configuration()
+
+    #     is_link.return_value = False
+
+    #     web_configuration()
+
+    #     self.assertTrue(api_cd.called)
+    #     self.assertEqual(api_cd.call_args,
+    #                      call('/etc/nginx/sites-enabled'))
+
+    #     self.assertTrue(api_sudo.called)
+    #     self.assertEqual(api_sudo.call_args_list,
+    #                      [call('ln -s /etc/nginx/sites-available/server_name.conf .'), call('rm -f default')])
+
+
     @patch('fabtools.files.upload_template', return_value=Mock())
     @patch('fabtools.files.is_link', return_value=True)
     @patch('fabric.api.cd', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
-    def test_web_configuration(self, api_sudo, api_cd, is_link, upload_template):
+    def test_up_site_conf(self, api_sudo, api_cd, is_link, upload_template):
         api_cd.return_value.__exit__ = Mock()
         api_cd.return_value.__enter__ = Mock()
 
-        web_configuration()
+        up_site_config()
 
         self.assertTrue(upload_template.called)
         self.assertTrue(
@@ -121,5 +144,4 @@ class NginxCheck(TestCase):
                          call('/etc/nginx/sites-enabled'))
 
         self.assertTrue(api_sudo.called)
-        self.assertEqual(api_sudo.call_args_list,
-                         [call('ln -s /etc/nginx/sites-available/server_name.conf .'), call('rm -f default')])
+        self.assertEqual(api_sudo.call_args,call('ln -s /etc/nginx/sites-available/server_name.conf .'))

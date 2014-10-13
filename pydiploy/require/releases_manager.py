@@ -27,6 +27,12 @@ def setup():
     fabric.api.sudo("mkdir -p %(remote_shared_path)s/{config,log}" %
                     {'remote_shared_path': env.remote_shared_path})
     fabric.api.execute(pydiploy.require.system.permissions)
+    # extra symlinks if present in settings
+    if env.has_key('extra_symlink_dirs'):
+        for extra_symlink_dir in env.extra_symlink_dirs:
+            fabric.api.sudo("mkdir -p %(remote_shared_path)s/%(shared_dir)s" %
+                            {'remote_shared_path': env.remote_shared_path,
+                             'shared_dir': os.path.basename(extra_symlink_dir)})
 
 
 def cleanup():
@@ -97,6 +103,10 @@ def deploy_code():
 
             exclude_files += cfg_shared_file
 
+    if env.has_key('extra_symlink_dirs'):
+        for symlink_dir in env.extra_symlink_dirs:
+            exclude_files += symlink_dir
+
     env.remote_current_release = "%(releases_path)s/%(time).0f" % {
         'releases_path': env.remote_releases_path, 'time': time()}
 
@@ -136,6 +146,7 @@ def symlink():
     fabric.api.sudo("ln -nfs %(shared_path)s/log %(current_release)s/log" %
                     {'shared_path': env.remote_shared_path,
                      'current_release': env.remote_current_release})
+
     if env.has_key('cfg_shared_files'):
         for cfg_shared_file in env.cfg_shared_files:
             fabric.api.sudo("ln -nfs %(shared_path)s/config/%(file_name)s %(current_release)s/%(file)s" %
@@ -143,3 +154,10 @@ def symlink():
                              'current_release': env.remote_current_release,
                              'file': cfg_shared_file,
                              'file_name':  os.path.basename(cfg_shared_file)})
+
+    if env.has_key('extra_symlink_dirs'):
+        for extra_symlink_dir in env.extra_symlink_dirs:
+            fabric.api.sudo("ln -nfs %(shared_path)s/%(dir_name)s %(current_release)s/%(dir_name)s" %
+                            {'shared_path': env.remote_shared_path,
+                             'current_release': env.remote_current_release,
+                             'dir_name':  extra_symlink_dir})

@@ -53,7 +53,8 @@ PARAMS = {
                             'nginx_location_extra_directives': "nginx location extra directive(s)",
                             'verbose_output': "verbose output (True/False)",
                             'no_config_test': "don't check config params (True/False)",
-                            'req_pydiploy_version': "pydiploy version required for checking fabfile syntax"}
+                            'req_pydiploy_version': "pydiploy version required for checking fabfile syntax",
+                            'extra_symlink_dirs': 'extra dirs to symlink to shared folder'}
 
     }
 }
