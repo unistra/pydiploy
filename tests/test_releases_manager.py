@@ -147,6 +147,8 @@ class ReleasesManagerCheck(TestCase):
         deploy_code()
 
         del env['tag']
+        #tag_exist.return_value = False
+
         deploy_code()
         self.assertTrue(api_prompt.called)
 

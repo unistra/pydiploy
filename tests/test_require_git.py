@@ -76,3 +76,15 @@ class GitCheck(TestCase):
         api_lcd.return_value.__exit__ = Mock()
         api_lcd.return_value.__enter__ = Mock()
         collect_branches(remote=None, project_path=None)
+
+    @patch('pydiploy.require.git.collect_tags', return_value=['test',])
+    @patch('pydiploy.require.git.collect_branches', return_value=['test',])
+    def test_check_tag_exist(self, collect_branches, collect_tags):
+
+        check_tag_exist(tag="master")
+
+        check_tag_exist(tag="test")
+
+
+
+

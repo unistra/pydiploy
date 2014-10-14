@@ -6,11 +6,12 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.django import (application_packages, deploy_backend, deploy_frontend,
-                             dump_database, post_install_backend,
-                             post_install_frontend,pre_install_backend,
-                             pre_install_frontend, reload_backend,
-                             reload_frontend, rollback)
+from pydiploy.django import (application_packages, deploy_backend,
+                             deploy_frontend, dump_database,
+                             post_install_backend, post_install_frontend,
+                             pre_install_backend, pre_install_frontend,
+                             reload_backend, reload_frontend, rollback,
+                             set_app_down, set_app_up)
 
 
 class ReleasesManagerCheck(TestCase):
@@ -175,3 +176,15 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(api_execute.called)
         self.assertTrue(str(api_execute.call_args_list[0]).find(
             'call(<function app_reload') == 0)
+
+    @patch('pydiploy.require.nginx.set_website_down', return_value=Mock())
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_set_app_down(self, api_execute, website_down):
+
+        set_app_down()
+
+    @patch('pydiploy.require.nginx.set_website_up', return_value=Mock())
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_set_app_up(self, api_execute, website_down):
+
+        set_app_up()
