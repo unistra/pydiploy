@@ -82,6 +82,7 @@ class ReleasesManagerCheck(TestCase):
         self.assertEqual(
             api_sudo.call_args, call('rm -rf remote_releases_path/1.0'))
 
+    @patch('pydiploy.require.git.check_tag_exist', return_value=True)
     @patch('fabric.api.prompt', return_value=Mock())
     @patch('fabric.api.local', return_value=Mock())
     @patch('fabric.api.require', return_value=Mock())
@@ -92,7 +93,7 @@ class ReleasesManagerCheck(TestCase):
     @patch('pydiploy.require.git.archive', return_value="myarchive")
     @patch('fabric.contrib.project.rsync_project', return_value=Mock())
     @patch('fabtools.files.is_file', return_value=None)
-    def test_deploy_code(self, is_file, rsync_project, git_archive, upload_template, api_execute, api_sudo, api_lcd, api_require, api_local, api_prompt):
+    def test_deploy_code(self, is_file, rsync_project, git_archive, upload_template, api_execute, api_sudo, api_lcd, api_require, api_local, api_prompt, tag_exist):
         api_lcd.return_value.__exit__ = Mock()
         api_lcd.return_value.__enter__ = Mock()
 

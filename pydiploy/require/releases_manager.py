@@ -58,11 +58,16 @@ def deploy_code():
 
     # checks if tag is specified if not fabric.api.prompt user
     if "tag" not in env:
-        env.tag = fabric.api.prompt('Please specify target tag used: ')
-        env.local_tmp_root_app = os.path.join(env.local_tmp_dir,
-                                              '%(application_name)s-%(tag)s' % env)
-        env.local_tmp_root_app_package = os.path.join(env.local_tmp_root_app,
-                                                      env.root_package_name)
+        tag_requested = fabric.api.prompt('Please specify target tag used: ')
+        while(not pydiploy.require.git.check_tag_exist(tag_requested)):
+            tag_requested = fabric.api.prompt('tag %s unknown please specify valid target tag used: ' % tag_requested)
+
+        env.tag = tag_requested
+
+    env.local_tmp_root_app = os.path.join(env.local_tmp_dir,
+                                          '%(application_name)s-%(tag)s' % env)
+    env.local_tmp_root_app_package = os.path.join(env.local_tmp_root_app,
+                                                  env.root_package_name)
 
     fabric.api.require('tag', provided_by=['tag', 'head'])
     fabric.api.require('remote_project_dir', provided_by=env.goals)

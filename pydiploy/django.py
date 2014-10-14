@@ -99,3 +99,11 @@ def reload_frontend():
 def reload_backend():
     """ Reload backend """
     fabric.api.execute(pydiploy.require.circus.app_reload)
+
+def set_app_down():
+    """ Set app in maintenance mode """
+    fabric.api.execute(pydiploy.require.nginx.set_website_down)
+
+def set_app_up():
+    """ Set app in maintenance mode """
+    fabric.api.execute(pydiploy.require.nginx.set_website_up)

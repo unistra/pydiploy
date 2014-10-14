@@ -6,7 +6,8 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.require.git import archive
+from pydiploy.require.git import (archive, check_tag_exist, collect_branches,
+                                  collect_tags)
 
 
 class GitCheck(TestCase):
@@ -54,3 +55,24 @@ class GitCheck(TestCase):
         self.assertTrue(api_abort.called)
         self.assertEqual(api_abort.call_args, call(
             'Git archive format not supported: error'))
+
+    @patch('fabric.api.lcd', return_value=Mock())
+    @patch('fabric.context_managers.hide', return_value=Mock())
+    def test_collect_tags(self, fabric_hide, api_lcd):
+
+        fabric_hide.return_value.__exit__ = Mock()
+        fabric_hide.return_value.__enter__ = Mock()
+
+        api_lcd.return_value.__exit__ = Mock()
+        api_lcd.return_value.__enter__ = Mock()
+        collect_tags(remote=None, project_path=None)
+
+    @patch('fabric.api.lcd', return_value=Mock())
+    @patch('fabric.context_managers.hide', return_value=Mock())
+    def test_collect_branches(self, fabric_hide, api_lcd):
+        fabric_hide.return_value.__exit__ = Mock()
+        fabric_hide.return_value.__enter__ = Mock()
+
+        api_lcd.return_value.__exit__ = Mock()
+        api_lcd.return_value.__enter__ = Mock()
+        collect_branches(remote=None, project_path=None)

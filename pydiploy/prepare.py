@@ -12,16 +12,20 @@ import os
 import fabric
 import fabtools
 from fabric.api import env
-
 from pydiploy.params import PARAMS
+from pydiploy.require.git import check_tag_exist
 from pydiploy.version import __version__, __version_info__
 
 
 @fabric.api.task
 def tag(version):
     """ Defines tag to deploy """
-
-    env.tag = version
+    if "pydiploy_version" in env:
+        fabric.api.abort("tag should be set before calling goal (ex: fab tag:master test deploy)")
+    if check_tag_exist(version):
+        env.tag = version
+    else:
+        fabric.api.abort("tag sets is not in the repository please fix this first")
 
 
 def init_params():

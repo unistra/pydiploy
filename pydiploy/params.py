@@ -54,7 +54,15 @@ PARAMS = {
                             'verbose_output': "verbose output (True/False)",
                             'no_config_test': "don't check config params (True/False)",
                             'req_pydiploy_version': "pydiploy version required for checking fabfile syntax",
-                            'extra_symlink_dirs': 'extra dirs to symlink to shared folder'}
+                            'extra_symlink_dirs': 'extra dirs to symlink to shared folder',
+                            'tag': 'tag to deploy',
+                            'no_shared_sessions': 'if True add ip_hash to nginx config',
+                            'server_ssl_on': 'use ssl on nginx',
+                            'path_to_cert': 'ssl certificate path',
+                            'path_to_cert_key': 'ssl cert key path',
+                            'map_settings': 'settings to map in django settings files',
+                            'maintenance_title': 'customize maitenance page title',
+                            'maintenance_txt': 'customize maintenance page text'}
 
     }
 }

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <title>Maintenance</title>
+        <title>Maintenance {{ server_name }}</title>
 
         <style>
             a {
@@ -29,13 +29,13 @@
             {% if maintenance_title %}
             {{ maintenance_title }}
             {% else %}
-            {{ server_name }} : System Maintenance
+            {{ server_name }} : system maintenance
             {% endif %}
 
         </h2>
         <p>
             {% if maintenance_txt %}
-            {{ maintenanc}}
+            {{ maintenance_txt }}
             {% else %}
             We apologize for the interruption, but we're currently performing
             maintenance for {{ server_name }} . Please check back again in a few minutes.
