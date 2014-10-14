@@ -59,6 +59,8 @@ class PrepareCheck(TestCase):
         tag("master")
         self.assertEqual(env.tag, "master")
 
+        tag("4.0")
+
     @patch('fabric.api.prompt', return_value="4.0")
     @patch('fabtools.files.is_dir', return_value=True)
     @patch('fabric.api.run', return_value="4.0")
