@@ -65,7 +65,10 @@ class GitCheck(TestCase):
 
         api_lcd.return_value.__exit__ = Mock()
         api_lcd.return_value.__enter__ = Mock()
-        collect_tags(remote=None, project_path=None)
+        collect_tags(project_path='.', remote=None)
+        self.assertTrue(api_lcd.called)
+        self.assertEqual(api_lcd.call_args, call('.'))
+        collect_tags(project_path='.', remote=True)
 
     @patch('fabric.api.lcd', return_value=Mock())
     @patch('fabric.context_managers.hide', return_value=Mock())
@@ -75,7 +78,10 @@ class GitCheck(TestCase):
 
         api_lcd.return_value.__exit__ = Mock()
         api_lcd.return_value.__enter__ = Mock()
-        collect_branches(remote=None, project_path=None)
+        collect_branches(project_path='.', remote=None)
+        self.assertTrue(api_lcd.called)
+        self.assertEqual(api_lcd.call_args, call('.'))
+        collect_branches(project_path='.', remote=True)
 
     @patch('pydiploy.require.git.collect_tags', return_value=['test',])
     @patch('pydiploy.require.git.collect_branches', return_value=['test',])

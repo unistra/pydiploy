@@ -107,9 +107,9 @@ def collect_branches(project_path='.', remote=""):
             refs = fabric.api.local(command, capture=True)
         return refs.split('\n')
 
-def check_tag_exist(tag = ""):
+def check_tag_exist(tag=None):
     """ checks if a tag/branch exists in the repository """
     if tag:
         if (tag not in collect_branches() and tag not in collect_tags()):
             return False
-    return True
+        return True

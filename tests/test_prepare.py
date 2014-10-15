@@ -39,25 +39,35 @@ class PrepareCheck(TestCase):
         env.update(self.previous_env)
 
     @patch('fabric.api.abort', return_value=Mock())
-    @patch('pydiploy.require.git.check_tag_exist', return_value=True)
-    def test_tag(self, git_tag_exist, api_abort):
+    @patch('pydiploy.require.git.collect_tags', return_value=[''])
+    @patch('pydiploy.require.git.collect_branches', return_value=['master','4.0'])
+    @patch('pydiploy.require.git.check_tag_exist', return_value=Mock())
+    def test_tag(self, tag_exist, collect_branches, collect_tags, api_abort):
+
+        del env['tag']
+
+        # test tag called after goal eg: fab test tag:master deploy
+        env.pydiploy_version = 1664
+        tag('fail')
+        self.assertTrue(api_abort.called)
+
+        # check tag unknown
+        del env['pydiploy_version']
+        tag_exist.return_value = False
+        tag('fail')
+        self.assertTrue(api_abort.called)
+
+        tag_exist.return_value = True
+        tag('master')
+        self.assertEqual(env.tag, 'master')
 
         tag('4.0')
         self.assertEqual(env.tag, '4.0')
 
-        # test tag called after goal eg: fab test tag:master deploy
-        env.pydiploy_version = 1664
-        tag('4.0')
-        self.assertTrue(api_abort.called)
 
-        # check tag unknown
-        git_tag_exist.return_value = False
-        tag('4.0')
-        self.assertTrue(api_abort.called)
 
-        git_tag_exist.return_value = True
-        tag('master')
-        self.assertEqual(env.tag, 'master')
+
+
 
     @patch('fabric.api.prompt', return_value="4.0")
     @patch('fabtools.files.is_dir', return_value=True)

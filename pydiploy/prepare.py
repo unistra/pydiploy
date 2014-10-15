@@ -20,6 +20,7 @@ from pydiploy.version import __version__, __version_info__
 @fabric.api.task
 def tag(version):
     """ Defines tag to deploy """
+
     if "pydiploy_version" in env:
         fabric.api.abort("tag should be set before calling goal (ex: fab tag:master test deploy)")
     if check_tag_exist(version):
