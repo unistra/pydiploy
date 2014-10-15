@@ -12,7 +12,8 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     from fabric.api import (env, roles, execute, task)
     from os.path import join
 
-    from pydiploy.prepare import tag, build_env as pydiploy_build_env
+    from pydiploy.prepare import (tag as pydiploy_tag,
+                                  build_env as pydiploy_build_env)
     from pydiploy.django import (deploy_backend as pydiploy_deploy_backend,
                                  deploy_frontend as pydiploy_deploy_frontend,
                                  rollback as pydiploy_rollback,
@@ -21,15 +22,18 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
                                  pre_install_backend as pydiploy_preinstall_backend,
                                  pre_install_frontend as pydiploy_preinstall_frontend,
                                  reload_frontend as pydiploy_reload_frontend,
-                                 reload_backend as pydiploy_reload_backend)
+                                 reload_backend as pydiploy_reload_backend,
+                                 set_app_up as pydiploy_set_up,
+                                 set_app_down as pydiploy_set_down)
 
     from pydiploy.require.databases import (install_oracle_client as pydiploy_setup_oracle,
                                            install_postgres_server as pydiploy_setup_postgres)
     # edit config here !
     env.user = 'vagrant'  # user for ssh
+    env.use_sudo = True # use sudo or not
 
     env.remote_owner = 'django'  # remote server user
-    env.remote_group = 'di'  # remote server group
+    env.remote_group = 'django'  # remote server group
 
     env.application_name = 'myapp'   # name of webapp
     env.root_package_name = 'myapp'  # name of app in webapp
@@ -41,7 +45,7 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
                                      env.application_name)  # venv for webapp dir
     env.remote_repo_url = 'git@git.net:myapp.git'  # git repository url
     env.local_tmp_dir = '/tmp'  # tmp dir
-    env.remote_static_root = 'static'  # root of static files
+    env.remote_static_root = '/var/www/static'  # root of static files
     env.locale = 'fr_FR.UTF-8'  # locale to use on remote
     env.timezone = 'Europe/Paris'  # timezone for remote
     env.keep_releases = 2  # number of old releases to keep before cleaning
@@ -58,6 +62,8 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     env.verbose = True # verbose display for pydiploy default value = True
     env.req_pydiploy_version = "0.9" # required pydiploy version for this fabfile
     env.no_config_test = False # avoid config checker if True
+    env.maintenance.txt = "" # add a customize maintenance text for maitenance page
+    env.maintenance.title = "" # add a customize title for maintenance page
 
     env.oracle_client_version = '11.2'
     env.oracle_download_url = 'http://librepo.net/lib/oracle/'
@@ -66,13 +72,12 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
                            'instantclient-sdk-linux-x86-64-11.2.0.2.0.zip',
                            'instantclient-sqlplus-linux-x86-64-11.2.0.2.0.zip']
 
-    # change the package to use to install circus
-    # env.circus_package_name = 'https://github.com/morganbohn/circus/archive/master.zip'
 
-    # add directive(s) to nginx config file in location part
-    # env.nginx_location_extra_directives = ['proxy_read_timeout 120']
+    env.circus_package_name = 'https://github.com/githubaccount/circus/archive/master.zip' # change the package to use to install circus
 
-    # fill and uncomment not to pass parameters in term
+    env.nginx_location_extra_directives = ['proxy_read_timeout 120'] # add directive(s) to nginx config file in location part
+
+    # fill and uncomment not to pass parameters in term (eg: fab tag:master test --set default_db_host='localhost',default_db_name='my_app_db' )
     # env.default_db_host = 'localhost'
     # env.default_db_name = 'myapp_db'
     # env.default_db_user = 'myapp_db_user'
@@ -96,6 +101,7 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         env.goal = 'test'
         env.socket_port = '8001'
         env.map_settings = {
+            # uncomment to use :
             #'ldap_user': "DATABASES['ldap']['USER']",
             #'ldap_password': "DATABASES['ldap']['PASSWORD']"
         }
@@ -117,10 +123,11 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         env.no_shared_sessions = False
         env.server_ssl_on = True
         env.path_to_cert = '/etc/ssl/certs/myapp.net.pem'
-        env.path_to_cert_key = '/etc/ssl/private/mtapp.net.key'
+        env.path_to_cert_key = '/etc/ssl/private/myapp.net.key'
         env.goal = 'prod'
         env.socket_port = '8001'
         env.map_settings = {
+            # uncomment to use :
             #'default_db_user': "DATABASES['default']['USER']",
             #'default_db_password': "DATABASES['default']['PASSWORD']",
             #'ldap_user': "DATABASES['ldap']['USER']",
@@ -130,6 +137,17 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         execute(build_env)
 
     # dont touch after that point if you don't know what you are doing !
+
+    @task
+    def tag(version_string):
+        """ Set the version to deploy to `version_number`. """
+        execute(pydiploy_tag, version=version_string)
+
+
+    @task
+    def head_master():
+        """ Set the version to deploy to the head of the master. """
+        execute(pydiploy_tag, version='master')
 
 
     @roles(['web','lb'])
@@ -159,8 +177,12 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     @task
     def deploy():
         """Deploy code and sync static files"""
+        # uncomment this to set app in maitenance mode
+        # execute(pydiploy_set_down)
         execute(pydiploy_deploy_backend)
         execute(pydiploy_deploy_frontend)
+        # uncomment this to toggle app to up mode again
+        #execute(pydiploy_set_up)
 
 
     @roles('web')
@@ -185,8 +207,8 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     @task
     def post_install():
         """post install for backend & frontend"""
-        execute(post_install_backend)
         execute(post_install_frontend)
+        execute(post_install_backend)
 
 
     @roles('web')
@@ -232,3 +254,16 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     @task
     def reload_backend():
         execute(pydiploy_reload_backend)
+
+    @roles('lb')
+    @task
+    def set_down():
+        """ Set app to maintenance mode """
+        execute(pydiploy_set_down)
+
+
+    @roles('lb')
+    @task
+    def set_up():
+        """ Set app to up mode """
+        execute(pydiploy_set_up)

@@ -60,7 +60,7 @@ def deploy_code():
     if "tag" not in env:
         tag_requested = fabric.api.prompt('Please specify target tag used: ')
         while(not pydiploy.require.git.check_tag_exist(tag_requested)):
-            tag_requested = fabric.api.prompt('tag %s unknown please specify valid target tag used: ' % tag_requested)
+            tag_requested = fabric.api.prompt('tag %s unknown please specify valid target tag used: ' % fabric.colors.red(tag_requested))
 
         env.tag = tag_requested
 

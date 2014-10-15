@@ -22,11 +22,11 @@ def tag(version):
     """ Defines tag to deploy """
 
     if "pydiploy_version" in env:
-        fabric.api.abort("tag should be set before calling goal (ex: fab tag:master test deploy)")
+        fabric.api.abort(fabric.colors.red("tag should be set before calling goal (ex: fab tag:master test deploy)"))
     if check_tag_exist(version):
         env.tag = version
     else:
-        fabric.api.abort("tag sets is not in the repository please fix this first")
+        fabric.api.abort(fabric.colors.red("tag/branch provided is not in the repository please fix this first"))
 
 
 def init_params():
@@ -178,10 +178,10 @@ def test_config(verbose=True):
         fabric.api.puts('\n\nOptional parameters list : \n\n')
         if len(opt_parameters):
             for param, value, description in opt_parameters:
-                value = "Warning initialized but not set" if not bool(
-                    value) else value
+                value = fabric.colors.red("Warning initialized but not set") if not bool(
+                    value) else fabric.colors.green(value)
                 fabric.api.puts('* %s %s' %
-                                (param.ljust(max_opt_param_length), fabric.colors.green(value)))
+                                (param.ljust(max_opt_param_length), value))
         else:
             fabric.api.puts("No optionnal parameter found")
     fabric.api.puts('\n\nRole : %s -> configuration %s!\n\n' %
