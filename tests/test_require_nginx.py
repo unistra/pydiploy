@@ -155,7 +155,6 @@ class NginxCheck(TestCase):
         down_site_config()
 
         self.assertTrue(upload_template.called)
-        print(upload_template.call_args)
         # self.assertTrue(
         #     str(upload_template.call_args).find("'nginx_down.conf.tpl'") > 0)
         # self.assertTrue(str(upload_template.call_args).find(

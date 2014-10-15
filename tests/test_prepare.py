@@ -42,22 +42,22 @@ class PrepareCheck(TestCase):
     @patch('pydiploy.require.git.check_tag_exist', return_value=True)
     def test_tag(self, git_tag_exist, api_abort):
 
-        tag("4.0")
-        self.assertEqual(env.tag, "4.0")
+        tag('4.0')
+        self.assertEqual(env.tag, '4.0')
 
         # test tag called after goal eg: fab test tag:master deploy
         env.pydiploy_version = 1664
-        tag("4.0")
+        tag('4.0')
         self.assertTrue(api_abort.called)
 
         # check tag unknown
         git_tag_exist.return_value = False
-        tag("4.0")
+        tag('4.0')
         self.assertTrue(api_abort.called)
 
         git_tag_exist.return_value = True
-        tag("4.0")
-        self.assertEqual(env.tag, "4.0")
+        tag('master')
+        self.assertEqual(env.tag, 'master')
 
     @patch('fabric.api.prompt', return_value="4.0")
     @patch('fabtools.files.is_dir', return_value=True)

@@ -82,7 +82,7 @@ class ReleasesManagerCheck(TestCase):
         self.assertEqual(
             api_sudo.call_args, call('rm -rf remote_releases_path/1.0'))
 
-    @patch('pydiploy.require.git.check_tag_exist', return_value=True)
+    @patch('pydiploy.require.git.check_tag_exist', return_value=Mock())
     @patch('fabric.api.prompt', return_value=Mock())
     @patch('fabric.api.local', return_value=Mock())
     @patch('fabric.api.require', return_value=Mock())
@@ -147,10 +147,12 @@ class ReleasesManagerCheck(TestCase):
         deploy_code()
 
         del env['tag']
-        #tag_exist.return_value = False
+        tag_exist.side_effect = [False,True]
+        api_prompt.return_value='4.0'
 
         deploy_code()
         self.assertTrue(api_prompt.called)
+        self.assertEqual(env.tag, '4.0')
 
     @patch('fabric.api.sudo', return_value=Mock())
     def test_rollback_code(self, api_sudo):
