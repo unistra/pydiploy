@@ -9,7 +9,8 @@ from mock import call, Mock, patch
 from pydiploy.require.nginx import (down_site_config, nginx_pkg, nginx_reload,
                                     nginx_restart, root_web, set_website_down,
                                     set_website_up, up_site_config,
-                                    web_configuration, web_static_files)
+                                    upload_maitenance_page, web_configuration,
+                                    web_static_files)
 
 
 class NginxCheck(TestCase):
@@ -149,29 +150,20 @@ class NginxCheck(TestCase):
         self.assertEqual(api_sudo.call_args, call(
             'ln -s /etc/nginx/sites-available/server_name.conf .'))
 
+    @patch('pydiploy.require.nginx.upload_maitenance_page')
     @patch('fabtools.files.upload_template', return_value=Mock())
-    def test_down_site_conf(self, upload_template):
+    def test_down_site_conf(self, upload_template, maintenance_page):
 
         down_site_config()
 
         self.assertTrue(upload_template.called)
-        # self.assertTrue(
-        #     str(upload_template.call_args).find("'nginx_down.conf.tpl'") > 0)
-        # self.assertTrue(str(upload_template.call_args).find(
-        #     "'/etc/nginx/sites-available/server_name_down.conf'") > 0)
-        # self.assertTrue(str(upload_template.call_args)
-        #                 .find("template_dir='lib_path/templates'") > 0)
-
-        # self.assertTrue(upload_template.is_link)
-
-
-        # self.assertTrue(api_cd.called)
-        # self.assertEqual(api_cd.call_args,
-        #                  call('/etc/nginx/sites-enabled'))
-
-        # self.assertTrue(api_sudo.called)
-        # self.assertEqual(api_sudo.call_args, call(
-        #     'ln -s /etc/nginx/sites-available/server_name.conf .'))
+        self.assertTrue(maintenance_page.called)
+        self.assertTrue(
+             str(upload_template.call_args).find("'nginx_down.conf.tpl'") > 0)
+        self.assertTrue(str(upload_template.call_args).find(
+             "'/etc/nginx/sites-available/server_name_down.conf'") > 0)
+        self.assertTrue(str(upload_template.call_args)
+                         .find("template_dir='lib_path/templates'") > 0)
 
     @patch('fabtools.files.upload_template', return_value=Mock())
     @patch('fabtools.files.is_link', return_value=True)
@@ -202,7 +194,6 @@ class NginxCheck(TestCase):
         self.assertTrue(api_sudo.called)
         self.assertEqual(api_sudo.call_args, call(
             'ln -s /etc/nginx/sites-available/server_name.conf .'))
-
 
     @patch('pydiploy.require.nginx.nginx_restart', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
@@ -241,7 +232,6 @@ class NginxCheck(TestCase):
         self.assertEqual(api_sudo.call_args, call(
             'ln -s /etc/nginx/sites-available/server_name.conf .'))
 
-
     @patch('pydiploy.require.nginx.nginx_restart', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
     @patch('fabric.api.cd', return_value=Mock())
@@ -261,7 +251,6 @@ class NginxCheck(TestCase):
         self.assertEqual(api_sudo.call_args, call(
             'rm -f server_name.conf'))
 
-
         # no up config file
         is_file.return_value = False
         set_website_down()
@@ -279,3 +268,15 @@ class NginxCheck(TestCase):
         self.assertTrue(api_sudo.called)
         self.assertEqual(api_sudo.call_args, call(
             'ln -s /etc/nginx/sites-available/server_name_down.conf .'))
+
+    @patch('fabtools.files.upload_template', return_value=Mock())
+    def test_upload_maintenance_page(self, upload_template):
+
+        upload_maitenance_page()
+        self.assertTrue(upload_template.called)
+        self.assertTrue(str(upload_template.call_args)
+                        .find("maitenance.html.tpl") > 0)
+        self.assertTrue(str(upload_template.call_args)
+                        .find("remote_static_root/application_name/maintenance.html") > 0)
+        self.assertTrue(str(upload_template.call_args)
+                        .find("template_dir='lib_path/templates'") > 0)

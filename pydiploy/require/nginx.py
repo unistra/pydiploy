@@ -96,7 +96,7 @@ def down_site_config():
     nginx_root = '/etc/nginx'
     nginx_available = os.path.join(nginx_root, 'sites-available')
     app_conf = os.path.join(nginx_available, '%s_down.conf' % env.server_name)
-    maintenance_file = os.path.join(env.remote_static_root, env.application_name, 'maintenance.html')
+
     fabtools.files.upload_template('nginx_down.conf.tpl',
                                    app_conf,
                                    context=env,
@@ -108,16 +108,7 @@ def down_site_config():
                                    chown=True,
                                    mode='644')
 
-    fabtools.files.upload_template('maitenance.html.tpl',
-                                   maintenance_file,
-                                   context=env,
-                                   template_dir=os.path.join(
-                                       env.lib_path, 'templates'),
-                                   use_jinja=True,
-                                   use_sudo=True,
-                                   user='root',
-                                   chown=True,
-                                   mode='644')
+    fabric.api.execute(upload_maitenance_page)
 
 
 def set_website_up():
@@ -167,3 +158,22 @@ def set_website_down():
             fabric.api.sudo('ln -s %s .' % app_down_conf)
 
     fabric.api.execute(nginx_restart)
+
+
+def upload_maitenance_page():
+    """ upload and forge maintenance.html according to template """
+
+    maintenance_file = os.path.join(env.remote_static_root,
+                                    env.application_name,
+                                    'maintenance.html')
+
+    fabtools.files.upload_template('maitenance.html.tpl',
+                                   maintenance_file,
+                                   context=env,
+                                   template_dir=os.path.join(
+                                       env.lib_path, 'templates'),
+                                   use_jinja=True,
+                                   use_sudo=True,
+                                   user='root',
+                                   chown=True,
+                                   mode='644')

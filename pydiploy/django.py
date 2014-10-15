@@ -102,6 +102,7 @@ def reload_backend():
 
 def set_app_down():
     """ Set app in maintenance mode """
+    fabric.api.execute(pydiploy.require.nginx.down_site_config)
     fabric.api.execute(pydiploy.require.nginx.set_website_down)
 
 def set_app_up():
