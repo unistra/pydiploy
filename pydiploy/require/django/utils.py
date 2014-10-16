@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" Utilities for django settings. """
+""" Utilities for django (settings...) """
 
 import os
 import random
@@ -13,7 +13,8 @@ from fabric.api import env
 
 
 def generate_secret_key():
-    """ Generate the django's secret key. """
+    """ Generates the django's secret key. """
+
     letters = string.ascii_letters + string.punctuation.replace('\'', '')
     random_letters = map(lambda i: random.SystemRandom().choice(letters),
                          range(50))
@@ -22,7 +23,8 @@ def generate_secret_key():
 
 
 def extract_settings():
-    """ Extract settings from django settings files. """
+    """ Extracts settings from django settings files. """
+
     # get the remote file
     fabric.api.get(env.previous_settings_file, local_path=env.local_tmp_dir)
     settings_file = os.path.join(env.local_tmp_dir, '%s.py' % env.goal)
@@ -52,7 +54,7 @@ def extract_settings():
 
 
 def app_settings(**kwargs):
-    """ Manage django settings file """
+    """ Manages django settings file """
 
     settings_present = fabtools.files.is_file(path=env.previous_settings_file,
                                               use_sudo=True)
@@ -88,7 +90,7 @@ def app_settings(**kwargs):
 
 
 def deploy_manage_file():
-    """ uploading manage.py template """
+    """ uploads manage.py template on remote """
 
     fabtools.files.upload_template('manage.py',
                                    os.path.join(
@@ -103,7 +105,7 @@ def deploy_manage_file():
 
 
 def deploy_wsgi_file():
-    """ uploading wsgi.py template """
+    """ Uploads wsgi.py template on remote """
 
     fabtools.files.upload_template('wsgi.py',
                                    os.path.join(

@@ -1,5 +1,5 @@
 ==================================
-releases manager relatives methods
+Releases manager relatives methods
 ==================================
 
 .. automodule:: pydiploy.require.releases_manager

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-"""
-    This module is used to deploy a whole django webapp on a remote/vagrant machine :
+""" This module is used to deploy a whole django webapp using chaussette/circus nginx on a remote/vagrant machine.
+
+This module shoud be imported in a fabfile to deploy an application using pydiploy.
 
 """
 
@@ -32,7 +33,7 @@ def application_packages(update=False):
 
 def pre_install_backend(commands='/usr/bin/rsync'):
     """ Installs requirements for circus & virtualenv env """
-    fabric.api.execute(pydiploy.require.system.django_user, commands=commands)
+    fabric.api.execute(pydiploy.require.system.add_user, commands=commands)
     fabric.api.execute(pydiploy.require.system.set_locale)
     fabric.api.execute(pydiploy.require.system.set_timezone)
     fabric.api.execute(pydiploy.require.system.update_pkg_index)
@@ -65,7 +66,7 @@ def deploy_backend(upgrade_pkg=False, **kwargs):
 
 
 def deploy_frontend():
-    """ synchronise static files after deploy """
+    """ Synchronises static files after deploy """
     fabric.api.execute(pydiploy.require.nginx.web_static_files)
 
 
@@ -76,7 +77,7 @@ def rollback():
 
 
 def post_install_backend():
-    """ Post installation of webapp"""
+    """ Post-installation of webapp"""
     fabric.api.execute(pydiploy.require.circus.app_circus_conf)
     fabric.api.execute(pydiploy.require.circus.app_reload)
 
@@ -92,19 +93,19 @@ def dump_database():
 
 
 def reload_frontend():
-    """ Reload frontend """
+    """ Reloads frontend """
     fabric.api.execute(pydiploy.require.nginx.nginx_reload)
 
 
 def reload_backend():
-    """ Reload backend """
+    """ Reloads backend """
     fabric.api.execute(pydiploy.require.circus.app_reload)
 
 def set_app_down():
-    """ Set app in maintenance mode """
+    """ Sets app in maintenance mode """
     fabric.api.execute(pydiploy.require.nginx.down_site_config)
     fabric.api.execute(pydiploy.require.nginx.set_website_down)
 
 def set_app_up():
-    """ Set app in maintenance mode """
+    """ Sets app in maintenance mode """
     fabric.api.execute(pydiploy.require.nginx.set_website_up)

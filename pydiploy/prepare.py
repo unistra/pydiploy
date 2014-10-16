@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 
-"""  This module builds env. vars used for the whole library methods are :
+"""  This module builds env. vars used for the whole library, and check them methods are :
 
-* tag : get the tag used to deploy the app
+* _get_current_role() : gets role used in fabric
 * build_env : inits all env. vars used by the library
+* check_req_pydiploy_version : checks required version of pydiploy for a specific fabfile
+* init_params : gets required and optional parameters used for config checker
+* tag : gets the tag used to deploy the app
+* test_config : checks configuration in fabfile
+
 
 """
 
@@ -30,17 +35,16 @@ def tag(version):
 
 
 def init_params():
-    """ sets required params and its description """
+    """ Sets required params and its description """
 
     # TODO implement mechanism to deploy other technos with specific required
-    # and optionnal parameters !
+    # and optional parameters !
     return PARAMS['default']['required_params'], PARAMS['default']['optional_params']
 
 
 def build_env():
-    """
-    Builds env vars
-    """
+    """ Builds env vars """
+
     env.pydiploy_version = __version__
 
     # check pydiploy version required by fabfile (major version number)
@@ -125,6 +129,7 @@ def build_env():
 
 @fabric.api.task
 def test_config(verbose=True):
+    """ Checks fabfile for required params and optional params """
 
     if "no_config_test" in env:
         if env.no_config_test:
@@ -183,14 +188,15 @@ def test_config(verbose=True):
                 fabric.api.puts('* %s %s' %
                                 (param.ljust(max_opt_param_length), value))
         else:
-            fabric.api.puts("No optionnal parameter found")
+            fabric.api.puts("No optional parameter found")
     fabric.api.puts('\n\nRole : %s -> configuration %s!\n\n' %
                     (fabric.colors.green(current_role), fabric.colors.green("OK")))
     return True
 
 
 def _get_current_role():
-    """ gets fabric current role should be env.effective_roles in future's fabric release """
+    """ Gets fabric current role should be env.effective_roles in future's fabric release """
+
     try:
         current_role = "Not set!"
         for role in env.roledefs.keys():
@@ -201,7 +207,8 @@ def _get_current_role():
 
 
 def check_req_pydiploy_version():
-    """ check pydiploy version required with pydiploy version installed """
+    """ Check pydiploy version required with pydiploy version installed """
+
     if "req_pydiploy_version" in env:
         major_version_installed = __version_info__[0:2]
         major_version_required = tuple(

@@ -23,7 +23,7 @@ def nginx_pkg(update=False):
 
 
 def nginx_reload():
-    """ Starts/Reloads nginx """
+    """ Starts/reeloads nginx """
 
     if not fabtools.service.is_running('nginx'):
         fabtools.service.start('nginx')
@@ -67,7 +67,7 @@ def web_configuration():
 
 
 def up_site_config():
-    """ upload site config for nginx """
+    """ Uploads site config for nginx """
     nginx_root = '/etc/nginx'
     nginx_available = os.path.join(nginx_root, 'sites-available')
     nginx_enabled = os.path.join(nginx_root, 'sites-enabled')
@@ -91,7 +91,7 @@ def up_site_config():
 
 
 def down_site_config():
-    """ upload site_down config for nginx """
+    """ Uploads site_down config for nginx """
 
     nginx_root = '/etc/nginx'
     nginx_available = os.path.join(nginx_root, 'sites-available')
@@ -108,11 +108,11 @@ def down_site_config():
                                    chown=True,
                                    mode='644')
 
-    fabric.api.execute(upload_maitenance_page)
+    fabric.api.execute(upload_maintenance_page)
 
 
 def set_website_up():
-    """ set websiste up """
+    """ Sets website up """
 
     nginx_root = '/etc/nginx'
     nginx_available = os.path.join(nginx_root, 'sites-available')
@@ -136,7 +136,7 @@ def set_website_up():
 
 
 def set_website_down():
-    """ set websiste down """
+    """ Sets website down """
 
     nginx_root = '/etc/nginx'
     nginx_available = os.path.join(nginx_root, 'sites-available')
@@ -160,14 +160,14 @@ def set_website_down():
     fabric.api.execute(nginx_restart)
 
 
-def upload_maitenance_page():
-    """ upload and forge maintenance.html according to template """
+def upload_maintenance_page():
+    """ Uploads and forges maintenance.html according to template """
 
     maintenance_file = os.path.join(env.remote_static_root,
                                     env.application_name,
                                     'maintenance.html')
 
-    fabtools.files.upload_template('maitenance.html.tpl',
+    fabtools.files.upload_template('maintenance.html.tpl',
                                    maintenance_file,
                                    context=env,
                                    template_dir=os.path.join(

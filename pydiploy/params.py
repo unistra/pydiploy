@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
 
-
-#
-# This module sets required and optionnal params for the stuff to be deployed
-#
+""" This module sets required and optional params for the stuff to be deployed.
 
 
-# default is python/django/circus/nginx deployement
-#
-# PARAMS = { 'role'
-#                   'required_params'  : {  key description },
-#                   'optional_params'  : {  key description }
-#          }
-# ...
+::
+
+ default is python/django/circus/nginx deployement
+
+ PARAMS = {
+            'role': {
+                     'required_params'  : {  key description },
+                     'optional_params'  : {  key description }
+                    }
+          }
+ ...
+
+"""
+
 PARAMS = {
     'default': {
 
@@ -61,8 +65,8 @@ PARAMS = {
                             'path_to_cert': 'ssl certificate path',
                             'path_to_cert_key': 'ssl cert key path',
                             'map_settings': 'settings to map in django settings files',
-                            'maintenance_title': 'customize maitenance page title',
-                            'maintenance_txt': 'customize maintenance page text'}
+                            'maintenance_title': 'customize maintenance page title',
+                            'maintenance_text': 'customize maintenance page text'}
 
     }
 }

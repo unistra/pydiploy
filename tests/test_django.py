@@ -70,7 +70,7 @@ class ReleasesManagerCheck(TestCase):
         pre_install_backend()
         self.assertTrue(api_execute.called)
         self.assertTrue(
-            str(api_execute.call_args_list[0]).find('call(<function django_user') == 0)
+            str(api_execute.call_args_list[0]).find('call(<function add_user') == 0)
         self.assertTrue(
             str(api_execute.call_args_list[1]).find('call(<function set_locale') == 0)
         self.assertTrue(str(api_execute.call_args_list[2]).find(

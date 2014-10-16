@@ -34,8 +34,8 @@
 
         </h2>
         <p>
-            {% if maintenance_txt %}
-            {{ maintenance_txt }}
+            {% if maintenance_text %}
+            {{ maintenance_text }}
             {% else %}
             We apologize for the interruption, but we're currently performing
             maintenance for {{ server_name }} . Please check back again in a few minutes.

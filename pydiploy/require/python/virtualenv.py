@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
+""" This module is used for virtualenv relatives """
+
 import fabtools
 from fabric.api import env
 
 
 def virtualenv(clear=False):
-    """
-    Creates virtualenv
-    """
+    """ Creates virtualenv """
     fabtools.require.files.directory(env.remote_virtualenv_dir,
                                      owner=env.remote_owner,
                                      group=env.remote_group,

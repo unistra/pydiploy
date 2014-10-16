@@ -6,8 +6,8 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.require.system import (check_python3_install, django_group,
-                                     django_user, install_extra_packages,
+from pydiploy.require.system import (check_python3_install, add_group,
+                                     add_user, install_extra_packages,
                                      install_extra_ppa, package_installed,
                                      permissions, set_locale, set_timezone,
                                      update_pkg_index)
@@ -35,8 +35,8 @@ class SystemCheck(TestCase):
     @patch('fabtools.require.group', return_value=Mock())
     @patch('fabtools.require.user', return_value=Mock())
     @patch('fabtools.require.sudoer', return_value=Mock())
-    def test_django_user(self, require_group, require_user, require_sudoer):
-        django_user(commands='mycommand')
+    def test_add_user(self, require_group, require_user, require_sudoer):
+        add_user(commands='mycommand')
 
         self.assertTrue(require_group.called)
         self.assertEqual(require_group.call_args, call(
@@ -50,8 +50,8 @@ class SystemCheck(TestCase):
         self.assertEqual(require_sudoer.call_args, call('remote_group'))
 
     @patch('fabtools.require.group', return_value=Mock())
-    def test_django_group(self, require_group):
-        django_group("mygroup")
+    def test_add_group(self, require_group):
+        add_group("mygroup")
         self.assertTrue(require_group.called)
         self.assertEqual(require_group.call_args, call('mygroup'))
 

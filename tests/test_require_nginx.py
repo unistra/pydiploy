@@ -9,7 +9,7 @@ from mock import call, Mock, patch
 from pydiploy.require.nginx import (down_site_config, nginx_pkg, nginx_reload,
                                     nginx_restart, root_web, set_website_down,
                                     set_website_up, up_site_config,
-                                    upload_maitenance_page, web_configuration,
+                                    upload_maintenance_page, web_configuration,
                                     web_static_files)
 
 
@@ -150,7 +150,7 @@ class NginxCheck(TestCase):
         self.assertEqual(api_sudo.call_args, call(
             'ln -s /etc/nginx/sites-available/server_name.conf .'))
 
-    @patch('pydiploy.require.nginx.upload_maitenance_page')
+    @patch('pydiploy.require.nginx.upload_maintenance_page')
     @patch('fabtools.files.upload_template', return_value=Mock())
     def test_down_site_conf(self, upload_template, maintenance_page):
 
@@ -272,10 +272,10 @@ class NginxCheck(TestCase):
     @patch('fabtools.files.upload_template', return_value=Mock())
     def test_upload_maintenance_page(self, upload_template):
 
-        upload_maitenance_page()
+        upload_maintenance_page()
         self.assertTrue(upload_template.called)
         self.assertTrue(str(upload_template.call_args)
-                        .find("maitenance.html.tpl") > 0)
+                        .find("maintenance.html.tpl") > 0)
         self.assertTrue(str(upload_template.call_args)
                         .find("remote_static_root/application_name/maintenance.html") > 0)
         self.assertTrue(str(upload_template.call_args)

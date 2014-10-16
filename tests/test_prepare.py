@@ -184,7 +184,7 @@ class PrepareCheck(TestCase):
         del env['verbose_output']
         build_env()
 
-        # test optionnal params not set
+        # test optional params not set
         del env['dest_path']
         del env['extra_goals']
         build_env()

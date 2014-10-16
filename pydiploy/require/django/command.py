@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""
+""" This module is used for commands relatives to django framework
+
 """
 
 import datetime
@@ -13,7 +14,8 @@ from fabric.api import env
 
 def django_prepare():
     """
-    Prepares django webapp (syncdb,migrate,collectstatic,and eventually compilemessages)
+    Prepares django webapp (syncdb,migrate,collectstatic,and eventually
+    compilemessages)
     """
 
     # remove old statics from local tmp dir before collecting new ones
@@ -42,7 +44,12 @@ def django_prepare():
 
 def django_dump_database():
     """
-    Dumps webapp datas in json
+    Dumps webapp datas in json.
+
+    If env.dest_path is not set in fabfile or --set dest_path is not
+    used in command line uses default /tmp in local machine using the
+    fabfile.
+
     """
     with fabtools.python.virtualenv(env.remote_virtualenv_dir):
         with fabric.api.cd(env.remote_current_path):

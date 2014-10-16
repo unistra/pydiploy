@@ -50,7 +50,7 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     env.timezone = 'Europe/Paris'  # timezone for remote
     env.keep_releases = 2  # number of old releases to keep before cleaning
 
-    # optionnal parameters
+    # optional parameters
 
     env.dest_path = '' # if not set using env_local_tmp_dir
     env.excluded_files = ['pron.jpg'] # file(s) that rsync should exclude when deploying app
@@ -62,8 +62,8 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     env.verbose = True # verbose display for pydiploy default value = True
     env.req_pydiploy_version = "0.9" # required pydiploy version for this fabfile
     env.no_config_test = False # avoid config checker if True
-    env.maintenance.txt = "" # add a customize maintenance text for maitenance page
-    env.maintenance.title = "" # add a customize title for maintenance page
+    env.maintenance_text = "" # add a customize maintenance text for maintenance page
+    env.maintenance_title = "" # add a customize title for maintenance page
 
     env.oracle_client_version = '11.2'
     env.oracle_download_url = 'http://librepo.net/lib/oracle/'
