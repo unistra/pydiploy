@@ -109,3 +109,7 @@ def set_app_down():
 def set_app_up():
     """ Sets app in maintenance mode """
     fabric.api.execute(pydiploy.require.nginx.set_website_up)
+
+def custom_manage_command(cmd):
+    """ Passes custom commandes to manage.py """
+    fabric.api.execute(pydiploy.require.django.command.django_custom_cmd,cmd)

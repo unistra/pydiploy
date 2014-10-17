@@ -59,3 +59,15 @@ def django_dump_database():
                 fabric.api.sudo(
                     'python manage.py dumpdata --indent=4 > /tmp/%s ' % dump_name)
     fabric.api.get('/tmp/%s' % dump_name, local_path=env.dest_path)
+
+
+def django_custom_cmd(commands):
+    """ Passes custom commands to manage.py """
+
+    if not isinstance(commands, basestring):
+        packages = ' '.join(commands)
+
+    with fabtools.python.virtualenv(env.remote_virtualenv_dir):
+        with fabric.api.cd(env.remote_current_path):
+            with fabric.api.settings(sudo_user=env.remote_owner):
+                fabric.api.sudo('python manage.py %s' % commands)
