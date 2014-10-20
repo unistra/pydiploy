@@ -8,12 +8,12 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.require.django.command import (django_dump_database,
+from pydiploy.require.django.command import (django_custom_cmd,
+                                             django_dump_database,
                                              django_prepare)
-from pydiploy.require.django.utils import (app_settings, extract_settings,
-                                           generate_secret_key,
-                                           deploy_manage_file,
-                                           deploy_wsgi_file)
+from pydiploy.require.django.utils import (app_settings, deploy_manage_file,
+                                           deploy_wsgi_file, extract_settings,
+                                           generate_secret_key)
 
 
 class CommandCheck(TestCase):
@@ -126,6 +126,22 @@ class CommandCheck(TestCase):
         self.assertTrue(api_get.called)
         self.assertEqual(api_get.call_args, call(
             '/tmp/%s' % self.dump_name, local_path=env.dest_path))
+
+    @patch('fabtools.python.virtualenv', return_value=Mock())
+    @patch('fabric.api.cd', return_value=Mock())
+    @patch('fabric.api.settings', return_value=Mock())
+    @patch('fabric.api.sudo', return_value=Mock())
+    def test_django_custom_cmd(self, api_sudo, api_settings, api_cd, python_virtualenv):
+
+        python_virtualenv.return_value.__exit__ = Mock()
+        python_virtualenv.return_value.__enter__ = Mock()
+
+        api_cd.return_value.__exit__ = Mock()
+        api_cd.return_value.__enter__ = Mock()
+
+        api_settings.return_value.__exit__ = Mock()
+        api_settings.return_value.__enter__ = Mock()
+        django_custom_cmd('test')
 
 
 class UtilsCheck(TestCase):

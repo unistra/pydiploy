@@ -64,9 +64,6 @@ def django_dump_database():
 def django_custom_cmd(commands):
     """ Passes custom commands to manage.py """
 
-    if not isinstance(commands, basestring):
-        packages = ' '.join(commands)
-
     with fabtools.python.virtualenv(env.remote_virtualenv_dir):
         with fabric.api.cd(env.remote_current_path):
             with fabric.api.settings(sudo_user=env.remote_owner):

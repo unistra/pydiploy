@@ -6,8 +6,8 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.django import (application_packages, deploy_backend,
-                             deploy_frontend, dump_database,
+from pydiploy.django import (application_packages, custom_manage_command,
+                             deploy_backend, deploy_frontend, dump_database,
                              post_install_backend, post_install_frontend,
                              pre_install_backend, pre_install_frontend,
                              reload_backend, reload_frontend, rollback,
@@ -188,3 +188,8 @@ class ReleasesManagerCheck(TestCase):
     def test_set_app_up(self, api_execute, website_down):
 
         set_app_up()
+
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_custom_manage_command(self, api_execute):
+
+        custom_manage_command('toto')
