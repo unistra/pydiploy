@@ -6,25 +6,26 @@
     Fabfile example file to deploy a standard django webapp
 """
 
-from fabric.api import (env, roles, execute, task)
 from os.path import join
 
-from pydiploy.prepare import (tag as pydiploy_tag,
-                                  build_env as pydiploy_build_env)
-from pydiploy.django import (deploy_backend as pydiploy_deploy_backend,
-                             deploy_frontend as pydiploy_deploy_frontend,
-                             rollback as pydiploy_rollback,
-                             post_install_backend as pydiploy_postinstall_backend,
-                             post_install_frontend as pydiploy_postinstall_frontend,
-                             pre_install_backend as pydiploy_preinstall_backend,
-                             pre_install_frontend as pydiploy_preinstall_frontend,
-                             reload_frontend as pydiploy_reload_frontend,
-                             reload_backend as pydiploy_reload_backend,
-                             set_app_up as pydiploy_set_up,
-                             set_app_down as pydiploy_set_down)
+from fabric.api import env, execute, roles, task
+from pydiploy.django import custmom_manage_command as pydiploy_custom_command
+from pydiploy.django import deploy_backend as pydiploy_deploy_backend
+from pydiploy.django import deploy_frontend as pydiploy_deploy_frontend
+from pydiploy.django import post_install_backend as pydiploy_postinstall_backend
+from pydiploy.django import post_install_frontend as pydiploy_postinstall_frontend
+from pydiploy.django import pre_install_backend as pydiploy_preinstall_backend
+from pydiploy.django import pre_install_frontend as pydiploy_preinstall_frontend
+from pydiploy.django import reload_backend as pydiploy_reload_backend
+from pydiploy.django import reload_frontend as pydiploy_reload_frontend
+from pydiploy.django import rollback as pydiploy_rollback
+from pydiploy.django import set_app_down as pydiploy_set_down
+from pydiploy.django import set_app_up as pydiploy_set_up
+from pydiploy.prepare import build_env as pydiploy_build_env
+from pydiploy.prepare import tag as pydiploy_tag
+from pydiploy.require.databases import install_oracle_client as pydiploy_setup_oracle
+from pydiploy.require.databases import install_postgres_server as pydiploy_setup_postgres
 
-from pydiploy.require.databases import (install_oracle_client as pydiploy_setup_oracle,
-                                       install_postgres_server as pydiploy_setup_postgres)
 # edit config here !
 env.user = 'vagrant'  # user for ssh
 env.use_sudo = True # use sudo or not
@@ -264,6 +265,13 @@ def set_down():
 def set_up():
     """ Set app to up mode """
     execute(pydiploy_set_up)
+
+
+@roles('web')
+@task
+def custom_manage_cmd(cmd):
+    """ Execute custom command in manage.py """
+    execute(pydiploy_custom_command,cmd)
 
 ]]></content>
     <description>Pydiploy fabfile</description>

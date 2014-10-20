@@ -24,7 +24,8 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
                                  reload_frontend as pydiploy_reload_frontend,
                                  reload_backend as pydiploy_reload_backend,
                                  set_app_up as pydiploy_set_up,
-                                 set_app_down as pydiploy_set_down)
+                                 set_app_down as pydiploy_set_down,
+                                 custom_manage_command as pydiploy_custom_command,cmd)
 
     from pydiploy.require.databases import (install_oracle_client as pydiploy_setup_oracle,
                                            install_postgres_server as pydiploy_setup_postgres)
@@ -154,6 +155,7 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     def build_env():
         execute(pydiploy_build_env)
 
+
     @task
     def pre_install():
         """Pre install of backend & frontend"""
@@ -174,6 +176,7 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         """Setup server for frontend"""
         execute(pydiploy_preinstall_frontend)
 
+
     @task
     def deploy():
         """Deploy code and sync static files"""
@@ -190,6 +193,7 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     def deploy_backend(update_pkg=False):
         """Deploy code on server"""
         execute(pydiploy_deploy_backend)
+
 
     @roles('lb')
     @task
@@ -245,15 +249,18 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
         execute(reload_frontend)
         execute(reload_backend)
 
+
     @roles('lb')
     @task
     def reload_frontend():
         execute(pydiploy_reload_frontend)
 
+
     @roles('web')
     @task
     def reload_backend():
         execute(pydiploy_reload_backend)
+
 
     @roles('lb')
     @task
@@ -267,3 +274,10 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
     def set_up():
         """ Set app to up mode """
         execute(pydiploy_set_up)
+
+
+    @roles('web')
+    @task
+    def custom_manage_cmd(cmd):
+        """ Execute custom command in manage.py """
+        execute(pydiploy_custom_command,cmd)
