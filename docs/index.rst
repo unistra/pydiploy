@@ -59,14 +59,21 @@ Sublime text 2/3
 You can use the snippet in the tools folder which can help you to generate a standard fabfile for the library.
 Trigger is "pydiployfab"
 
+.. literalinclude:: /../tools/pydiployfabfile.sublime-snippet
+   :language: python
+
 .. seealso::
 
    `Sublime text documentation for snippets <http://docs.sublimetext.info/en/latest/extensibility/snippets.html?highlight=snippet>`_
       Sublime text unofficial documentation.
 
-Templates
-=========
+Vim plugin
+----------
 
+.. literalinclude:: /../tools/pydiploy-vim/plugin/pydiployfabfile.vim
+   :language: bash
+
+Install this plugin in your ~/.vim/plugin or ~/.vim/bundle directory when editing a file in vim first save the file (type :file fabfile.py for example) and then use the command :PYDIPLOYFAB to generate a standard fabfile.
 
 Indices and tables
 ==================
