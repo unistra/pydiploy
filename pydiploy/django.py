@@ -119,7 +119,15 @@ def custom_manage_command(cmd):
 
 
 def install_postgres_server(user=None,dbname=None,password=None):
-    """ Install postgres server & add user for postgres """
+    """ Install postgres server & add user for postgres
+
+        if no parameters are provided using (if exists) ::
+
+            default_db_user
+            default_db_name
+            default_db_password
+
+    """
 
     if not (user and dbname and password):
         if all([e in env.keys() for e in ('default_db_user', 'default_db_name', 'default_db_password')]):

@@ -25,10 +25,11 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
                                  reload_backend as pydiploy_reload_backend,
                                  set_app_up as pydiploy_set_up,
                                  set_app_down as pydiploy_set_down,
-                                 custom_manage_command as pydiploy_custom_command,cmd)
+                                 custom_manage_command as pydiploy_custom_command,
+                                 install_oracle_client as pydiploy_setup_oracle,
+                                 install_postgres_server as pydiploy_setup_postgres)
 
-    from pydiploy.require.databases import (install_oracle_client as pydiploy_setup_oracle,
-                                           install_postgres_server as pydiploy_setup_postgres)
+
     # edit config here !
     env.user = 'vagrant'  # user for ssh
     env.use_sudo = True # use sudo or not
@@ -238,9 +239,9 @@ A simple fab file to deploy a django web app with circus/nginx using postgres an
 
     @roles('web')
     @task
-    def install_postgres():
+    def install_postgres(user=None, dbname=None, password=None):
         """Install Postgres on remote"""
-        execute(pydiploy_setup_postgres)
+        execute(pydiploy_setup_postgres, user=user, dbname=dbname, password=password)
 
 
     @task

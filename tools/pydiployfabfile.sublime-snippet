@@ -12,6 +12,8 @@ from fabric.api import env, execute, roles, task
 from pydiploy.django import custmom_manage_command as pydiploy_custom_command
 from pydiploy.django import deploy_backend as pydiploy_deploy_backend
 from pydiploy.django import deploy_frontend as pydiploy_deploy_frontend
+from pydiploy.django import install_oracle_client as pydiploy_setup_oracle
+from pydiploy.django import install_postgres_server as pydiploy_setup_postgres
 from pydiploy.django import post_install_backend as pydiploy_postinstall_backend
 from pydiploy.django import post_install_frontend as pydiploy_postinstall_frontend
 from pydiploy.django import pre_install_backend as pydiploy_preinstall_backend
@@ -23,8 +25,6 @@ from pydiploy.django import set_app_down as pydiploy_set_down
 from pydiploy.django import set_app_up as pydiploy_set_up
 from pydiploy.prepare import build_env as pydiploy_build_env
 from pydiploy.prepare import tag as pydiploy_tag
-from pydiploy.require.databases import install_oracle_client as pydiploy_setup_oracle
-from pydiploy.require.databases import install_postgres_server as pydiploy_setup_postgres
 
 # edit config here !
 env.user = 'vagrant'  # user for ssh
@@ -232,9 +232,9 @@ def install_oracle():
 
 @roles('web')
 @task
-def install_postgres():
+def install_postgres(user=None, dbname=None, password=None):
     """Install Postgres on remote"""
-    execute(pydiploy_setup_postgres)
+    execute(pydiploy_setup_postgres, user=user, dbname=dbname, password=password)
 
 
 @task
