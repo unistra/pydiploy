@@ -101,15 +101,38 @@ def reload_backend():
     """ Reloads backend """
     fabric.api.execute(pydiploy.require.circus.app_reload)
 
+
 def set_app_down():
     """ Sets app in maintenance mode """
     fabric.api.execute(pydiploy.require.nginx.down_site_config)
     fabric.api.execute(pydiploy.require.nginx.set_website_down)
 
+
 def set_app_up():
     """ Sets app in maintenance mode """
     fabric.api.execute(pydiploy.require.nginx.set_website_up)
 
+
 def custom_manage_command(cmd):
     """ Passes custom commandes to manage.py """
-    fabric.api.execute(pydiploy.require.django.command.django_custom_cmd,cmd)
+    fabric.api.execute(pydiploy.require.django.command.django_custom_cmd, cmd)
+
+
+def install_postgres_server(user=None,dbname=None,password=None):
+    """ Install postgres server & add user for postgres """
+
+    if not (user and dbname and password):
+        if all([e in env.keys() for e in ('default_db_user', 'default_db_name', 'default_db_password')]):
+            user = env.default_db_user
+            dbname = env.default_db_name
+            password = env.default_db_password
+        else:
+            fabric.api.abort('Please provide user,dbname,password parameters for postgres.')
+
+    fabric.api.execute(pydiploy.require.databases.postgres.install_postgres_server)
+    fabric.api.execute(pydiploy.require.databases.postgres.add_postgres_user,user,password=password)
+    fabric.api.execute(pydiploy.require.databases.postgres.add_postgres_database,dbname,owner=user,locale=env.locale)
+
+def install_oracle_client():
+    """ Installs oracle client """
+    fabric.api.execute(pydiploy.require.databases.oracle.install_oracle_client)

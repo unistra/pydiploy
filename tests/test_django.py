@@ -8,6 +8,7 @@ from fabric.api import env
 from mock import call, Mock, patch
 from pydiploy.django import (application_packages, custom_manage_command,
                              deploy_backend, deploy_frontend, dump_database,
+                             install_oracle_client, install_postgres_server,
                              post_install_backend, post_install_frontend,
                              pre_install_backend, pre_install_frontend,
                              reload_backend, reload_frontend, rollback,
@@ -193,3 +194,35 @@ class ReleasesManagerCheck(TestCase):
     def test_custom_manage_command(self, api_execute):
 
         custom_manage_command('toto')
+
+    @patch('fabric.api.abort', return_value=Mock())
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_install_postgres_server(self, api_execute, api_abort):
+
+        # no parameters provided env.default_db_* no present
+        install_postgres_server()
+        self.assertTrue(api_abort.called)
+
+        # no parameters provided env.default_db_* present
+        env.default_db_user = "foo"
+        env.default_db_name = "foo"
+        env.default_db_password = "bar"
+        install_postgres_server()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function install_postgres_server') == 0)
+        self.assertTrue(str(api_execute.call_args_list[1]).find(
+            'call(<function add_postgres_user') == 0)
+        self.assertTrue(str(api_execute.call_args_list[2]).find(
+            'call(<function add_postgres_database') == 0)
+
+        # parameters provided
+        install_postgres_server(user='foo', dbname='foo', password='bar')
+
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_install_oracle_client(self, api_execute):
+
+        install_oracle_client()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function install_oracle_client') == 0)

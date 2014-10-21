@@ -88,6 +88,7 @@ class PostgresCheck(TestCase):
 
         self.previous_env = copy.deepcopy(env)
         env.verbose_output = True
+        env.locale = 'fr_FR.UTF-8'
 
     def tearDown(self):
         env.clear()
@@ -109,12 +110,12 @@ class PostgresCheck(TestCase):
 
     @patch("fabtools.postgres.user_exists", return_value=False)
     @patch("fabtools.require.postgres.user", return_value=Mock())
-    def test_add_postgres_user(self, postgres_user_exist, postgres_user):
+    def test_add_postgres_user(self, postgres_user, postgres_user_exist):
 
         add_postgres_user(name='bill', password='g@t3s')
         self.assertTrue(postgres_user.called)
         self.assertEqual(
-            postgres_user.call_args, call('bill'))
+            postgres_user.call_args, call('bill', 'g@t3s', False, False, False, True, True, None, False))
 
         # verbose_output = false
         env.verbose_output = False
@@ -125,9 +126,10 @@ class PostgresCheck(TestCase):
         postgres_user_exist.return_value = True
         add_postgres_user(name='bill', password='g@t3s')
 
+
     @patch("fabtools.postgres.database_exists", return_value=False)
     @patch("fabtools.require.postgres.database", return_value=Mock())
-    def test_add_postgres_database(self, postgres_db_exists, postgres_database):
+    def test_add_postgres_database(self, postgres_database, postgres_db_exists):
 
         add_postgres_database('db', 'dbowner')
         self.assertTrue(postgres_db_exists)
