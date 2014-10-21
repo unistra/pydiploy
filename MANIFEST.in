@@ -1,3 +1,4 @@
 recursive-include pydiploy/templates *.tpl
+recursive-include pydiploy/examples *.py
 include requirements.txt
 include README.rst

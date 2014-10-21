@@ -16,6 +16,8 @@ import os
 
 import fabric
 import fabtools
+
+from pkg_resources import resource_filename, Requirement
 from fabric.api import env
 from pydiploy.params import PARAMS
 from pydiploy.require.git import check_tag_exist
@@ -27,11 +29,13 @@ def tag(version):
     """ Defines tag to deploy """
 
     if "pydiploy_version" in env:
-        fabric.api.abort(fabric.colors.red("tag should be set before calling goal (ex: fab tag:master test deploy)"))
+        fabric.api.abort(fabric.colors.red(
+            "tag should be set before calling goal (ex: fab tag:master test deploy)"))
     if check_tag_exist(version):
         env.tag = version
     else:
-        fabric.api.abort(fabric.colors.red("tag/branch provided is not in the repository please fix this first"))
+        fabric.api.abort(fabric.colors.red(
+            "tag/branch provided is not in the repository please fix this first"))
 
 
 def init_params():
@@ -207,7 +211,7 @@ def _get_current_role():
 
 
 def check_req_pydiploy_version():
-    """ Check pydiploy version required with pydiploy version installed """
+    """ Checks pydiploy version required with pydiploy version installed """
 
     if "req_pydiploy_version" in env:
         major_version_installed = __version_info__[0:2]
@@ -217,3 +221,12 @@ def check_req_pydiploy_version():
         if (major_version_installed > major_version_required):
             return False
         return True
+
+
+def generate_fabfile():
+    """ Returns current django_fabfile example """
+
+    fab_sample = resource_filename("pydiploy", "examples/django_fabfile.py")
+
+    with open(fab_sample) as f:
+        return f.read()

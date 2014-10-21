@@ -8,8 +8,8 @@ from unittest import TestCase
 from fabric.api import env
 from mock import call, Mock, patch
 from pydiploy.prepare import (_get_current_role, build_env,
-                              check_req_pydiploy_version, init_params, tag,
-                              test_config)
+                              check_req_pydiploy_version, generate_fabfile,
+                              init_params, tag, test_config)
 
 
 class PrepareCheck(TestCase):
@@ -235,3 +235,6 @@ class PrepareCheck(TestCase):
 
     def test_check_req_pydiploy_version(self):
         check_req_pydiploy_version()
+
+    def test_generate_fabfile(self):
+        generate_fabfile()
