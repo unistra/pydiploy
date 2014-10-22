@@ -111,6 +111,46 @@ Maintenance mode
 
         fab prod set_up
 
+Run tasks in parallel
+~~~~~~~~~~~~~~~~~~~~~
+
+    - By default pydiploy (via fabric) executes tasks serially : ::
+
+        for example if you have 4 servers :
+
+        fab tag:master test deploy
+
+        will run like this :
+        deploy on web1
+        deploy on web2
+        deploy on web3
+        deploy on web4
+
+        instead you can use fabric's parallel mode :
+
+        fab -P tag:master test deploy    (or set a env.parallel = True in fabfile)
+
+        will run like this :
+
+        deploy on web1,web2,web3,web4
+
+    - Be carefull with parallel mode as env.vars are reseted not all taks are callable for now !
+
+    - For password prompt use fab -I
+
+.. seealso::
+
+   `Fabric documentation for parallel execution mode <http://docs.fabfile.org/en/latest/usage/parallel.html>`_
+
+      Fabric official documentation.
+
+.. seealso::
+
+   `Fabric documentation for forcing a password prompt at the start of the session <http://docs.fabfile.org/en/latest/usage/fab.html#cmdoption-I>`_
+
+      Fabric official documentation.
+
+
 Optional parmeters
 ~~~~~~~~~~~~~~~~~~
 
