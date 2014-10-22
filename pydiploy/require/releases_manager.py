@@ -26,8 +26,14 @@ def setup():
                     {'remote_domain_path': env.remote_project_dir})
     fabric.api.sudo("mkdir -p %(remote_shared_path)s/{config,log}" %
                     {'remote_shared_path': env.remote_shared_path})
-    fabric.api.execute(pydiploy.require.system.permissions)
+    # extra symlinks if present in settings
+    if env.has_key('extra_symlink_dirs'):
+        for extra_symlink_dir in env.extra_symlink_dirs:
+            fabric.api.sudo("mkdir -p %(remote_shared_path)s/%(shared_dir)s" %
+                            {'remote_shared_path': env.remote_shared_path,
+                             'shared_dir': os.path.basename(extra_symlink_dir)})
 
+    fabric.api.execute(pydiploy.require.system.permissions)
 
 def cleanup():
     """
@@ -38,8 +44,8 @@ def cleanup():
         directories.reverse()
         del directories[:env.keep_releases]
         env.directories = ' '.join(["%(releases_path)s/%(release)s" %
-                                   {'releases_path': env.remote_releases_path,
-                                    'release': release} for release in directories])
+                                    {'releases_path': env.remote_releases_path,
+                                     'release': release} for release in directories])
 
         fabric.api.sudo("rm -rf %(directories)s" %
                         {'directories': env.directories})
@@ -49,6 +55,20 @@ def deploy_code():
     """
     Deploys code according to tag in env var
     """
+
+    # checks if tag is specified if not fabric.api.prompt user
+    if "tag" not in env:
+        tag_requested = fabric.api.prompt('Please specify target tag used: ')
+        while(not pydiploy.require.git.check_tag_exist(tag_requested)):
+            tag_requested = fabric.api.prompt('tag %s unknown please specify valid target tag used: ' % fabric.colors.red(tag_requested))
+
+        env.tag = tag_requested
+
+    env.local_tmp_root_app = os.path.join(env.local_tmp_dir,
+                                          '%(application_name)s-%(tag)s' % env)
+    env.local_tmp_root_app_package = os.path.join(env.local_tmp_root_app,
+                                                  env.root_package_name)
+
     fabric.api.require('tag', provided_by=['tag', 'head'])
     fabric.api.require('remote_project_dir', provided_by=env.goals)
     tarball = pydiploy.require.git.archive(env.application_name,
@@ -88,6 +108,10 @@ def deploy_code():
 
             exclude_files += cfg_shared_file
 
+    if env.has_key('extra_symlink_dirs'):
+        for symlink_dir in env.extra_symlink_dirs:
+            exclude_files += symlink_dir
+
     env.remote_current_release = "%(releases_path)s/%(time).0f" % {
         'releases_path': env.remote_releases_path, 'time': time()}
 
@@ -108,29 +132,6 @@ def deploy_code():
     # set current directory with new release
     fabric.api.execute(set_current)
 
-    # uploading manage.py template
-    fabtools.files.upload_template('manage.py',
-                                   os.path.join(
-                                       env.remote_current_release, 'manage.py'),
-                                   template_dir=env.local_tmp_root_app,
-                                   context=env,
-                                   use_sudo=True,
-                                   user=env.remote_owner,
-                                   chown=True,
-                                   mode='744',
-                                   use_jinja=True)
-
-    # uploading wsgi.py template
-    fabtools.files.upload_template('wsgi.py',
-                                   os.path.join(
-                                       env.remote_base_package_dir, 'wsgi.py'),
-                                   template_dir=env.local_tmp_root_app_package,
-                                   context=env,
-                                   use_sudo=True,
-                                   user=env.remote_owner,
-                                   chown=True,
-                                   mode='644',
-                                   use_jinja=True)
     fabric.api.lcd('rm %s' % tarball)
 
 
@@ -150,6 +151,7 @@ def symlink():
     fabric.api.sudo("ln -nfs %(shared_path)s/log %(current_release)s/log" %
                     {'shared_path': env.remote_shared_path,
                      'current_release': env.remote_current_release})
+
     if env.has_key('cfg_shared_files'):
         for cfg_shared_file in env.cfg_shared_files:
             fabric.api.sudo("ln -nfs %(shared_path)s/config/%(file_name)s %(current_release)s/%(file)s" %
@@ -157,3 +159,10 @@ def symlink():
                              'current_release': env.remote_current_release,
                              'file': cfg_shared_file,
                              'file_name':  os.path.basename(cfg_shared_file)})
+
+    if env.has_key('extra_symlink_dirs'):
+        for extra_symlink_dir in env.extra_symlink_dirs:
+            fabric.api.sudo("ln -nfs %(shared_path)s/%(dir_name)s %(current_release)s/%(dir_name)s" %
+                            {'shared_path': env.remote_shared_path,
+                             'current_release': env.remote_current_release,
+                             'dir_name':  extra_symlink_dir})

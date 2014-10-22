@@ -1,5 +1,5 @@
 =======================
-nginx relatives methods
+Nginx relatives methods
 =======================
 
 .. automodule:: pydiploy.require.nginx

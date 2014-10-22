@@ -6,10 +6,13 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.django import (application_packages, deploy, dump_database,
+from pydiploy.django import (application_packages, custom_manage_command,
+                             deploy_backend, deploy_frontend, dump_database,
+                             install_oracle_client, install_postgres_server,
                              post_install_backend, post_install_frontend,
                              pre_install_backend, pre_install_frontend,
-                             reload_backend, reload_frontend, rollback)
+                             reload_backend, reload_frontend, rollback,
+                             set_app_down, set_app_up)
 
 
 class ReleasesManagerCheck(TestCase):
@@ -21,6 +24,7 @@ class ReleasesManagerCheck(TestCase):
     def setUp(self):
         self.previous_env = copy.deepcopy(env)
         env.remote_python_version = 2.7
+        env.locale = 'fr_FR.UTF-8'
 
     def tearDown(self):
         env.clear()
@@ -67,7 +71,7 @@ class ReleasesManagerCheck(TestCase):
         pre_install_backend()
         self.assertTrue(api_execute.called)
         self.assertTrue(
-            str(api_execute.call_args_list[0]).find('call(<function django_user') == 0)
+            str(api_execute.call_args_list[0]).find('call(<function add_user') == 0)
         self.assertTrue(
             str(api_execute.call_args_list[1]).find('call(<function set_locale') == 0)
         self.assertTrue(str(api_execute.call_args_list[2]).find(
@@ -95,25 +99,36 @@ class ReleasesManagerCheck(TestCase):
             str(api_execute.call_args_list[2]).find('call(<function nginx_pkg') == 0)
 
     @patch('fabric.api.execute', return_value=Mock())
-    def test_deploy(self, api_execute):
-        deploy()
+    def test_deploy_backend(self, api_execute):
+        deploy_backend()
         self.assertTrue(api_execute.called)
-        self.assertTrue(
-            str(api_execute.call_args_list[0]).find('call(<function setup') == 0)
-        self.assertTrue(
-            str(api_execute.call_args_list[1]).find('call(<function deploy_code') == 0)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function setup') == 0)
+        self.assertTrue(str(api_execute.call_args_list[1]).find(
+            'call(<function deploy_code') == 0)
         self.assertTrue(str(api_execute.call_args_list[2]).find(
-            'call(<function application_dependencies') == 0)
+            'call(<function deploy_manage_file') == 0)
         self.assertTrue(str(api_execute.call_args_list[3]).find(
-            'call(<function app_settings') == 0)
+            'call(<function deploy_wsgi_file') == 0)
         self.assertTrue(str(api_execute.call_args_list[4]).find(
+            'call(<function application_dependencies') == 0)
+        self.assertTrue(str(api_execute.call_args_list[5]).find(
+            'call(<function app_settings') == 0)
+        self.assertTrue(str(api_execute.call_args_list[6]).find(
             'call(<function django_prepare') == 0)
         self.assertTrue(
-            str(api_execute.call_args_list[5]).find('call(<function permissions') == 0)
+            str(api_execute.call_args_list[7]).find('call(<function permissions') == 0)
         self.assertTrue(
-            str(api_execute.call_args_list[6]).find('call(<function app_reload') == 0)
+            str(api_execute.call_args_list[8]).find('call(<function app_reload') == 0)
         self.assertTrue(
-            str(api_execute.call_args_list[7]).find('call(<function cleanup') == 0)
+            str(api_execute.call_args_list[9]).find('call(<function cleanup') == 0)
+
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_deploy_frontend(self, api_execute):
+        deploy_frontend()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function web_static_files') == 0)
 
     @patch('fabric.api.execute', return_value=Mock())
     def test_rollback(self, api_execute):
@@ -129,10 +144,8 @@ class ReleasesManagerCheck(TestCase):
         post_install_frontend()
         self.assertTrue(api_execute.called)
         self.assertTrue(str(api_execute.call_args_list[0]).find(
-            'call(<function web_static_files') == 0)
-        self.assertTrue(str(api_execute.call_args_list[1]).find(
             'call(<function web_configuration') == 0)
-        self.assertTrue(str(api_execute.call_args_list[2]).find(
+        self.assertTrue(str(api_execute.call_args_list[1]).find(
             'call(<function nginx_restart') == 0)
 
     @patch('fabric.api.execute', return_value=Mock())
@@ -164,3 +177,52 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(api_execute.called)
         self.assertTrue(str(api_execute.call_args_list[0]).find(
             'call(<function app_reload') == 0)
+
+    @patch('pydiploy.require.nginx.set_website_down', return_value=Mock())
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_set_app_down(self, api_execute, website_down):
+
+        set_app_down()
+
+    @patch('pydiploy.require.nginx.set_website_up', return_value=Mock())
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_set_app_up(self, api_execute, website_down):
+
+        set_app_up()
+
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_custom_manage_command(self, api_execute):
+
+        custom_manage_command('toto')
+
+    @patch('fabric.api.abort', return_value=Mock())
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_install_postgres_server(self, api_execute, api_abort):
+
+        # no parameters provided env.default_db_* no present
+        install_postgres_server()
+        self.assertTrue(api_abort.called)
+
+        # no parameters provided env.default_db_* present
+        env.default_db_user = "foo"
+        env.default_db_name = "foo"
+        env.default_db_password = "bar"
+        install_postgres_server()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function install_postgres_server') == 0)
+        self.assertTrue(str(api_execute.call_args_list[1]).find(
+            'call(<function add_postgres_user') == 0)
+        self.assertTrue(str(api_execute.call_args_list[2]).find(
+            'call(<function add_postgres_database') == 0)
+
+        # parameters provided
+        install_postgres_server(user='foo', dbname='foo', password='bar')
+
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_install_oracle_client(self, api_execute):
+
+        install_oracle_client()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function install_oracle_client') == 0)

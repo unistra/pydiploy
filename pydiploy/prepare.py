@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 
-"""  This module builds env. vars used for the whole library methods are :
+"""  This module builds env. vars used for the whole library, and check them methods are :
 
-* tag : get the tag used to deploy the app
+* _get_current_role() : gets role used in fabric
 * build_env : inits all env. vars used by the library
+* check_req_pydiploy_version : checks required version of pydiploy for a specific fabfile
+* init_params : gets required and optional parameters used for config checker
+* tag : gets the tag used to deploy the app
+* test_config : checks configuration in fabfile
+
 
 """
 
@@ -11,42 +16,64 @@ import os
 
 import fabric
 import fabtools
-from fabric.api import env
 
+from pkg_resources import resource_filename, Requirement
+from fabric.api import env
 from pydiploy.params import PARAMS
+from pydiploy.require.git import check_tag_exist
+from pydiploy.version import __version__, __version_info__
 
 
 @fabric.api.task
 def tag(version):
     """ Defines tag to deploy """
 
-    env.tag = version
+    if "pydiploy_version" in env:
+        fabric.api.abort(fabric.colors.red(
+            "tag should be set before calling goal (ex: fab tag:master test deploy)"))
+    if check_tag_exist(version):
+        env.tag = version
+    else:
+        fabric.api.abort(fabric.colors.red(
+            "tag/branch provided is not in the repository please fix this first"))
 
 
 def init_params():
-    """ sets required params and its description """
+    """ Sets required params and its description """
 
+    # TODO implement mechanism to deploy other technos with specific required
+    # and optional parameters !
     return PARAMS['default']['required_params'], PARAMS['default']['optional_params']
 
 
 def build_env():
-    """
-    Builds env vars
-    """
+    """ Builds env vars """
 
-    # checks if tag is specified if not fabric.api.prompt user
-    if "tag" not in env:
-        env.tag = fabric.api.prompt('Please specify target tag used: ')
+    env.pydiploy_version = __version__
+
+    # check pydiploy version required by fabfile (major version number)
+    if "req_pydiploy_version" in env:
+        if not check_req_pydiploy_version():
+            if not fabric.contrib.console.confirm(
+                    "\nYour fabfile require pydiploy %s and pydiploy %s is installed ! \
+                    \nBe sure that your fabfile complies last pydiploy evolutions. \
+                    \nContinue at your own risks ! \
+                    \n\nDo you want to continue?" %
+                    (fabric.colors.red(env.req_pydiploy_version),
+                        fabric.colors.red(__version__)), default=False):
+                fabric.api.abort("Aborting at user request.")
 
     # defines destination path for fetched file(s)
     if "dest_path" not in env:
         env.dest_path = env.local_tmp_dir
 
     env.remote_project_dir = os.path.join(env.remote_home, env.server_name)
-    env.local_tmp_root_app = os.path.join(env.local_tmp_dir,
-                                          '%(application_name)s-%(tag)s' % env)
-    env.local_tmp_root_app_package = os.path.join(env.local_tmp_root_app,
-                                                  env.root_package_name)
+
+    if "tag" in env:
+        env.local_tmp_root_app = os.path.join(env.local_tmp_dir,
+                                              '%(application_name)s-%(tag)s' % env)
+        env.local_tmp_root_app_package = os.path.join(env.local_tmp_root_app,
+                                                      env.root_package_name)
 
     env.remote_current_path = os.path.join(env.remote_project_dir, 'current')
     env.remote_releases_path = os.path.join(env.remote_project_dir, 'releases')
@@ -106,6 +133,12 @@ def build_env():
 
 @fabric.api.task
 def test_config(verbose=True):
+    """ Checks fabfile for required params and optional params """
+
+    if "no_config_test" in env:
+        if env.no_config_test:
+            return True
+
     err = []
     req_parameters = []
     opt_parameters = []
@@ -114,7 +147,10 @@ def test_config(verbose=True):
     max_req_desc_length = max(map(len, req_params.values()))
     max_opt_param_length = max(map(len, opt_params.keys()))
     max_opt_desc_length = max(map(len, opt_params.values()))
+    current_role = _get_current_role()
 
+    fabric.api.puts("\n\nConfiguration checking for role : %s, host : %s" % (
+        fabric.colors.green(current_role), fabric.colors.green(env.host)))
     for param, desc in sorted(req_params.items()):
         if param not in env:
             err.append("%s -> %s : missing" %
@@ -137,25 +173,59 @@ def test_config(verbose=True):
             fabric.api.puts(
                 'You need to configure correctly the fabfile please RTFM first !')
         else:
-            fabric.api.puts('Config test failed (%s error%s) :' %
-                            (err_nb, 's' if err_nb > 1 else ''))
+            fabric.api.puts('Config test failed (%s error%s) for role %s:' %
+                            (err_nb, 's' if err_nb > 1 else '', current_role))
             fabric.api.puts('%s\n\n* %s\n' % ('-' * 30, '\n* '.join(err)))
             fabric.api.puts(
                 'Please fix them or continue with possible errors.')
         return False
     elif verbose:
-        fabric.api.puts('Required parameters list : \n\n')
+        fabric.api.puts('\n\nRequired parameters list : \n\n')
         for param, value, description in req_parameters:
             fabric.api.puts('* %s %s' %
                             (param.ljust(max_req_param_length), fabric.colors.green(value)))
         fabric.api.puts('\n\nOptional parameters list : \n\n')
         if len(opt_parameters):
             for param, value, description in opt_parameters:
-                value = "Warning initialized but not set" if not bool(
-                    value) else value
+                value = fabric.colors.red("Warning initialized but not set") if not bool(
+                    str(value)) ^ bool(value == None) else fabric.colors.green(value)
                 fabric.api.puts('* %s %s' %
-                                (param.ljust(max_opt_param_length), fabric.colors.green(value)))
+                                (param.ljust(max_opt_param_length), value))
         else:
-            fabric.api.puts("No optionnal parameter found")
-    fabric.api.puts('\n\nConfiguration OK!\n\n')
+            fabric.api.puts("No optional parameter found")
+    fabric.api.puts('\n\nRole : %s -> configuration %s!\n\n' %
+                    (fabric.colors.green(current_role), fabric.colors.green("OK")))
     return True
+
+
+def _get_current_role():
+    """ Gets fabric current role should be env.effective_roles in future's fabric release """
+
+    try:
+        current_role = "Not set!"
+        for role in env.roledefs.keys():
+            if env.host_string in env.roledefs[role]:
+                current_role = role
+    finally:
+        return current_role
+
+
+def check_req_pydiploy_version():
+    """ Checks pydiploy version required with pydiploy version installed """
+
+    if "req_pydiploy_version" in env:
+        major_version_installed = __version_info__[0:2]
+        major_version_required = tuple(
+            [int(num) for num in env.req_pydiploy_version.split('.')])
+        if (major_version_installed != major_version_required[0:2]):
+            return False
+        return True
+
+
+def generate_fabfile():
+    """ Returns current django_fabfile example """
+
+    fab_sample = resource_filename("pydiploy", "examples/django_fabfile.py")
+
+    with open(fab_sample) as f:
+        return f.read()

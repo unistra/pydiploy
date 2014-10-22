@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """
-Git
-===
 
-Create an archive from a remote or directly from a project
+Git vcs relatives methods
+=========================
+
 """
 
 import os
@@ -14,7 +14,7 @@ import fabric
 
 def archive(filename, path='/tmp', format="tar.gz", tag="HEAD", remote="",
             prefix="", project_path="."):
-    """ Creates an archive from a git repository
+    """ Creates an archive from a git repository or directly from a project
 
     * Using at the root path of a local cloned repository. This will create
       a tar.gz tarball as /tmp/my_project.tar.gz : ::
@@ -78,3 +78,39 @@ def archive(filename, path='/tmp', format="tar.gz", tag="HEAD", remote="",
         fabric.api.local(command % (options_build, tag))
 
     return os.path.join(path, filename)
+
+
+def collect_tags(project_path='.', remote=""):
+    """ Collects tags names locally or from a remote repository """
+
+    command = "git tag | sort -V"
+
+    with fabric.context_managers.hide('running', 'stdout', 'stderr'):
+        if not remote and project_path:
+            with fabric.api.lcd(project_path):
+                refs = fabric.api.local(command, capture=True)
+        else:
+            refs = fabric.api.local(command, capture=True)
+        return refs.split('\n')
+
+
+def collect_branches(project_path='.', remote=""):
+    """ Collects branches names locally or from a remote repository """
+
+    command = "git branch | sort -V | sed -e 's/^\* //' -e 's/^  //'"
+
+    with fabric.context_managers.hide('running', 'stdout', 'stderr'):
+        if not remote and project_path:
+            with fabric.api.lcd(project_path):
+                refs = fabric.api.local(command, capture=True)
+        else:
+            refs = fabric.api.local(command, capture=True)
+        return refs.split('\n')
+
+
+def check_tag_exist(tag=None):
+    """ Checks if a tag/branch exists in the repository """
+    if tag:
+        if (tag not in collect_branches() and tag not in collect_tags()):
+            return False
+        return True

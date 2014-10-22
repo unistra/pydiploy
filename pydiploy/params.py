@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
 
-
-#
-# This module sets required and optionnal params for the stuff to be deployed
-#
+""" This module sets required and optional params for the stuff to be deployed.
 
 
-# default is python/django/circus/nginx deployement
-#
-# PARAMS = { 'role'
-#                   'required_params'  : {  key description },
-#                   'optional_params'  : {  key description }
-#          }
-# ...
+::
+
+ default is python/django/circus/nginx deployement
+
+ PARAMS = {
+            'role': {
+                     'required_params'  : {  key description },
+                     'optional_params'  : {  key description }
+                    }
+          }
+ ...
+
+"""
+
 PARAMS = {
     'default': {
 
@@ -51,7 +55,18 @@ PARAMS = {
                             'circus_package_name': "circus package name",
                             'dest_path': "destination path",
                             'nginx_location_extra_directives': "nginx location extra directive(s)",
-                            'verbose_output': "verbose output"}
+                            'verbose_output': "verbose output (True/False)",
+                            'no_config_test': "don't check config params (True/False)",
+                            'req_pydiploy_version': "pydiploy version required for checking fabfile syntax",
+                            'extra_symlink_dirs': 'extra dirs to symlink to shared folder',
+                            'tag': 'tag to deploy',
+                            'no_shared_sessions': 'if True add ip_hash to nginx config',
+                            'server_ssl_on': 'use ssl on nginx',
+                            'path_to_cert': 'ssl certificate path',
+                            'path_to_cert_key': 'ssl cert key path',
+                            'map_settings': 'settings to map in django settings files',
+                            'maintenance_title': 'customize maintenance page title',
+                            'maintenance_text': 'customize maintenance page text'}
 
     }
 }

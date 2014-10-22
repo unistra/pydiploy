@@ -6,3 +6,4 @@ dans des environnements multiples comme le test, la pre-production, la prodcutio
 """
 
 from pydiploy import django, prepare, require, params
+from pydiploy.version import __version__

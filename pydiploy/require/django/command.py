@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""
+""" This module is used for commands relatives to django framework
+
 """
 
 import datetime
@@ -13,7 +14,8 @@ from fabric.api import env
 
 def django_prepare():
     """
-    Prepares django webapp (syncdb,migrate,collectstatic,and eventually compilemessages)
+    Prepares django webapp (syncdb,migrate,collectstatic,and eventually
+    compilemessages)
     """
 
     # remove old statics from local tmp dir before collecting new ones
@@ -32,7 +34,7 @@ def django_prepare():
                     os.path.join(env.remote_base_package_dir,
                                  'locale')):
                     fabric.api.sudo('python manage.py compilemessages')
-                ignore = ('admin',  'rest_framework',  'django_extensions')
+                ignore = ('rest_framework',  'django_extensions')
                 fabric.api.sudo('python manage.py collectstatic --noinput -i %s' %
                                 ' -i '.join(ignore))
 
@@ -42,7 +44,12 @@ def django_prepare():
 
 def django_dump_database():
     """
-    Dumps webapp datas in json
+    Dumps webapp datas in json.
+
+    If env.dest_path is not set in fabfile or --set dest_path is not
+    used in command line uses default /tmp in local machine using the
+    fabfile.
+
     """
     with fabtools.python.virtualenv(env.remote_virtualenv_dir):
         with fabric.api.cd(env.remote_current_path):
@@ -52,3 +59,12 @@ def django_dump_database():
                 fabric.api.sudo(
                     'python manage.py dumpdata --indent=4 > /tmp/%s ' % dump_name)
     fabric.api.get('/tmp/%s' % dump_name, local_path=env.dest_path)
+
+
+def django_custom_cmd(commands):
+    """ Passes custom commands to manage.py """
+
+    with fabtools.python.virtualenv(env.remote_virtualenv_dir):
+        with fabric.api.cd(env.remote_current_path):
+            with fabric.api.settings(sudo_user=env.remote_owner):
+                fabric.api.sudo('python manage.py %s' % commands)

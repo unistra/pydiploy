@@ -7,7 +7,10 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.prepare import build_env, tag, test_config, init_params
+from pydiploy.prepare import (_get_current_role, build_env,
+                              check_req_pydiploy_version, generate_fabfile,
+                              init_params, tag, test_config)
+from pydiploy import version
 
 
 class PrepareCheck(TestCase):
@@ -28,14 +31,40 @@ class PrepareCheck(TestCase):
         env.tag = "4.0"
         env.output_prefix = ""
         env.host_string = ""
+        env.roledefs = {'web': ['192.168.1.2'], 'lb': ['192.168.1.3'], }
+        env.host = '192.168.1.2'
+        env.host_string = env.host
 
     def tearDown(self):
         env.clear()
         env.update(self.previous_env)
 
-    def test_tag(self):
-        tag("4.0")
-        self.assertEqual(env.tag, "4.0")
+    @patch('fabric.api.abort', return_value=Mock())
+    @patch('pydiploy.require.git.collect_tags', return_value=[''])
+    @patch('pydiploy.require.git.collect_branches', return_value=['master','4.0'])
+    @patch('pydiploy.require.git.check_tag_exist', return_value=Mock())
+    def test_tag(self, tag_exist, collect_branches, collect_tags, api_abort):
+
+        del env['tag']
+
+        # test tag called after goal eg: fab test tag:master deploy
+        env.pydiploy_version = 1664
+        tag('fail')
+        self.assertTrue(api_abort.called)
+
+        # check tag unknown
+        del env['pydiploy_version']
+        tag_exist.return_value = False
+        tag('fail')
+        self.assertTrue(api_abort.called)
+
+        tag_exist.return_value = True
+        tag('master')
+        self.assertEqual(env.tag, 'master')
+
+        tag('4.0')
+        self.assertEqual(env.tag, '4.0')
+
 
     @patch('fabric.api.prompt', return_value="4.0")
     @patch('fabtools.files.is_dir', return_value=True)
@@ -44,12 +73,12 @@ class PrepareCheck(TestCase):
     @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabric.api.abort', return_value=Mock())
     def test_build_env(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+
         build_env()
         self.assertFalse(api_prompt.called)
         del env['tag']
         # self.assertTrue(api_execute.called)
         build_env()
-        self.assertTrue(api_prompt.called)
         # test env var
         self.assertEqual(env.remote_project_dir, "remote_home/server_name")
         self.assertEqual(
@@ -139,6 +168,7 @@ class PrepareCheck(TestCase):
         env.static_folder = 'foo'
         env.socket_port = 'foo'
         env.local_tmp_dir = 'foo'
+        env.roledefs = {'web': ['192.168.1.21'], 'lb': ['1164-web2'], }
         build_env()
 
         # test env.verbose set
@@ -150,7 +180,7 @@ class PrepareCheck(TestCase):
         del env['verbose_output']
         build_env()
 
-        # test optionnal params not set
+        # test optional params not set
         del env['dest_path']
         del env['extra_goals']
         build_env()
@@ -180,7 +210,32 @@ class PrepareCheck(TestCase):
         env.local_tmp_dir = ''
         build_env()
 
+        # check req_pydiploy_version
+        env.req_pydiploy_version = '0.9'
+        build_env()
+
+        env.req_pydiploy_version = '1.2'
+        build_env()
+
+        # good version
+        env.req_pydiploy_version = version.__version__
+        build_env()
+
+
     @patch('fabric.api.puts', return_value=Mock())
     def test_config(self, api_puts):
         test_config()
         self.assertTrue(api_puts.called)
+
+        # no config check
+        env.no_config_test = True
+        test_config()
+
+    def test_get_current_role(self):
+        _get_current_role()
+
+    def test_check_req_pydiploy_version(self):
+        check_req_pydiploy_version()
+
+    def test_generate_fabfile(self):
+        generate_fabfile()
