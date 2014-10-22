@@ -88,7 +88,7 @@ class CommandCheck(TestCase):
                 'python manage.py syncdb --noinput'),
                 call('python manage.py migrate'),
                 call('python manage.py compilemessages'),
-                call('python manage.py collectstatic --noinput -i admin -i rest_framework -i django_extensions')])
+                call('python manage.py collectstatic --noinput -i rest_framework -i django_extensions')])
 
     @patch('fabtools.python.virtualenv', return_value=Mock())
     @patch('fabric.api.cd', return_value=Mock())

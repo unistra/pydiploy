@@ -34,7 +34,7 @@ def django_prepare():
                     os.path.join(env.remote_base_package_dir,
                                  'locale')):
                     fabric.api.sudo('python manage.py compilemessages')
-                ignore = ('admin',  'rest_framework',  'django_extensions')
+                ignore = ('rest_framework',  'django_extensions')
                 fabric.api.sudo('python manage.py collectstatic --noinput -i %s' %
                                 ' -i '.join(ignore))
 
