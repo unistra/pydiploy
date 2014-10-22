@@ -280,3 +280,7 @@ class NginxCheck(TestCase):
                         .find("remote_static_root/application_name/maintenance.html") > 0)
         self.assertTrue(str(upload_template.call_args)
                         .find("template_dir='lib_path/templates'") > 0)
+
+        env.maintenance_text = "ééééééééééééééééééé"
+        env.maintenance_title = "ààààààà"
+        upload_maintenance_page()

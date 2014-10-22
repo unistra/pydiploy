@@ -10,6 +10,7 @@ from mock import call, Mock, patch
 from pydiploy.prepare import (_get_current_role, build_env,
                               check_req_pydiploy_version, generate_fabfile,
                               init_params, tag, test_config)
+from pydiploy import version
 
 
 class PrepareCheck(TestCase):
@@ -75,8 +76,7 @@ class PrepareCheck(TestCase):
     @patch('fabric.api.execute', return_value=True)
     @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabric.api.abort', return_value=Mock())
-    @patch('fabtools.python_setuptools.package_version', return_value="1664")
-    def test_build_env(self, pkg_version, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+    def test_build_env(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
 
         build_env()
         self.assertFalse(api_prompt.called)
@@ -218,8 +218,13 @@ class PrepareCheck(TestCase):
         env.req_pydiploy_version = '0.9'
         build_env()
 
-        env.req_pydiploy_version = '100.0'
+        env.req_pydiploy_version = '1.2'
         build_env()
+
+        # good version
+        env.req_pydiploy_version = version.__version__
+        build_env()
+
 
     @patch('fabric.api.puts', return_value=Mock())
     def test_config(self, api_puts):

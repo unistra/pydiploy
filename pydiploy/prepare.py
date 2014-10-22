@@ -188,7 +188,7 @@ def test_config(verbose=True):
         if len(opt_parameters):
             for param, value, description in opt_parameters:
                 value = fabric.colors.red("Warning initialized but not set") if not bool(
-                    value) else fabric.colors.green(value)
+                    str(value)) ^ bool(value == None) else fabric.colors.green(value)
                 fabric.api.puts('* %s %s' %
                                 (param.ljust(max_opt_param_length), value))
         else:
@@ -216,9 +216,8 @@ def check_req_pydiploy_version():
     if "req_pydiploy_version" in env:
         major_version_installed = __version_info__[0:2]
         major_version_required = tuple(
-            [int(num) for num in env.req_pydiploy_version.split('.', 1)])
-
-        if (major_version_installed != major_version_required):
+            [int(num) for num in env.req_pydiploy_version.split('.')])
+        if (major_version_installed != major_version_required[0:2]):
             return False
         return True
 

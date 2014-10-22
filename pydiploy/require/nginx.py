@@ -166,6 +166,11 @@ def upload_maintenance_page():
     maintenance_file = os.path.join(env.remote_static_root,
                                     env.application_name,
                                     'maintenance.html')
+    vars_required = ['maintenance_text', 'maintenance_title']
+
+    for v in vars_required:
+        if v in env:
+            env[v] = env[v].decode('utf-8')
 
     fabtools.files.upload_template('maintenance.html.tpl',
                                    maintenance_file,
