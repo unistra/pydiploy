@@ -218,7 +218,7 @@ def check_req_pydiploy_version():
         major_version_required = tuple(
             [int(num) for num in env.req_pydiploy_version.split('.', 1)])
 
-        if (major_version_installed > major_version_required):
+        if (major_version_installed != major_version_required):
             return False
         return True
 
