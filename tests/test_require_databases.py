@@ -228,13 +228,14 @@ class OracleCheck(TestCase):
         env.clear()
         env.update(self.previous_env)
 
+    @patch('fabric.api.abort', return_value=Mock())
     @patch("fabtools.files.is_link", return_value=False)
     @patch("fabric.api.sudo", return_value=Mock())
     @patch("fabric.api.cd", return_value=Mock())
     @patch("fabtools.require.files.directory", return_value=Mock())
     @patch("fabtools.require.deb.packages", return_value=Mock())
     def test_install_oracle_client(self, deb_packages, files_directory,
-                                   api_cd, api_sudo, files_is_link):
+                                   api_cd, api_sudo, files_is_link, api_abort):
 
         api_cd.return_value.__exit__ = Mock()
         api_cd.return_value.__enter__ = Mock()
@@ -281,6 +282,10 @@ class OracleCheck(TestCase):
                           call(
                              'echo /home/django/oracle_client/instantclient_11_2 > /etc/ld.so.conf.d/oracle.conf'),
                           call('ldconfig')])
+
+        del env['oracle_client_version']
+        install_oracle_client()
+        self.assertTrue(api_abort.called)
 
     @patch("fabtools.oracle_jdk.install_from_oracle_site", return_value=Mock())
     def test_install_oracle_jdk(self, oracle_jdk_install):
