@@ -1,30 +1,31 @@
 <snippet>
-    <content><![CDATA[
+<content><![CDATA[
 # -*- coding: utf-8 -*-
 
 """
     Fabfile example file to deploy a standard django webapp
 """
 
+from fabric.api import (env, roles, execute, task)
 from os.path import join
 
-from fabric.api import env, execute, roles, task
-from pydiploy.django import custmom_manage_command as pydiploy_custom_command
-from pydiploy.django import deploy_backend as pydiploy_deploy_backend
-from pydiploy.django import deploy_frontend as pydiploy_deploy_frontend
-from pydiploy.django import install_oracle_client as pydiploy_setup_oracle
-from pydiploy.django import install_postgres_server as pydiploy_setup_postgres
-from pydiploy.django import post_install_backend as pydiploy_postinstall_backend
-from pydiploy.django import post_install_frontend as pydiploy_postinstall_frontend
-from pydiploy.django import pre_install_backend as pydiploy_preinstall_backend
-from pydiploy.django import pre_install_frontend as pydiploy_preinstall_frontend
-from pydiploy.django import reload_backend as pydiploy_reload_backend
-from pydiploy.django import reload_frontend as pydiploy_reload_frontend
-from pydiploy.django import rollback as pydiploy_rollback
-from pydiploy.django import set_app_down as pydiploy_set_down
-from pydiploy.django import set_app_up as pydiploy_set_up
-from pydiploy.prepare import build_env as pydiploy_build_env
-from pydiploy.prepare import tag as pydiploy_tag
+from pydiploy.prepare import (tag as pydiploy_tag,
+                              build_env as pydiploy_build_env)
+from pydiploy.django import (deploy_backend as pydiploy_deploy_backend,
+                             deploy_frontend as pydiploy_deploy_frontend,
+                             rollback as pydiploy_rollback,
+                             post_install_backend as pydiploy_postinstall_backend,
+                             post_install_frontend as pydiploy_postinstall_frontend,
+                             pre_install_backend as pydiploy_preinstall_backend,
+                             pre_install_frontend as pydiploy_preinstall_frontend,
+                             reload_frontend as pydiploy_reload_frontend,
+                             reload_backend as pydiploy_reload_backend,
+                             set_app_up as pydiploy_set_up,
+                             set_app_down as pydiploy_set_down,
+                             custom_manage_command as pydiploy_custom_command,
+                             install_oracle_client as pydiploy_setup_oracle,
+                             install_postgres_server as pydiploy_setup_postgres)
+
 
 # edit config here !
 env.user = 'vagrant'  # user for ssh
@@ -48,7 +49,7 @@ env.locale = 'fr_FR.UTF-8'  # locale to use on remote
 env.timezone = 'Europe/Paris'  # timezone for remote
 env.keep_releases = 2  # number of old releases to keep before cleaning
 
-# optional parameters uncomment to use them
+# optional parameters
 
 # env.dest_path = '' # if not set using env_local_tmp_dir
 # env.excluded_files = ['pron.jpg'] # file(s) that rsync should exclude when deploying app
@@ -71,9 +72,9 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 #                        'instantclient-sqlplus-linux-x86-64-11.2.0.2.0.zip']
 
 
-# env.circus_package_name = 'https://github.com/githubaccount/circus/archive/master.zip' # change the package to use to install circus
+#env.circus_package_name = 'https://github.com/githubaccount/circus/archive/master.zip' # change the package to use to install circus
 
-# env.nginx_location_extra_directives = ['proxy_read_timeout 120'] # add directive(s) to nginx config file in location part
+#env.nginx_location_extra_directives = ['proxy_read_timeout 120'] # add directive(s) to nginx config file in location part
 
 # fill and uncomment not to pass parameters in term (eg: fab tag:master test --set default_db_host='localhost',default_db_name='my_app_db' )
 # env.default_db_host = 'localhost'
@@ -152,6 +153,7 @@ def head_master():
 def build_env():
     execute(pydiploy_build_env)
 
+
 @task
 def pre_install():
     """Pre install of backend & frontend"""
@@ -172,15 +174,16 @@ def pre_install_frontend():
     """Setup server for frontend"""
     execute(pydiploy_preinstall_frontend)
 
+
 @task
 def deploy():
     """Deploy code and sync static files"""
-    # uncomment this to set app in maintenance mode
-    # execute(pydiploy_set_down)
-    execute(pydiploy_deploy_backend)
-    execute(pydiploy_deploy_frontend)
-    # uncomment this to toggle app to up mode again
-    #execute(pydiploy_set_up)
+    # uncomment this to set app in maitenance mode :
+    # execute(set_down)
+    execute(deploy_backend)
+    execute(deploy_frontend)
+    # uncomment this to toggle app to up mode again :
+    #execute(set_up)
 
 
 @roles('web')
@@ -188,6 +191,7 @@ def deploy():
 def deploy_backend(update_pkg=False):
     """Deploy code on server"""
     execute(pydiploy_deploy_backend)
+
 
 @roles('lb')
 @task
@@ -204,7 +208,7 @@ def rollback():
 
 @task
 def post_install():
-    """post install for backend & frontend"""
+    """Post install for backend & frontend"""
     execute(post_install_frontend)
     execute(post_install_backend)
 
@@ -243,15 +247,18 @@ def reload():
     execute(reload_frontend)
     execute(reload_backend)
 
+
 @roles('lb')
 @task
 def reload_frontend():
     execute(pydiploy_reload_frontend)
 
+
 @roles('web')
 @task
 def reload_backend():
     execute(pydiploy_reload_backend)
+
 
 @roles('lb')
 @task
@@ -274,7 +281,7 @@ def custom_manage_cmd(cmd):
     execute(pydiploy_custom_command,cmd)
 
 ]]></content>
-    <description>Pydiploy fabfile</description>
-    <tabTrigger>pydiployfab</tabTrigger>
-    <scope>source.python</scope>
+<description>Pydiploy fabfile 1.1.0.0</description>
+<tabTrigger>pydiployfab</tabTrigger>
+<scope>source.python</scope>
 </snippet>

@@ -49,30 +49,30 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 
 # optional parameters
 
-env.dest_path = '' # if not set using env_local_tmp_dir
-env.excluded_files = ['pron.jpg'] # file(s) that rsync should exclude when deploying app
-env.extra_ppa_to_install = ['ppa:vincent-c/ponysay'] # extra ppa source(s) to use
-env.extra_pkg_to_install = ['ponysay'] # extra debian/ubuntu package(s) to install on remote
-env.cfg_shared_files = ['config','/app/path/to/config/config_file'] # config files to be placed in shared config dir
-env.extra_symlink_dirs = ['mydir','/app/mydir'] # dirs to be symlinked in shared directory
-env.extra_goals = ['preprod'] # add extra goal(s) to defaults (test,dev,prod)
-env.verbose = True # verbose display for pydiploy default value = True
-env.req_pydiploy_version = "0.9" # required pydiploy version for this fabfile
-env.no_config_test = False # avoid config checker if True
-env.maintenance_text = "" # add a customize maintenance text for maintenance page
-env.maintenance_title = "" # add a customize title for maintenance page
+# env.dest_path = '' # if not set using env_local_tmp_dir
+# env.excluded_files = ['pron.jpg'] # file(s) that rsync should exclude when deploying app
+# env.extra_ppa_to_install = ['ppa:vincent-c/ponysay'] # extra ppa source(s) to use
+# env.extra_pkg_to_install = ['ponysay'] # extra debian/ubuntu package(s) to install on remote
+# env.cfg_shared_files = ['config','/app/path/to/config/config_file'] # config files to be placed in shared config dir
+# env.extra_symlink_dirs = ['mydir','/app/mydir'] # dirs to be symlinked in shared directory
+# env.extra_goals = ['preprod'] # add extra goal(s) to defaults (test,dev,prod)
+# env.verbose = True # verbose display for pydiploy default value = True
+# env.req_pydiploy_version = "0.9" # required pydiploy version for this fabfile
+# env.no_config_test = False # avoid config checker if True
+# env.maintenance_text = "" # add a customize maintenance text for maintenance page
+# env.maintenance_title = "" # add a customize title for maintenance page
 
-env.oracle_client_version = '11.2'
-env.oracle_download_url = 'http://librepo.net/lib/oracle/'
-env.oracle_remote_dir = 'oracle_client'
-env.oracle_packages = ['instantclient-basic-linux-x86-64-11.2.0.2.0.zip',
-                       'instantclient-sdk-linux-x86-64-11.2.0.2.0.zip',
-                       'instantclient-sqlplus-linux-x86-64-11.2.0.2.0.zip']
+# env.oracle_client_version = '11.2'
+# env.oracle_download_url = 'http://librepo.net/lib/oracle/'
+# env.oracle_remote_dir = 'oracle_client'
+# env.oracle_packages = ['instantclient-basic-linux-x86-64-11.2.0.2.0.zip',
+#                        'instantclient-sdk-linux-x86-64-11.2.0.2.0.zip',
+#                        'instantclient-sqlplus-linux-x86-64-11.2.0.2.0.zip']
 
 
-env.circus_package_name = 'https://github.com/githubaccount/circus/archive/master.zip' # change the package to use to install circus
+#env.circus_package_name = 'https://github.com/githubaccount/circus/archive/master.zip' # change the package to use to install circus
 
-env.nginx_location_extra_directives = ['proxy_read_timeout 120'] # add directive(s) to nginx config file in location part
+#env.nginx_location_extra_directives = ['proxy_read_timeout 120'] # add directive(s) to nginx config file in location part
 
 # fill and uncomment not to pass parameters in term (eg: fab tag:master test --set default_db_host='localhost',default_db_name='my_app_db' )
 # env.default_db_host = 'localhost'
@@ -176,12 +176,12 @@ def pre_install_frontend():
 @task
 def deploy():
     """Deploy code and sync static files"""
-    # uncomment this to set app in maitenance mode
-    # execute(pydiploy_set_down)
-    execute(pydiploy_deploy_backend)
-    execute(pydiploy_deploy_frontend)
-    # uncomment this to toggle app to up mode again
-    #execute(pydiploy_set_up)
+    # uncomment this to set app in maitenance mode :
+    # execute(set_down)
+    execute(deploy_backend)
+    execute(deploy_frontend)
+    # uncomment this to toggle app to up mode again :
+    #execute(set_up)
 
 
 @roles('web')
@@ -206,7 +206,7 @@ def rollback():
 
 @task
 def post_install():
-    """post install for backend & frontend"""
+    """Post install for backend & frontend"""
     execute(post_install_frontend)
     execute(post_install_backend)
 
