@@ -175,8 +175,8 @@ Managing output
 
       Fabric official documentation.
 
-Optional parmeters
-~~~~~~~~~~~~~~~~~~
+Optional parameters
+~~~~~~~~~~~~~~~~~~~
 
     - dest_path specifies a local temp dir if dest_path not set /tmp is used : ::
 
