@@ -66,7 +66,8 @@ PARAMS = {
                             'path_to_cert_key': 'ssl cert key path',
                             'map_settings': 'settings to map in django settings files',
                             'maintenance_title': 'customize maintenance page title',
-                            'maintenance_text': 'customize maintenance page text'}
+                            'maintenance_text': 'customize maintenance page text',
+                            'nginx_start_confirmation': 'if nginx not started needs confirmation to start'}
 
     }
 }

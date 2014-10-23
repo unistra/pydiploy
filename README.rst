@@ -231,6 +231,10 @@ Optional parmeters
 
         env.nginx_location_extra_directives = ['proxy_read_timeout 120']
 
+    - env.nginx_start_confirmation if True when nginx is not started needs confirmation to start it : ::
+
+        env.nginx_start_confirmation = False
+
     - oracle_* : see :ref:`databases`
 
 

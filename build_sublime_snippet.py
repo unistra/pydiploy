@@ -49,6 +49,7 @@ def main():
             dir = os.path.join(os.environ['HOME'], dir)
             if os.path.isdir(dir):
                 copyFile(dest_filename, dir)
+                print('Snippet installed in %s' % dir)
 
 
 if __name__ == '__main__':

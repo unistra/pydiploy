@@ -6,11 +6,12 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.require.nginx import (down_site_config, nginx_pkg, nginx_reload,
-                                    nginx_restart, root_web, set_website_down,
-                                    set_website_up, up_site_config,
-                                    upload_maintenance_page, web_configuration,
-                                    web_static_files)
+from pydiploy.require.nginx import (down_site_config, nginx_confirm_start,
+                                    nginx_pkg, nginx_reload, nginx_restart,
+                                    nginx_start, nginx_started, root_web,
+                                    set_website_down, set_website_up,
+                                    up_site_config, upload_maintenance_page,
+                                    web_configuration, web_static_files)
 
 
 class NginxCheck(TestCase):
@@ -44,10 +45,28 @@ class NginxCheck(TestCase):
         self.assertTrue(deb_packages.called)
         self.assertEqual(deb_packages.call_args, call(['nginx'], update=False))
 
+    @patch('fabric.contrib.console.confirm', return_value=False)
+    @patch('fabtools.service.start', return_value=Mock())
+    def test_nginx_start(self, service_start, console_confirm):
+
+        # env var sets + confirm start = no
+        env.nginx_start_confirmation = True
+        nginx_start()
+        self.assertFalse(service_start.called)
+        # env var + confirm start = yes
+        console_confirm.return_value = True
+        nginx_start()
+        self.assertTrue(service_start.called)
+        # no env.nginx_start_confirmation
+        del env['nginx_start_confirmation']
+        nginx_start()
+        self.assertTrue(service_start.called)
+
     @patch('fabtools.service.is_running', return_value=True)
+    @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabtools.service.start', return_value=Mock())
     @patch('fabtools.service.reload', return_value=Mock())
-    def test_nginx_reload(self, reload, start, is_running):
+    def test_nginx_reload(self, reload, start, confirm_start, is_running):
         nginx_reload()
         self.assertTrue(reload.called)
         self.assertEqual(reload.call_args, call('nginx'))
@@ -86,6 +105,16 @@ class NginxCheck(TestCase):
         self.assertTrue(is_running.called)
         self.assertTrue(start.called)
         self.assertEqual(start.call_args, call('nginx'))
+
+    @patch('fabtools.service.is_running', return_value=True)
+    def test_nginx_started(self, is_running):
+        res = nginx_started()
+        self.assertTrue(is_running.called)
+        self.assertEqual(res, True)
+        is_running.return_value = False
+        res = nginx_started()
+        self.assertTrue(is_running.called)
+        self.assertEqual(res, False)
 
     @patch('fabric.contrib.project.rsync_project', return_value=Mock())
     def test_web_static_files(self, rsync_project):
@@ -159,11 +188,11 @@ class NginxCheck(TestCase):
         self.assertTrue(upload_template.called)
         self.assertTrue(maintenance_page.called)
         self.assertTrue(
-             str(upload_template.call_args).find("'nginx_down.conf.tpl'") > 0)
+            str(upload_template.call_args).find("'nginx_down.conf.tpl'") > 0)
         self.assertTrue(str(upload_template.call_args).find(
-             "'/etc/nginx/sites-available/server_name_down.conf'") > 0)
+            "'/etc/nginx/sites-available/server_name_down.conf'") > 0)
         self.assertTrue(str(upload_template.call_args)
-                         .find("template_dir='lib_path/templates'") > 0)
+                        .find("template_dir='lib_path/templates'") > 0)
 
     @patch('fabtools.files.upload_template', return_value=Mock())
     @patch('fabtools.files.is_link', return_value=True)

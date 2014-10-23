@@ -7,6 +7,7 @@ import os
 import fabric
 import fabtools
 from fabric.api import env
+import pydiploy
 
 
 def root_web():
@@ -22,11 +23,21 @@ def nginx_pkg(update=False):
     fabtools.require.deb.packages(['nginx'], update=update)
 
 
-def nginx_reload():
-    """ Starts/reeloads nginx """
+def nginx_start():
+    """ Starts nginx """
 
-    if not fabtools.service.is_running('nginx'):
+    try:
+        if env.nginx_start_confirmation:
+            fabric.api.execute(nginx_confirm_start)
+    except:
         fabtools.service.start('nginx')
+
+
+def nginx_reload():
+    """ Starts/reloads nginx """
+
+    if not nginx_started():
+        fabric.api.execute(nginx_start)
     else:
         fabtools.service.reload('nginx')
 
@@ -34,10 +45,28 @@ def nginx_reload():
 def nginx_restart():
     """ Starts/Restarts nginx """
 
-    if not fabtools.service.is_running('nginx'):
-        fabtools.service.start('nginx')
+    if not nginx_started():
+        fabric.api.execute(nginx_start)
     else:
         fabtools.service.restart('nginx')
+
+
+def nginx_started():
+    """ Returns true/false depending on nginx service is started """
+
+    return fabtools.service.is_running('nginx')
+
+
+def nginx_confirm_start():
+    """ Confirms launch of nginx """
+
+    current_role = pydiploy.prepare._get_current_role()
+    if fabric.contrib.console.confirm(
+        "\nNginx on %s (role %s) seems not to be started ! \
+                    \n\nDo you want to try to start it?" %
+        (fabric.colors.red(env.host),
+         fabric.colors.red(current_role)), default=False):
+        fabtools.service.start('nginx')
 
 
 def web_static_files():
