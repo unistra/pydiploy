@@ -39,6 +39,10 @@ Usage
 
         fab tag:master test --set default_db_host='localhost',default_db_name='mydb',default_db_user='myuser',default_db_password='mypass' deploy
 
+    - Be carefull with --set if you want to pass booleans argument for example verbose_output=False : ::
+
+        fab tag:master test --set  verbose_output= deploy
+
     - See fabric documentation for more infos : http://fabric.readthedocs.org
 
 Tips
@@ -97,7 +101,7 @@ Maintenance mode
 
         fab prod set_down --set maintenance_title='Webapp is down !',maintenance_text='Time for maintenance, please come back later'
 
-    - If you want to permanent change the default maintenance page you could set an env var in fabfile :
+    - If you want to permanently change the default maintenance page you could set env vars in fabfile :
 
       .. code-block:: python
           :emphasize-lines: 3,4
@@ -134,7 +138,7 @@ Run tasks in parallel
 
         deploy on web1,web2,web3,web4
 
-    - Be carefull with parallel mode as env.vars are reseted not all taks are callable for now !
+    - Be carefull with parallel mode as env.vars are reseted not all tasks are callable for now !
 
     - For password prompt use fab -I
 
@@ -150,6 +154,26 @@ Run tasks in parallel
 
       Fabric official documentation.
 
+Managing output
+~~~~~~~~~~~~~~~
+
+    - By default fabric and so pydiploy is very verbose all levels (ie debug), are on.
+
+    - When using command line you can add --hide=LEVELS or --show=LEVELS parameters.
+
+    - You can disable verbose output on configuration checking by setting env.verbost_ouput=False or in terminal : ::
+
+        fab test --set verbose_ouput=
+
+    - You can disable also configuration checking by setting env.no_config_test=True or in terminal : ::
+
+        fab test --set no_config_test
+
+.. seealso::
+
+   `Fabric documentation for output levels <http://docs.fabfile.org/en/latest/usage/output_controls.html>`_
+
+      Fabric official documentation.
 
 Optional parmeters
 ~~~~~~~~~~~~~~~~~~
