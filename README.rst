@@ -76,6 +76,7 @@ Databases
                                'instantclient-sdk-linux-x86-64-11.2.0.2.0.zip',
                                'instantclient-sqlplus-linux-x86-64-11.2.0.2.0.zip']
 
+
 .. _maintenance-mode:
 
 Maintenance mode
@@ -152,9 +153,9 @@ Run tasks in parallel
 
     - For password prompt use fab -I
 
-    - see also : `Fabric documentation <http://docs.fabfile.org/en/latest/usage/parallel.html>`_ for parallel execution mode
+    - see also : Fabric documentation http://docs.fabfile.org/en/latest/usage/parallel.html for parallel execution mode
 
-    - see also : `Fabric documentation `<http://docs.fabfile.org/en/latest/usage/fab.html#cmdoption-I>`_ for forcing a password prompt at the start of the session
+    - see also : Fabric documentation http://docs.fabfile.org/en/latest/usage/fab.html#cmdoption-I for forcing a password prompt at the start of the session
 
 Managing output
 ~~~~~~~~~~~~~~~
@@ -171,7 +172,7 @@ Managing output
 
         $ fab test --set no_config_test
 
-    - see also `Fabric documentation<http://docs.fabfile.org/en/latest/usage/output_controls.html>`_ for output levels
+    - see also Fabric documentation http://docs.fabfile.org/en/latest/usage/output_controls.html for output levels
 
 
 Optional parameters
@@ -234,4 +235,4 @@ Optional parameters
 
         env.nginx_start_confirmation = False
 
-    - oracle_* : see `databases-part`_
+    - oracle_* : see `databases`_ for more infos on required parameters.
