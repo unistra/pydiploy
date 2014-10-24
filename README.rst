@@ -1,12 +1,15 @@
-pydiploy
+Pydiploy
 ========
+
 .. image:: https://secure.travis-ci.org/unistra/pydiploy.png?branch=master
     :target: https://travis-ci.org/unistra/pydiploy
+    :alt: Latest version
 
 .. image:: http://coveralls.io/repos/unistra/pydiploy/badge.png?branch=master
     :target: http://coveralls.io/r/unistra/pydiploy?branch=master
+    :alt: Travis-CI
 
-Pydiploy is a library used to deal with administration and deployment of applications on several environments (i.e : dev, test, pre-production, production) The library is based on fabric and fabtools.
+`Pydiploy` is a library used to deal with administration and deployment of applications on several environments (i.e : dev, test, pre-production, production) The library is based on fabric and fabtools.
 The purpose of the project is to deliver bunch of tools as generic as possible to standardize deployments and administrations tasks.
 To use it : create a fabfile (fabfile.py or fabfile/__init__.py) and start playing with your new toy !
 
@@ -15,40 +18,49 @@ Install
 -------
 
     - Requirements : python2.7, fabtools and fabric
-    - Installation : pip install pydiploy
+
+    - Installation : ::
+
+        $ pip install pydiploy
 
 Usage
 -----
 
     - See the example in the doc to setup correctly a fabfile (fabric,fabtools and pydiploy should be installed)
+
     - Use following command to install/deploy an application in test stage : ::
 
-        fab tag:master test pre_install deploy post_install
+        $ fab tag:master test pre_install deploy post_install
 
     - Just remember that the tag parameter is just used for the 'deploy' task if not set pydiploy will prompt you to choose a tag.
+
     - Use following command to install/deploy an application in production stage : ::
 
-        fab tag:master prod pre_install deploy post_install
+        $ fab tag:master prod pre_install deploy post_install
+
     - To deploy a new tag/release on production stage : ::
 
-        fab tag:1.0.1 prod deploy
+        $ fab tag:1.0.1 prod deploy
+
     - if something went wrong during deploy process you could rollback previous release : ::
 
-        fab prod rollback
+        $ fab prod rollback
+
     - To deploy with arguments : ::
 
-        fab tag:master test --set default_db_host='localhost',default_db_name='mydb',default_db_user='myuser',default_db_password='mypass' deploy
+        $ fab tag:master test --set default_db_host='localhost',default_db_name='mydb',default_db_user='myuser',default_db_password='mypass' deploy
 
     - Be carefull with --set if you want to pass booleans argument for example verbose_output=False : ::
 
-        fab tag:master test --set  verbose_output= deploy
+        $ fab tag:master test --set  verbose_output= deploy
 
     - See fabric documentation for more infos : http://fabric.readthedocs.org
 
 Tips
 ----
 
-.. _`databases`:
+
+.. _databases-part:
 
 Databases
 ~~~~~~~~~
@@ -64,7 +76,7 @@ Databases
                                'instantclient-sdk-linux-x86-64-11.2.0.2.0.zip',
                                'instantclient-sqlplus-linux-x86-64-11.2.0.2.0.zip']
 
-.. _`maintenance-mode`:
+.. _maintenance-mode:
 
 Maintenance mode
 ~~~~~~~~~~~~~~~~
@@ -72,7 +84,6 @@ Maintenance mode
     - For a django webapp deployement you can set the webserver to be in maintenance mode before deploying. For that purpose you could import in your fabfile pydiploy.django.set_app_up and pydiploy.django.set_app_down in a task :
 
       .. code-block:: python
-          :emphasize-lines: 1,2,7,9,14,16
 
           from pydiploy.django import (set_app_up as pydiploy_set_up,
                                        set_app_down as pydiploy_set_down)
@@ -95,7 +106,7 @@ Maintenance mode
 
     - Toggle to maintenance mode and active maintenance page : ::
 
-        fab prod set_down
+        $ fab prod set_down
 
     - When setting the site in maintenance mode you could customize title and text of the maintenance page : ::
 
@@ -104,7 +115,6 @@ Maintenance mode
     - If you want to permanently change the default maintenance page you could set env vars in fabfile :
 
       .. code-block:: python
-          :emphasize-lines: 3,4
 
           # Put this somewhere in the fabfile
 
@@ -113,7 +123,7 @@ Maintenance mode
 
     - Toggle to up mode and deactivate maintenance page : ::
 
-        fab prod set_up
+        $ fab prod set_up
 
 Run tasks in parallel
 ~~~~~~~~~~~~~~~~~~~~~
@@ -122,7 +132,7 @@ Run tasks in parallel
 
         for example if you have 4 servers :
 
-        fab tag:master test deploy
+        $ fab tag:master test deploy
 
         will run like this :
         deploy on web1
@@ -132,7 +142,7 @@ Run tasks in parallel
 
         instead you can use fabric's parallel mode :
 
-        fab -P tag:master test deploy    (or set a env.parallel = True in fabfile)
+        $ fab -P tag:master test deploy    (or set a env.parallel = True in fabfile)
 
         will run like this :
 
@@ -142,17 +152,9 @@ Run tasks in parallel
 
     - For password prompt use fab -I
 
-.. seealso::
+    - see also : `Fabric documentation <http://docs.fabfile.org/en/latest/usage/parallel.html>`_ for parallel execution mode
 
-   `Fabric documentation for parallel execution mode <http://docs.fabfile.org/en/latest/usage/parallel.html>`_
-
-      Fabric official documentation.
-
-.. seealso::
-
-   `Fabric documentation for forcing a password prompt at the start of the session <http://docs.fabfile.org/en/latest/usage/fab.html#cmdoption-I>`_
-
-      Fabric official documentation.
+    - see also : `Fabric documentation `<http://docs.fabfile.org/en/latest/usage/fab.html#cmdoption-I>`_ for forcing a password prompt at the start of the session
 
 Managing output
 ~~~~~~~~~~~~~~~
@@ -163,17 +165,14 @@ Managing output
 
     - You can disable verbose output on configuration checking by setting env.verbost_ouput=False or in terminal : ::
 
-        fab test --set verbose_ouput=
+        $ fab test --set verbose_ouput=
 
     - You can disable also configuration checking by setting env.no_config_test=True or in terminal : ::
 
-        fab test --set no_config_test
+        $ fab test --set no_config_test
 
-.. seealso::
+    - see also `Fabric documentation<http://docs.fabfile.org/en/latest/usage/output_controls.html>`_ for output levels
 
-   `Fabric documentation for output levels <http://docs.fabfile.org/en/latest/usage/output_controls.html>`_
-
-      Fabric official documentation.
 
 Optional parameters
 ~~~~~~~~~~~~~~~~~~~
@@ -218,7 +217,7 @@ Optional parameters
 
         env.no_config_test = True
 
-    - maintenance_title and maintenance_text : see :ref:`maintenance-mode` : ::
+    - maintenance_title and maintenance_text (see `maintenance-mode`_ for more infos) : ::
 
         env.maintenance_title='Webapp is down !'
         env.maintenance_text='Time for maintenance, please come back later'
@@ -235,6 +234,4 @@ Optional parameters
 
         env.nginx_start_confirmation = False
 
-    - oracle_* : see :ref:`databases`
-
-
+    - oracle_* : see `databases-part`_
