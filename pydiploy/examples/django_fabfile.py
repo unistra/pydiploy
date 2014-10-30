@@ -198,6 +198,7 @@ def deploy_frontend():
     """Deploy static files on load balancer"""
     execute(pydiploy_deploy_frontend)
 
+
 @roles('web')
 @task
 def rollback():
