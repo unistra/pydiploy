@@ -23,7 +23,7 @@ def buildmyenv():
                                      env.application_name)  # venv for webapp dir
     env.remote_repo_url = 'git@git.net:myapp.git'  # git repository url
     env.local_tmp_dir = '/tmp'  # tmp dir
-    env.remote_static_root = 'static'  # root of static files
+    env.remote_static_root = '/var/www/static'  # root of static files
     env.locale = 'fr_FR.UTF-8'  # locale to use on remote
     env.timezone = 'Europe/Paris'  # timezone for remote
     env.keep_releases = 2  # number of old releases to keep before cleaning
