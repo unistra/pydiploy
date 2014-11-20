@@ -53,8 +53,8 @@ class CircusCheck(TestCase):
 
         self.assertTrue(python_install.called)
         self.assertEqual(
-            python_install.call_args_list, [call('gevent', use_sudo=True),
-                                            call('circus', use_sudo=True), call('circus-web', use_sudo=True)])
+            python_install.call_args_list, [call('circus', use_sudo=True),
+                                            call('circus-web', use_sudo=True), call('gevent', use_sudo=True)])
 
         self.assertTrue(upload_template.called)
         self.assertTrue(
