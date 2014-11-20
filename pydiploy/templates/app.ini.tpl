@@ -22,5 +22,12 @@ stdout_stream.max_bytes = 209715200
 stdout_stream.backup_count = 5
 
 [socket:{{ application_name }}]
+
+{% if socket_host %}
+host = {{ socket_host }}
+{% else %}
 host = {{ host }}
+{% endif %}
+
+
 port = {{ socket_port }}

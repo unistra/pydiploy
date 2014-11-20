@@ -34,10 +34,12 @@ def circus_pkg(update=False):
         'libzmq-dev',
         'libevent-dev'], update=update)
     # not used anymore installed in venv !
-    fabtools.require.python.install('gevent', use_sudo=True)
     fabtools.require.python.install(env.get('circus_package_name', 'circus'),
                                     use_sudo=True)
-    fabtools.require.python.install('circus-web', use_sudo=True)
+
+    if 'no_circus_web' not in env or not env.no_circus_web:
+        fabtools.require.python.install('circus-web', use_sudo=True)
+        fabtools.require.python.install('gevent', use_sudo=True)
 
     # base configuration file for circus
     fabtools.files.upload_template(
