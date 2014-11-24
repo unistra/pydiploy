@@ -69,7 +69,7 @@ PARAMS = {
                             'maintenance_text': 'customize maintenance page text',
                             'nginx_start_confirmation': 'if nginx not started needs confirmation to start',
                             'socket_host': 'force a socket host',
-                            'no_circus_web': 'true if you don\'t want circus-web'}
+                            'no_circus_web': 'provides a way to not install circus-web'}
 
     }
 }

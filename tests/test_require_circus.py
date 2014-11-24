@@ -36,6 +36,9 @@ class CircusCheck(TestCase):
     @patch('fabtools.files.upload_template', return_value=Mock())
     @patch('fabtools.require.files.directory', return_value=Mock())
     def test_circus_pkg(self, files_directory, upload_template, python_install, deb_ppa, deb_packages, distrib_release, distrib_id):
+
+        # no_circus_web = True
+        env.no_circus_web = True
         circus_pkg()
 
         self.assertTrue(distrib_release.called)
@@ -52,9 +55,9 @@ class CircusCheck(TestCase):
                          call('ppa:chris-lea/zeromq'), call('ppa:chris-lea/libpgm')])
 
         self.assertTrue(python_install.called)
+
         self.assertEqual(
-            python_install.call_args_list, [call('circus', use_sudo=True),
-                                            call('circus-web', use_sudo=True), call('gevent', use_sudo=True)])
+            python_install.call_args_list, [call('circus', use_sudo=True)])
 
         self.assertTrue(upload_template.called)
         self.assertTrue(
@@ -69,6 +72,21 @@ class CircusCheck(TestCase):
         self.assertTrue(files_directory.called)
         self.assertEqual(files_directory.call_args,
                          call(owner='remote_owner', path='remote_home/.circus.d', use_sudo=True, group='remote_group', mode='750'))
+
+        # test circus_package_name
+        env.circus_package_name = "https://github.com/githubaccount/circus/archive/master.zip"
+        circus_pkg()
+        self.assertEqual(
+            python_install.call_args_list[1], call(
+                'https://github.com/githubaccount/circus/archive/master.zip', use_sudo=True)
+        )
+        # test no_circus_web
+        del env['no_circus_web']
+        del env['circus_package_name']
+        circus_pkg()
+        self.assertEqual(
+            python_install.call_args_list[-3:], [call('circus', use_sudo=True),
+                                                 call('circus-web', use_sudo=True), call('gevent', use_sudo=True)])
 
     @patch('fabtools.files.upload_template', return_value=Mock())
     def test_app_circus_conf(self, upload_template):

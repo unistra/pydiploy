@@ -227,6 +227,10 @@ Optional parameters
 
         env.circus_package_name = 'https://github.com/githubaccount/circus/archive/master.zip'
 
+    - no_circus_web if sets to True, circus-web package will not be installed during pre_install process : ::
+
+        env.no_circus_web = True
+
     - nginx_location_extra_directives adds specific directives in location part of nginx config file : ::
 
         env.nginx_location_extra_directives = ['proxy_read_timeout 120']
@@ -236,3 +240,7 @@ Optional parameters
         env.nginx_start_confirmation = False
 
     - oracle_* : see `databases`_ for more infos on required parameters.
+
+    - socket_host used to force a socket host other thant hostname in circus app config file : ::
+
+        env.socket_host = True
