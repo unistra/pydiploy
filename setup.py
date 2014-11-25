@@ -31,7 +31,11 @@ setup(
     install_requires=libraries,
     dependency_links=dependency_links,
     keywords=['deploy', 'fabric', 'automation'],
-    entry_points={},
+    entry_points={
+        'console_scripts': [
+            'pydiploy_sublime_snippet = pydiploy.scripts:sublime_text_snippet',
+        ]
+    },
     classifiers=(
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
