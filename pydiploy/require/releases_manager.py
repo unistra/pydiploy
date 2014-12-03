@@ -7,8 +7,10 @@ import fabric
 import fabtools
 import pydiploy
 from fabric.api import env
+from pydiploy.decorators import do_verbose
 
 
+@do_verbose
 def set_current():
     """
     Uses current directory for new release
@@ -18,6 +20,7 @@ def set_current():
                        'current_path': env.remote_current_path})
 
 
+@do_verbose
 def setup():
     """
     Configs stuff for deployement
@@ -35,6 +38,8 @@ def setup():
 
     fabric.api.execute(pydiploy.require.system.permissions)
 
+
+@do_verbose
 def cleanup():
     """
     Cleans old stuff on remote server
@@ -51,6 +56,7 @@ def cleanup():
                         {'directories': env.directories})
 
 
+@do_verbose
 def deploy_code():
     """
     Deploys code according to tag in env var
@@ -135,6 +141,7 @@ def deploy_code():
     fabric.api.lcd('rm %s' % tarball)
 
 
+@do_verbose
 def rollback_code():
     """
     Rolls back to the previously deployed version
@@ -144,6 +151,7 @@ def rollback_code():
                         {'current_release': env.current_release, 'previous_release': env.previous_release, 'current_path': env.remote_current_path})
 
 
+@do_verbose
 def symlink():
     """
     Updates symlink stuff to the current deployed version

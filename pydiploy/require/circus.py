@@ -14,12 +14,13 @@ Methods to install circus package
 """
 
 import os
-
+from pydiploy.decorators import do_verbose
 import fabric
 import fabtools
 from fabric.api import env
 
 
+@do_verbose
 def circus_pkg(update=False):
     """ Installs packages relatives to circus """
 
@@ -63,6 +64,7 @@ def circus_pkg(update=False):
         mode='750')
 
 
+@do_verbose
 def app_circus_conf():
     """
     Sets circus app's configuration using templates in templates dir
@@ -81,6 +83,7 @@ def app_circus_conf():
                                    use_jinja=True)
 
 
+@do_verbose
 def upstart():
     """
     Sets script to start circus at boot using templates in templates dir
@@ -100,6 +103,7 @@ def upstart():
                                    use_jinja=True)
 
 
+@do_verbose
 def app_reload():
     """ Starts/restarts app using circus """
 

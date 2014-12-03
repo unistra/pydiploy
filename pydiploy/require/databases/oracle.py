@@ -10,12 +10,13 @@ Required functions for Oracle database
 
 import os
 from string import Template
-
+from pydiploy.decorators import do_verbose
 import fabric
 import fabtools
 from fabric.api import env
 
 
+@do_verbose
 def install_oracle_client():
     """
     installs oracle's specif client for Python oracle_cx for example.
@@ -80,11 +81,13 @@ def install_oracle_client():
         fabric.api.abort('Please provide parameters for oracle installation !')
 
 
+@do_verbose
 def install_oracle_jdk(version='7u25-b15'):
     """ install oracle jdk from oracle website """
     fabtools.oracle_jdk.install_from_oracle_site(version=version)
 
 
+@do_verbose
 def get_oracle_jdk_version():
     """ get oracle jdk version returns null if not installed """
     return fabtools.oracle_jdk.version()

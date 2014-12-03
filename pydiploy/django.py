@@ -11,8 +11,10 @@ import fabric
 import fabtools
 import pydiploy
 from fabric.api import env
+from pydiploy.decorators import do_verbose
 
 
+@do_verbose
 def application_packages(update=False):
     """ Installs all packages for django webapp """
     fabtools.require.deb.packages(['gettext'], update=update)

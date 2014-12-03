@@ -6,12 +6,13 @@
 
 import datetime
 import os
-
+from pydiploy.decorators import do_verbose
 import fabric
 import fabtools
 from fabric.api import env
 
 
+@do_verbose
 def django_prepare():
     """
     Prepares django webapp (syncdb,migrate,collectstatic,and eventually
@@ -42,6 +43,7 @@ def django_prepare():
                    local_path=env.local_tmp_dir)
 
 
+@do_verbose
 def django_dump_database():
     """
     Dumps webapp datas in json.
@@ -61,6 +63,7 @@ def django_dump_database():
     fabric.api.get('/tmp/%s' % dump_name, local_path=env.dest_path)
 
 
+@do_verbose
 def django_custom_cmd(commands):
     """ Passes custom commands to manage.py """
 

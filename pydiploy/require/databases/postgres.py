@@ -11,14 +11,17 @@ Required functions for postgresql database
 import fabric
 import fabtools
 from fabric.api import env
+from pydiploy.decorators import do_verbose
 
 
+@do_verbose
 def postgres_pkg(update=False):
     """ Installs dependencies for postgresql """
 
     fabtools.require.deb.packages(['libpq-dev'], update=update)
 
 
+@do_verbose
 def install_postgres_server(update=False):
     """ Installs  postgres server on remote """
 
@@ -27,6 +30,7 @@ def install_postgres_server(update=False):
     fabtools.require.postgres.server()
 
 
+@do_verbose
 def add_postgres_user(name, password, superuser=False, createdb=False,
                       createrole=False, inherit=True, login=True,
                       connection_limit=None, encrypted_password=False,
@@ -48,6 +52,7 @@ def add_postgres_user(name, password, superuser=False, createdb=False,
         fabric.api.puts(msg)
 
 
+@do_verbose
 def add_postgres_database(name, owner, template='template0', encoding='UTF8',
                           locale='fr_FR.UTF-8', verbose=True):
     """ Adds  postgresql database on remote """

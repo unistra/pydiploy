@@ -11,9 +11,10 @@ Requires functions for mongodb database
 import fabtools
 import fabric
 import pydiploy
+from pydiploy.decorators import do_verbose
 
 
-
+@do_verbose
 def install_mongodb():
     if not pydiploy.require.system.package_installed('mongodb-10gen'):
         fabtools.require.deb.source('mongodb',

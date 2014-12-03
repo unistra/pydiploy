@@ -8,10 +8,11 @@ Git vcs relatives methods
 """
 
 import os
-
+from pydiploy.decorators import do_verbose
 import fabric
 
 
+@do_verbose
 def archive(filename, path='/tmp', format="tar.gz", tag="HEAD", remote="",
             prefix="", project_path="."):
     """ Creates an archive from a git repository or directly from a project
@@ -80,6 +81,7 @@ def archive(filename, path='/tmp', format="tar.gz", tag="HEAD", remote="",
     return os.path.join(path, filename)
 
 
+@do_verbose
 def collect_tags(project_path='.', remote=""):
     """ Collects tags names locally or from a remote repository """
 
@@ -94,6 +96,7 @@ def collect_tags(project_path='.', remote=""):
         return refs.split('\n')
 
 
+@do_verbose
 def collect_branches(project_path='.', remote=""):
     """ Collects branches names locally or from a remote repository """
 
@@ -108,6 +111,7 @@ def collect_branches(project_path='.', remote=""):
         return refs.split('\n')
 
 
+@do_verbose
 def check_tag_exist(tag=None):
     """ Checks if a tag/branch exists in the repository """
     if tag:

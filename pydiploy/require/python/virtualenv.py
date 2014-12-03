@@ -4,8 +4,10 @@
 
 import fabtools
 from fabric.api import env
+from pydiploy.decorators import do_verbose
 
 
+@do_verbose
 def virtualenv(clear=False):
     """ Creates virtualenv """
     fabtools.require.files.directory(env.remote_virtualenv_dir,

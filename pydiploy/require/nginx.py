@@ -8,8 +8,10 @@ import fabric
 import fabtools
 from fabric.api import env
 import pydiploy
+from pydiploy.decorators import do_verbose
 
 
+@do_verbose
 def root_web():
     """ Creates web root for webserver """
 
@@ -17,12 +19,14 @@ def root_web():
                                      owner='root', group='root', mode='755')
 
 
+@do_verbose
 def nginx_pkg(update=False):
     """ Installs nginx package on remote server """
 
     fabtools.require.deb.packages(['nginx'], update=update)
 
 
+@do_verbose
 def nginx_start():
     """ Starts nginx """
 
@@ -33,6 +37,7 @@ def nginx_start():
         fabtools.service.start('nginx')
 
 
+@do_verbose
 def nginx_reload():
     """ Starts/reloads nginx """
 
@@ -42,6 +47,7 @@ def nginx_reload():
         fabtools.service.reload('nginx')
 
 
+@do_verbose
 def nginx_restart():
     """ Starts/Restarts nginx """
 
@@ -51,12 +57,14 @@ def nginx_restart():
         fabtools.service.restart('nginx')
 
 
+@do_verbose
 def nginx_started():
     """ Returns true/false depending on nginx service is started """
 
     return fabtools.service.is_running('nginx')
 
 
+@do_verbose
 def nginx_confirm_start():
     """ Confirms launch of nginx """
 
@@ -69,6 +77,7 @@ def nginx_confirm_start():
         fabtools.service.start('nginx')
 
 
+@do_verbose
 def web_static_files():
     """ Syncs statics files """
 
@@ -79,6 +88,7 @@ def web_static_files():
         ssh_opts='-t')
 
 
+@do_verbose
 def web_configuration():
     """ Setups webserver's configuration """
 
@@ -95,6 +105,7 @@ def web_configuration():
             fabric.api.sudo('rm -f default')
 
 
+@do_verbose
 def up_site_config():
     """ Uploads site config for nginx """
     nginx_root = '/etc/nginx'
@@ -119,6 +130,7 @@ def up_site_config():
             fabric.api.sudo('ln -s %s .' % app_conf)
 
 
+@do_verbose
 def down_site_config():
     """ Uploads site_down config for nginx """
 
@@ -140,6 +152,7 @@ def down_site_config():
     fabric.api.execute(upload_maintenance_page)
 
 
+@do_verbose
 def set_website_up():
     """ Sets website up """
 
@@ -164,6 +177,7 @@ def set_website_up():
     fabric.api.execute(nginx_restart)
 
 
+@do_verbose
 def set_website_down():
     """ Sets website down """
 
@@ -189,6 +203,7 @@ def set_website_down():
     fabric.api.execute(nginx_restart)
 
 
+@do_verbose
 def upload_maintenance_page():
     """ Uploads and forges maintenance.html according to template """
 

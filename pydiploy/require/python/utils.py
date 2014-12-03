@@ -3,12 +3,13 @@
 """ Utilities module for python """
 
 import os
-
+from pydiploy.decorators import do_verbose
 import fabric
 import fabtools
 from fabric.api import env
 
 
+@do_verbose
 def python_pkg(update=False):
     """ Installs python packages and pip """
 
@@ -19,6 +20,7 @@ def python_pkg(update=False):
     fabtools.require.python.install('pip', upgrade=True, use_sudo=True)
 
 
+@do_verbose
 def application_dependencies(upgrade_pkg, staging=True):
     """ Installs application dependencies with requirements.txt files """
 

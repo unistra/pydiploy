@@ -9,8 +9,10 @@ This class is for sytem relatives tools and commands
 import fabric
 import fabtools
 from fabric.api import env
+from pydiploy.decorators import do_verbose
 
 
+@do_verbose
 def add_user(commands=None):
     """
     Creates user on remote system
@@ -37,18 +39,21 @@ def add_user(commands=None):
                                 commands=commands)
 
 
+@do_verbose
 def add_group(name):
     """ Creates user's group (=name) on a remote server """
 
     fabtools.require.group(name)
 
 
+@do_verbose
 def update_pkg_index():
     """ Updates packages on remote server (ubuntu/debian) """
 
     fabtools.require.deb.uptodate_index(max_age={'day': 1})
 
 
+@do_verbose
 def set_locale():
     """
     Sets server's locales
@@ -59,6 +64,7 @@ def set_locale():
         fabric.api.sudo('/usr/sbin/update-locale LANG=' + env.locale)
 
 
+@do_verbose
 def set_timezone():
     """
     Sets the timezone
@@ -70,6 +76,7 @@ def set_timezone():
     return fabric.api.sudo("cp -f /usr/share/zoneinfo/%s /etc/localtime" % env.timezone)
 
 
+@do_verbose
 def permissions():
     """
     Makes the release group-writable
@@ -83,6 +90,7 @@ def permissions():
                     {'domain_path': env.remote_project_dir})
 
 
+@do_verbose
 def package_installed(pkg_name):
     """
     Checks if a debian/ubuntu package is installed
@@ -97,6 +105,7 @@ def package_installed(pkg_name):
     return result.succeeded
 
 
+@do_verbose
 def check_python3_install(version='python3', update=False):
     """
     Installs python 3 on ubuntu remote server
@@ -110,6 +119,7 @@ def check_python3_install(version='python3', update=False):
         fabtools.require.deb.package(version, update=True)
 
 
+@do_verbose
 def install_extra_packages(pkg, update=False):
     """
     Install extra packages on remote server
@@ -118,6 +128,7 @@ def install_extra_packages(pkg, update=False):
     fabtools.require.deb.packages(pkg, update=update)
 
 
+@do_verbose
 def install_extra_ppa(extra_ppa):
     """
 

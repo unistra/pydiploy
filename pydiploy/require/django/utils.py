@@ -6,12 +6,13 @@ import os
 import random
 import re
 import string
-
+from pydiploy.decorators import do_verbose
 import fabric
 import fabtools
 from fabric.api import env
 
 
+@do_verbose
 def generate_secret_key():
     """ Generates the django's secret key. """
 
@@ -22,6 +23,7 @@ def generate_secret_key():
     env.secret_key = ''.join(random_letters)
 
 
+@do_verbose
 def extract_settings():
     """ Extracts settings from django settings files. """
 
@@ -53,6 +55,7 @@ def extract_settings():
                     break
 
 
+@do_verbose
 def app_settings(**kwargs):
     """ Manages django settings file """
 
@@ -89,6 +92,7 @@ def app_settings(**kwargs):
                                    use_jinja=True)
 
 
+@do_verbose
 def deploy_manage_file():
     """ uploads manage.py template on remote """
 
@@ -104,6 +108,7 @@ def deploy_manage_file():
                                    use_jinja=True)
 
 
+@do_verbose
 def deploy_wsgi_file():
     """ Uploads wsgi.py template on remote """
 
