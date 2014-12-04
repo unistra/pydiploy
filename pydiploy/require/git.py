@@ -8,8 +8,9 @@ Git vcs relatives methods
 """
 
 import os
-from pydiploy.decorators import do_verbose
+
 import fabric
+from pydiploy.decorators import do_verbose
 
 
 @do_verbose

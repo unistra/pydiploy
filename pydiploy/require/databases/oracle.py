@@ -10,10 +10,11 @@ Required functions for Oracle database
 
 import os
 from string import Template
-from pydiploy.decorators import do_verbose
+
 import fabric
 import fabtools
 from fabric.api import env
+from pydiploy.decorators import do_verbose
 
 
 @do_verbose

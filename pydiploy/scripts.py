@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-from os.path import join, expanduser, isdir, dirname
-from sys import stdout
-from six import StringIO
 import platform
+from os.path import dirname, expanduser, isdir, join
+from sys import stdout
 
 from pydiploy.version import __version__
+from six import StringIO
 
 """
     This script generate a sublime text snippet using

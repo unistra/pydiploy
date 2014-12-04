@@ -3,10 +3,11 @@
 """ Utilities module for python """
 
 import os
-from pydiploy.decorators import do_verbose
+
 import fabric
 import fabtools
 from fabric.api import env
+from pydiploy.decorators import do_verbose
 
 
 @do_verbose
@@ -28,7 +29,9 @@ def application_dependencies(upgrade_pkg, staging=True):
         with fabric.api.cd(env.remote_current_path):
             requirements_file = os.path.join('requirements',
                                              '%s.txt' % env.goal) if staging else 'requirements.txt'
-            pip_cmd = 'pip'
+            # ugly fix for error when pip install fail and error raises while /home/user/.pip not writable
+            pip_log = "%s/pip_error.log " % env.remote_home
+            pip_cmd = 'pip --log-file %s' % pip_log
             if 'oracle_client_version' in env:
                 oracle_dir = 'instantclient_%s' % '_'.join(
                     env.oracle_client_version.split('.')[:2])
@@ -42,7 +45,10 @@ def application_dependencies(upgrade_pkg, staging=True):
                                                  use_sudo=True,
                                                  user=env.remote_owner,
                                                  upgrade=upgrade_pkg,
-                                                 pip_cmd=pip_cmd)
+                                                 pip_cmd=pip_cmd,
+                                                 quiet=True)
 
             fabric.api.sudo(
-                'pip install -e .', user=env.remote_owner, pty=False)
+                'pip install --log-file %s --quiet -e .' % pip_log ,
+                user=env.remote_owner,
+                pty=False)

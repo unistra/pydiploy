@@ -11,6 +11,7 @@ Required functions for sqlite database
 import fabtools
 from pydiploy.decorators import do_verbose
 
+
 @do_verbose
 def sqlite3_pkg(use_sudo=False, user=None):
     """ Installs sqlite3 package and requirements """

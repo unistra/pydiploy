@@ -7,11 +7,23 @@ This module shoud be imported in a fabfile to deploy an application using pydipl
 """
 
 
+from contextlib import contextmanager
+
 import fabric
 import fabtools
 import pydiploy
 from fabric.api import env
 from pydiploy.decorators import do_verbose
+
+
+@contextmanager
+def wrap_deploy():
+    try:
+        yield
+    except SystemExit:
+        fabric.api.execute(rollback)
+        fabric.api.abort(fabric.colors.red(
+            "Deploy failed rollbacking process launched"))
 
 
 @do_verbose
@@ -54,17 +66,20 @@ def pre_install_frontend():
 
 def deploy_backend(upgrade_pkg=False, **kwargs):
     """ Deploys django webapp with required tag """
-    fabric.api.execute(pydiploy.require.releases_manager.setup)
-    fabric.api.execute(pydiploy.require.releases_manager.deploy_code)
-    fabric.api.execute(pydiploy.require.django.utils.deploy_manage_file)
-    fabric.api.execute(pydiploy.require.django.utils.deploy_wsgi_file)
-    fabric.api.execute(
-        pydiploy.require.python.utils.application_dependencies, upgrade_pkg)
-    fabric.api.execute(pydiploy.require.django.utils.app_settings, **kwargs)
-    fabric.api.execute(pydiploy.require.django.command.django_prepare)
-    fabric.api.execute(pydiploy.require.system.permissions)
-    fabric.api.execute(pydiploy.require.circus.app_reload)
-    fabric.api.execute(pydiploy.require.releases_manager.cleanup)
+    with wrap_deploy():
+        fabric.api.execute(pydiploy.require.releases_manager.setup)
+        fabric.api.execute(pydiploy.require.releases_manager.deploy_code)
+        fabric.api.execute(pydiploy.require.django.utils.deploy_manage_file)
+        fabric.api.execute(pydiploy.require.django.utils.deploy_wsgi_file)
+        fabric.api.execute(
+            pydiploy.require.python.utils.application_dependencies,
+            upgrade_pkg)
+        fabric.api.execute(pydiploy.require.django.utils.app_settings,
+            **kwargs)
+        fabric.api.execute(pydiploy.require.django.command.django_prepare)
+        fabric.api.execute(pydiploy.require.system.permissions)
+        fabric.api.execute(pydiploy.require.circus.app_reload)
+        fabric.api.execute(pydiploy.require.releases_manager.cleanup)
 
 
 def deploy_frontend():

@@ -26,7 +26,7 @@ from pydiploy.django import (deploy_backend as pydiploy_deploy_backend,
 
 
 # edit config here !
-env.user = 'vagrant'  # user for ssh
+
 env.use_sudo = True # use sudo or not
 
 env.remote_owner = 'django'  # remote server user
@@ -49,6 +49,7 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 
 # optional parameters
 
+# env.user = 'my_user'  # user for ssh
 # env.dest_path = '' # if not set using env_local_tmp_dir
 # env.excluded_files = ['pron.jpg'] # file(s) that rsync should exclude when deploying app
 # env.extra_ppa_to_install = ['ppa:vincent-c/ponysay'] # extra ppa source(s) to use
@@ -88,6 +89,7 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 @task
 def test():
     """Define test stage"""
+    env.user = 'vagrant'  # user for ssh
     env.roledefs = {
         'web': ['192.168.1.2'],
         'lb': ['192.168.1.3'],

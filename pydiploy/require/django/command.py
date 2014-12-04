@@ -6,10 +6,11 @@
 
 import datetime
 import os
-from pydiploy.decorators import do_verbose
+
 import fabric
 import fabtools
 from fabric.api import env
+from pydiploy.decorators import do_verbose
 
 
 @do_verbose

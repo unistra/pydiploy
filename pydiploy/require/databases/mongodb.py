@@ -8,8 +8,8 @@ Mongodb
 Requires functions for mongodb database
 """
 
-import fabtools
 import fabric
+import fabtools
 import pydiploy
 from pydiploy.decorators import do_verbose
 

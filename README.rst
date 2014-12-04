@@ -28,6 +28,10 @@ Usage
 
     - See the example in the doc to setup correctly a fabfile (fabric,fabtools and pydiploy should be installed)
 
+    - If env.user is not defined in fabfile (stage part or in main part of the fabfile) you can pass its value by command line : ::
+
+        $ fab test pre_install -u your_user
+
     - Use following command to install/deploy an application in test stage : ::
 
         $ fab tag:master test pre_install deploy post_install

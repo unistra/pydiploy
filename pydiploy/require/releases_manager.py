@@ -66,7 +66,8 @@ def deploy_code():
     if "tag" not in env:
         tag_requested = fabric.api.prompt('Please specify target tag used: ')
         while(not pydiploy.require.git.check_tag_exist(tag_requested)):
-            tag_requested = fabric.api.prompt('tag %s unknown please specify valid target tag used: ' % fabric.colors.red(tag_requested))
+            tag_requested = fabric.api.prompt(
+                'tag %s unknown please specify valid target tag used: ' % fabric.colors.red(tag_requested))
 
         env.tag = tag_requested
 
@@ -77,6 +78,7 @@ def deploy_code():
 
     fabric.api.require('tag', provided_by=['tag', 'head'])
     fabric.api.require('remote_project_dir', provided_by=env.goals)
+
     tarball = pydiploy.require.git.archive(env.application_name,
                                            prefix='%s-%s/' % (env.application_name,
                                                               env.tag.lower()),
@@ -123,7 +125,8 @@ def deploy_code():
 
     fabric.contrib.project.rsync_project(env.remote_current_release,
                                          '/tmp/%s-%s/' % (
-                                             env.application_name, env.tag.lower(
+                                             env.application_name,
+                                             env.tag.lower(
                                              )),
                                          delete=True,
                                          extra_opts='--rsync-path="sudo -u %s rsync"' % env.remote_owner,
@@ -149,6 +152,10 @@ def rollback_code():
     if len(env.releases) >= 2:
         fabric.api.sudo("rm %(current_path)s; ln -s %(previous_release)s %(current_path)s && rm -rf %(current_release)s" %
                         {'current_release': env.current_release, 'previous_release': env.previous_release, 'current_path': env.remote_current_path})
+    else:
+        fabric.api.sudo("rm %(current_path)s && rm -rf %(previous_release)s" %
+                        {'current_path': env.remote_current_path,'previous_release': env.remote_current_release})
+
 
 
 @do_verbose

@@ -16,9 +16,8 @@ import os
 
 import fabric
 import fabtools
-
-from pkg_resources import resource_filename, Requirement
 from fabric.api import env
+from pkg_resources import Requirement, resource_filename
 from pydiploy.params import PARAMS
 from pydiploy.require.git import check_tag_exist
 from pydiploy.version import __version__, __version_info__
@@ -48,7 +47,7 @@ def init_params():
 
 def build_env():
     """ Builds env vars """
-
+    fabric.api.puts("user -> %s" % env.user)
     env.pydiploy_version = __version__
 
     # check pydiploy version required by fabfile (major version number)

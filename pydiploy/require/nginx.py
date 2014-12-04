@@ -6,8 +6,8 @@ import os
 
 import fabric
 import fabtools
-from fabric.api import env
 import pydiploy
+from fabric.api import env
 from pydiploy.decorators import do_verbose
 
 
