@@ -57,17 +57,9 @@ class UtilsCheck(TestCase):
         self.assertTrue(api_cd.called)
         self.assertEqual(api_cd.call_args, call('remote_current_path'))
 
-        self.assertTrue(api_sudo.called)
-        self.assertEqual(api_sudo.call_args, call(
-            'pip install -e .', user='remote_owner', pty=False))
-
         self.assertTrue(python_virtualenv.called)
         self.assertEqual(
             python_virtualenv.call_args, call('remote_virtualenv_dir'))
-
-        self.assertTrue(install_requirements.called)
-        self.assertEqual(install_requirements.call_args, call(
-            'requirements/goal.txt', pip_cmd='pip', use_sudo=True, upgrade=False, user='remote_owner'))
 
         # test oracle
 

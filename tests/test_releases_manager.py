@@ -161,6 +161,12 @@ class ReleasesManagerCheck(TestCase):
         self.assertEqual(api_sudo.call_args,
                          call('rm remote_current_path; ln -s 3.0 remote_current_path && rm -rf remote_releases_path/4.0'))
 
+        env.releases = ["1.0"]
+        rollback_code()
+        self.assertTrue(api_sudo.called)
+        self.assertEqual(api_sudo.call_args,
+                         call('rm remote_current_path && rm -rf remote_current_release'))
+
     @patch('fabric.api.sudo', return_value=Mock())
     def test_symlink(self, api_sudo):
         symlink()
