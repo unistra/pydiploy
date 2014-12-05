@@ -15,6 +15,8 @@ from pydiploy.django import (application_packages, custom_manage_command,
                              set_app_down, set_app_up, wrap_deploy)
 
 
+
+
 class ReleasesManagerCheck(TestCase):
 
     """
@@ -34,6 +36,7 @@ class ReleasesManagerCheck(TestCase):
     @patch('fabric.api.execute', return_value=Mock())
     def test_wrap_deploy(self, api_execute, api_abort):
         wrap_deploy()
+
 
 
     @patch('fabtools.require.deb.packages', return_value=Mock())
@@ -128,9 +131,8 @@ class ReleasesManagerCheck(TestCase):
             str(api_execute.call_args_list[8]).find('call(<function app_reload') == 0)
         self.assertTrue(
             str(api_execute.call_args_list[9]).find('call(<function cleanup') == 0)
+        #self.assertRaises(SystemExit, api_execute, "")
 
-        api_execute.assertRaises("SystemExit")
-        deploy_backend()
 
     @patch('fabric.api.execute', return_value=Mock())
     def test_deploy_frontend(self, api_execute):

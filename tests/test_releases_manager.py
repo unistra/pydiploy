@@ -19,31 +19,31 @@ class ReleasesManagerCheck(TestCase):
 
     def setUp(self):
         self.previous_env = copy.deepcopy(env)
-        env.remote_current_release = "remote_current_release"
-        env.remote_current_path = "remote_current_path"
-        env.remote_project_dir = "remote_project_dir"
-        env.remote_shared_path = "remote_shared_path"
-        env.releases = ["1.0", "2.0", "3.0", "4.0"]
-        env.keep_releases = 3
-        env.remote_releases_path = "remote_releases_path"
-        env.current_revision = "4.0"
-        env.current_release = "remote_releases_path/4.0"
-        env.previous_release = "3.0"
         env.application_name = "appliname"
-        env.tag = "mytag"
-        env.remote_repo_url = "remote_repo_url"
-        env.root_package_name = "root_package_name"
-        env.remote_owner = "remote_owner"
-        env.remote_group = "remote_group"
-        env.local_tmp_root_app = "local_tmp_root_app"
-        env.remote_base_package_dir = "remote_base_package_dir"
-        env.local_tmp_root_app_package = "local_tmp_root_app_package"
-        env.excluded_files = ["fabhappening.jpg"]
-        env.extra_ppa_to_install = ["ppa:/encyclopedia/dramatica"]
-        env.extra_pkg_to_install = ["norton-utilities"]
         env.cfg_shared_files = ["README"]
+        env.current_release = "remote_releases_path/4.0"
+        env.current_revision = "4.0"
+        env.excluded_files = ["fabhappening.jpg"]
+        env.extra_pkg_to_install = ["norton-utilities"]
+        env.extra_ppa_to_install = ["ppa:/encyclopedia/dramatica"]
         env.goals = ['dev', 'test', 'prod']
+        env.keep_releases = 3
         env.local_tmp_dir = "/tmp"
+        env.local_tmp_root_app = "local_tmp_root_app"
+        env.local_tmp_root_app_package = "local_tmp_root_app_package"
+        env.previous_release = "3.0"
+        env.releases = ["1.0", "2.0", "3.0", "4.0"]
+        env.remote_base_package_dir = "remote_base_package_dir"
+        env.remote_current_path = "remote_current_path"
+        env.remote_current_release = "remote_current_release"
+        env.remote_group = "remote_group"
+        env.remote_owner = "remote_owner"
+        env.remote_project_dir = "remote_project_dir"
+        env.remote_releases_path = "remote_releases_path"
+        env.remote_repo_url = "remote_repo_url"
+        env.remote_shared_path = "remote_shared_path"
+        env.root_package_name = "root_package_name"
+        env.tag = "mytag"
 
     def tearDown(self):
         env.clear()
@@ -154,18 +154,33 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(api_prompt.called)
         self.assertEqual(env.tag, '4.0')
 
+    @patch('fabric.api.puts', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
-    def test_rollback_code(self, api_sudo):
+    @patch('pydiploy.prepare.process_releases', return_value=Mock())
+    def test_rollback_code(self, process_rel, api_sudo, api_puts):
+
+        # no old release first deploy with errors so rollback goes on !
+        env.releases = []
+        rollback_code()
+        self.assertTrue(api_sudo.called)
+        self.assertEqual(api_sudo.call_args,
+                          call('rm remote_current_path && rm -rf remote_current_release'))
+
+        # one release
+        env.releases = ["1.0"]
+        rollback_code()
+        self.assertTrue(api_puts.called)
+        self.assertEqual(api_puts.call_args,
+                          call('rollback_code : \x1b[32mDone\x1b[0m'))
+
+        env.releases = ["1.0", "2.0", "3.0", "4.0"]
         rollback_code()
         self.assertTrue(api_sudo.called)
         self.assertEqual(api_sudo.call_args,
                          call('rm remote_current_path; ln -s 3.0 remote_current_path && rm -rf remote_releases_path/4.0'))
 
-        env.releases = ["1.0"]
-        rollback_code()
-        self.assertTrue(api_sudo.called)
-        self.assertEqual(api_sudo.call_args,
-                         call('rm remote_current_path && rm -rf remote_current_release'))
+
+
 
     @patch('fabric.api.sudo', return_value=Mock())
     def test_symlink(self, api_sudo):

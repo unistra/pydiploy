@@ -47,7 +47,7 @@ def init_params():
 
 def build_env():
     """ Builds env vars """
-    fabric.api.puts("user -> %s" % env.user)
+
     env.pydiploy_version = __version__
 
     # check pydiploy version required by fabfile (major version number)
@@ -88,29 +88,9 @@ def build_env():
     if "previous_settings_file" not in env:
         env.previous_settings_file = ""
 
+    # populate env vars for current release / n-1 release
     if not "releases" in env:
-        if fabtools.files.is_dir(env.remote_releases_path):
-            env.releases = sorted(fabric.api.run('ls -x %(releases_path)s' %
-                                                 {'releases_path': env.remote_releases_path}).split())
-
-            if len(env.releases) >= 1:
-                env.current_revision = env.releases[-1]
-                env.current_release = "%(releases_path)s/%(current_revision)s" % \
-                                      {'releases_path': env.remote_releases_path,
-                                       'current_revision': env.current_revision}
-                # warning previous settings file before deployement !!!!!
-                env.previous_release_base_package_dir = os.path.join(
-                    env.current_release, env.root_package_name)
-                env.previous_release_settings_dir = os.path.join(
-                    env.previous_release_base_package_dir, 'settings')
-                env.previous_settings_file = os.path.join(
-                    env.previous_release_settings_dir, '%s.py' % env.goal)
-
-            if len(env.releases) > 1:
-                env.previous_revision = env.releases[-2]
-                env.previous_release = "%(releases_path)s/%(previous_revision)s" % \
-                                       {'releases_path': env.remote_releases_path,
-                                        'previous_revision': env.previous_revision}
+        fabric.api.execute(process_releases)
 
     # define main goals
     env.goals = ['dev', 'test', 'prod']
@@ -228,3 +208,28 @@ def generate_fabfile():
 
     with open(fab_sample) as f:
         return f.read()
+
+
+def process_releases():
+    """ Populates env vars for releases (current, old...) """
+    if fabtools.files.is_dir(env.remote_releases_path):
+        env.releases = sorted(fabric.api.run('ls -x %(releases_path)s' %
+                                             {'releases_path': env.remote_releases_path}).split())
+        if len(env.releases) >= 1:
+            env.current_revision = env.releases[-1]
+            env.current_release = "%(releases_path)s/%(current_revision)s" % \
+                                  {'releases_path': env.remote_releases_path,
+                                   'current_revision': env.current_revision}
+            # warning previous settings file before deployement !!!!!
+            env.previous_release_base_package_dir = os.path.join(
+                env.current_release, env.root_package_name)
+            env.previous_release_settings_dir = os.path.join(
+                env.previous_release_base_package_dir, 'settings')
+            env.previous_settings_file = os.path.join(
+                env.previous_release_settings_dir, '%s.py' % env.goal)
+
+        if len(env.releases) > 1:
+            env.previous_revision = env.releases[-2]
+            env.previous_release = "%(releases_path)s/%(previous_revision)s" % \
+                                   {'releases_path': env.remote_releases_path,
+                                    'previous_revision': env.previous_revision}

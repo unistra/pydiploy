@@ -149,13 +149,21 @@ def rollback_code():
     """
     Rolls back to the previously deployed version
     """
-    if len(env.releases) >= 2:
-        fabric.api.sudo("rm %(current_path)s; ln -s %(previous_release)s %(current_path)s && rm -rf %(current_release)s" %
-                        {'current_release': env.current_release, 'previous_release': env.previous_release, 'current_path': env.remote_current_path})
-    else:
-        fabric.api.sudo("rm %(current_path)s && rm -rf %(previous_release)s" %
-                        {'current_path': env.remote_current_path,'previous_release': env.remote_current_release})
 
+    fabric.api.execute(pydiploy.prepare.process_releases)
+    if "releases" in env:
+        nb_releases = len(env.releases)
+        if nb_releases >= 2:
+            fabric.api.sudo("rm %(current_path)s; ln -s %(previous_release)s %(current_path)s && rm -rf %(current_release)s" %
+                            {'current_release': env.current_release, 'previous_release': env.previous_release, 'current_path': env.remote_current_path})
+        # elif nb_releases == 1:
+        elif nb_releases == 1:
+
+            fabric.api.puts(fabric.colors.red(
+                            'No rollback only one release found on remote !'))
+        else:
+            fabric.api.sudo("rm %(current_path)s && rm -rf %(previous_release)s" %
+                            {'current_path': env.remote_current_path, 'previous_release': env.remote_current_release})
 
 
 @do_verbose

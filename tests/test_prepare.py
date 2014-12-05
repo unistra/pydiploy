@@ -7,10 +7,10 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
+from pydiploy import version
 from pydiploy.prepare import (_get_current_role, build_env,
                               check_req_pydiploy_version, generate_fabfile,
-                              init_params, tag, test_config)
-from pydiploy import version
+                              init_params, process_releases, tag, test_config)
 
 
 class PrepareCheck(TestCase):
@@ -21,19 +21,29 @@ class PrepareCheck(TestCase):
 
     def setUp(self):
         self.previous_env = copy.deepcopy(env)
-        env.remote_home = "remote_home"
-        env.server_name = "server_name"
-        env.local_tmp_dir = "local_tmp_dir"
         env.application_name = "application_name"
-        env.root_package_name = "root_package_name"
         env.goal = "goal"
-        env.releases = ["1.0", "2.0", "3.0", "4.0"]
-        env.tag = "4.0"
-        env.output_prefix = ""
-        env.host_string = ""
-        env.roledefs = {'web': ['192.168.1.2'], 'lb': ['192.168.1.3'], }
         env.host = '192.168.1.2'
+        env.host_string = ""
         env.host_string = env.host
+        env.local_tmp_dir = "local_tmp_dir"
+        env.output_prefix = ""
+        env.previous_release = "3.0"
+        env.releases = ["1.0", "2.0", "3.0", "4.0"]
+        env.remote_base_package_dir = "remote_base_package_dir"
+        env.remote_current_path = "remote_current_path"
+        env.remote_current_release = "remote_current_release"
+        env.remote_group = "remote_group"
+        env.remote_home = "remote_home"
+        env.remote_owner = "remote_owner"
+        env.remote_project_dir = "remote_home/server_name"
+        env.remote_releases_path = "remote_home/server_name/releases"
+        env.remote_repo_url = "remote_repo_url"
+        env.remote_shared_path = "remote_shared_path"
+        env.roledefs = {'web': ['192.168.1.2'], 'lb': ['192.168.1.3'], }
+        env.root_package_name = "root_package_name"
+        env.server_name = "server_name"
+        env.tag = "4.0"
 
     def tearDown(self):
         env.clear()
@@ -100,41 +110,14 @@ class PrepareCheck(TestCase):
         self.assertTrue(re.match("^.*pydiploy$", env.lib_path))
         self.assertEqual(env.goals, ['dev', 'test', 'prod'])
 
+        # no releases
+        del env['releases']
+        build_env()
+
         # test env.extra_goals
         env.extra_goals = ['toto']
         build_env()
         self.assertEqual(env.goals, ['dev', 'test', 'prod', 'toto'])
-
-        # test if no env release
-        del env['releases']
-        build_env()
-
-        self.assertTrue(is_dir.called)
-
-        self.assertTrue(api_run.called)
-        self.assertEqual(api_run.call_args, call(
-            'ls -x remote_home/server_name/releases'))
-
-        # with 1 release
-        self.assertEqual(env.releases, ['4.0'])
-        self.assertEqual(env.remote_project_dir, "remote_home/server_name")
-        self.assertEqual(env.current_revision, "4.0")
-        self.assertEqual(
-            env.current_release, "remote_home/server_name/releases/4.0")
-
-        # with 2 release
-        del env['releases']
-        api_run.return_value = "4.0 3.0"
-        build_env()
-
-        self.assertEqual(env.releases, ['3.0', '4.0'])
-        self.assertEqual(env.remote_project_dir, "remote_home/server_name")
-        self.assertEqual(env.current_revision, "4.0")
-        self.assertEqual(
-            env.current_release, "remote_home/server_name/releases/4.0")
-        self.assertEqual(env.previous_revision, "3.0")
-        self.assertEqual(
-            env.previous_release, "remote_home/server_name/releases/3.0")
 
         # test misconfiguration and abort
         api_execute.return_value = False
@@ -239,3 +222,39 @@ class PrepareCheck(TestCase):
 
     def test_generate_fabfile(self):
         generate_fabfile()
+
+    @patch('fabtools.files.is_dir', return_value=True)
+    @patch('fabric.api.run', return_value="4.0")
+    def test_process_releases(self, api_run, is_dir):
+
+        del env['releases']
+        process_releases()
+
+        self.assertTrue(is_dir.called)
+        self.assertTrue(api_run.called)
+        self.assertEqual(api_run.call_args, call(
+            'ls -x remote_home/server_name/releases'))
+
+        #with 1 release
+        api_run.return_value = "4.0"
+        process_releases()
+
+        self.assertEqual(env.releases, ['4.0'])
+        self.assertEqual(env.remote_project_dir, "remote_home/server_name")
+        self.assertEqual(env.current_revision, "4.0")
+        self.assertEqual(
+            env.current_release, "remote_home/server_name/releases/4.0")
+
+        # with 2 release
+        del env['releases']
+        api_run.return_value = "4.0 3.0"
+        process_releases()
+
+        self.assertEqual(env.releases, ['3.0', '4.0'])
+        self.assertEqual(env.remote_project_dir, "remote_home/server_name")
+        self.assertEqual(env.current_revision, "4.0")
+        self.assertEqual(
+            env.current_release, "remote_home/server_name/releases/4.0")
+        self.assertEqual(env.previous_revision, "3.0")
+        self.assertEqual(
+            env.previous_release, "remote_home/server_name/releases/3.0")
