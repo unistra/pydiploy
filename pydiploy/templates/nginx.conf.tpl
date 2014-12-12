@@ -51,8 +51,10 @@ server {
         proxy_set_header   Host             $host;
         proxy_set_header   X-Real-IP        $remote_addr;
         proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+        {% if server_ssl_on %}
         proxy_set_header   X-Forwarded-Protocol ssl;
         proxy_set_header   X-Forwarded-Ssl on;
+        {% endif %}
         {% if nginx_location_extra_directives %}
         {% for extra_directive in nginx_location_extra_directives %}
         {{ extra_directive }};
