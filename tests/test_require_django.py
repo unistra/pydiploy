@@ -43,9 +43,8 @@ class CommandCheck(TestCase):
     @patch('fabric.api.cd', return_value=Mock())
     @patch('fabric.api.settings', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
-    @patch('fabtools.files.is_dir', return_value=Mock())
     @patch('fabric.api.get', return_value=Mock())
-    def test_django_prepare(self, api_get, files_is_dir, api_sudo, api_settings, api_cd, python_virtualenv, api_local, api_lcd):
+    def test_django_prepare(self, api_get, api_sudo, api_settings, api_cd, python_virtualenv, api_local, api_lcd):
 
         api_lcd.return_value.__exit__ = Mock()
         api_lcd.return_value.__enter__ = Mock()
@@ -73,10 +72,6 @@ class CommandCheck(TestCase):
 
         self.assertTrue(api_settings.called)
         self.assertEqual(api_settings.call_args, call(warn_only=True))
-
-        self.assertTrue(files_is_dir.called)
-        self.assertEqual(
-            files_is_dir.call_args, call('remote_base_package_dir/locale'))
 
         self.assertTrue(api_get.called)
         self.assertEqual(api_get.call_args, call(

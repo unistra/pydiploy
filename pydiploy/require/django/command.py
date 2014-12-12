@@ -32,9 +32,6 @@ def django_prepare():
                 # south needed with django < 1.7 !!!!!
                 with fabric.api.settings(warn_only=True):
                     fabric.api.sudo('python manage.py migrate')
-                if fabtools.files.is_dir(
-                    os.path.join(env.remote_base_package_dir,
-                                 'locale')):
                     fabric.api.sudo('python manage.py compilemessages')
                 ignore = ('rest_framework',  'django_extensions')
                 fabric.api.sudo('python manage.py collectstatic --noinput -i %s' %
