@@ -43,6 +43,10 @@ def circus_pkg(update=False):
         fabtools.require.python.install('circus-web', use_sudo=True)
         fabtools.require.python.install('gevent', use_sudo=True)
 
+    # install circus backend sets in fabfile
+    if 'circus_backend' in env:
+        fabtools.require.python.install(env.circus_backend, use_sudo=True)
+
     # base configuration file for circus
     fabtools.files.upload_template(
         'circus.ini.tpl',

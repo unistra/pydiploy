@@ -4,12 +4,20 @@
 httpd = 0
 #httpd_host = {{ host }}
 #httpd_port = 8080
+{% if circus_backend %}
+stream_backend = {{ circus_backend }} 
+{% else %}
 #stream_backend = gevent
+{% endif %}
 {% else %}
 httpd = 1
 httpd_host = {{ host }}
 httpd_port = 8080
+{% if circus_backend %}
+stream_backend = {{ circus_backend }}
+{% else %}
 stream_backend = gevent
+{% endif %}
 {% endif %}
 statsd = 1
 pidfile = {{ remote_home }}/.circus.pid
