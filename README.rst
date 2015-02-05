@@ -3,11 +3,31 @@ Pydiploy
 
 .. image:: https://secure.travis-ci.org/unistra/pydiploy.png?branch=master
     :target: https://travis-ci.org/unistra/pydiploy
-    :alt: Latest version
+    :alt: Build
 
 .. image:: http://coveralls.io/repos/unistra/pydiploy/badge.png?branch=master
     :target: http://coveralls.io/r/unistra/pydiploy?branch=master
-    :alt: Travis-CI
+    :alt: Coverage
+
+.. image:: https://pypip.in/version/pydiploy/badge.png
+    :target: https://pypi.python.org/pypi/pydiploy
+    :alt: Version
+
+.. image:: https://pypip.in/py_versions/pydiploy/badge.png
+    :target: https://pypi.python.org/pypi/pydiploy
+    :alt: Python Version
+
+.. image:: https://pypip.in/status/pydiploy/badge.png
+    :target: https://pypi.python.org/pypi/pydiploy
+    :alt: Status
+
+.. image:: https://pypip.in/license/pydiploy/badge.png
+    :target: https://docs.python.org/2/license.html
+    :alt: Licence
+
+.. image:: https://pypip.in/download/pydiploy/badge.png
+    :target: https://pypi.python.org/pypi/pydiploy
+    :alt: Download
 
 `Pydiploy` is a library used to deal with administration and deployment of applications on several environments (i.e : dev, test, pre-production, production) The library is based on fabric and fabtools.
 The purpose of the project is to deliver bunch of tools as generic as possible to standardize deployments and administrations tasks.
