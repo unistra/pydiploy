@@ -15,7 +15,7 @@ from pydiploy.decorators import do_verbose
 
 @do_verbose
 def archive(filename, path='/tmp', format="tar.gz", tag="HEAD", remote="",
-            prefix="", project_path="."):
+            prefix="", project_path=".", specific_folder=""):
     """ Creates an archive from a git repository or directly from a project
 
     * Using at the root path of a local cloned repository. This will create
@@ -65,8 +65,10 @@ def archive(filename, path='/tmp', format="tar.gz", tag="HEAD", remote="",
         options.append('--remote=%s' % remote)
     if prefix:
         options.append('--prefix=%s' % prefix)
-
-    command = 'git archive %s %s'
+    if specific_folder:
+        command = 'git archive %s %s ' + specific_folder
+    else:
+        command = 'git archive %s %s'
     if gzip:
         command += ' |gzip > %s/%s' % (path, filename)
     else:
