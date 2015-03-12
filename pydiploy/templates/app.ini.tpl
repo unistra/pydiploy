@@ -1,5 +1,5 @@
 [watcher:{{ application_name }}]
-cmd = {{ remote_virtualenv_dir }}/bin/chaussette --fd $(circus.sockets.{{ application_name }}) {{ root_package_name }}.wsgi.application
+cmd = {{ remote_virtualenv_dir }}/bin/chaussette{% if chaussette_backend %} --backend {{ chaussette_backend }}{% endif %} --fd $(circus.sockets.{{ application_name }}) {{ root_package_name }}.wsgi.application
 working_dir = {{ remote_current_path }}
 copy_env = 1
 numprocesses = 3

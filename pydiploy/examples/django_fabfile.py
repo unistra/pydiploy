@@ -75,6 +75,8 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 # env.no_circus_web = True # true if you don't want circus-web
 # env.circus_backend = 'gevent' # name of circus backend to use
 
+# env.chaussette_backend = 'waitress' # name of chaussette backend to use. You need to add this backend in the app requirement file.
+
 # env.nginx_location_extra_directives = ['proxy_read_timeout 120'] # add directive(s) to nginx config file in location part
 # env.nginx_start_confirmation = True # if True when nginx is not started needs confirmation to start it.
 
