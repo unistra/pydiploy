@@ -1,6 +1,10 @@
 Pydiploy
 ========
 
+.. image:: https://badges.gitter.im/Join%20Chat.svg
+   :alt: Join the chat at https://gitter.im/unistra/pydiploy
+   :target: https://gitter.im/unistra/pydiploy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 .. image:: https://secure.travis-ci.org/unistra/pydiploy.png?branch=master
     :target: https://travis-ci.org/unistra/pydiploy
     :alt: Build
