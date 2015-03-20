@@ -397,7 +397,7 @@ class SAPCheck(TestCase):
 
         self.assertTrue(files_directory.called)
         self.assertEqual(files_directory.call_args,
-                         call(path='/usr/sap', use_sudo=True, mode='750'))
+                         call(path='/usr/sap', use_sudo=True, mode='755'))
 
         self.assertTrue(api_cd.called)
         self.assertEqual(api_cd.call_args_list,
@@ -407,6 +407,7 @@ class SAPCheck(TestCase):
         self.assertEqual(api_sudo.call_args_list, [
             call('wget -c http://librepo.net/lib/sap/rfcsdk_64.tar.gz'),
             call('tar xvf rfcsdk_64.tar.gz'),
+            call('chmod -R 755 rfcsdk'),
             call('rm rfcsdk_64.tar.gz'),
             call('ln -s /usr/sap/rfcsdk/lib/librfccm.so .')
         ])

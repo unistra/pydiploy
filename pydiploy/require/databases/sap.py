@@ -37,7 +37,7 @@ def install_sap_client():
 
         fabtools.require.files.directory(path=sap_lib_path,
                                          use_sudo=True,
-                                         mode='750')
+                                         mode='755')
 
         # get oracle's zip file(s) and unzip
         with fabric.api.cd(sap_lib_path):
@@ -45,6 +45,7 @@ def install_sap_client():
                 fabric.api.sudo('wget -c %s%s' %
                                 (env.sap_download_url, package))
                 fabric.api.sudo('tar xvf %s' % package)
+                fabric.api.sudo('chmod -R 755 rfcsdk')
                 fabric.api.sudo('rm %s' % package)
 
             with fabric.api.cd(join(sep, 'lib')):
