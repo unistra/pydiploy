@@ -9,12 +9,11 @@ from mock import call, Mock, patch
 from pydiploy.django import (application_packages, custom_manage_command,
                              deploy_backend, deploy_frontend, dump_database,
                              install_oracle_client, install_postgres_server,
-                             post_install_backend, post_install_frontend,
-                             pre_install_backend, pre_install_frontend,
-                             reload_backend, reload_frontend, rollback,
-                             set_app_down, set_app_up, wrap_deploy)
-
-
+                             install_sap_client, post_install_backend,
+                             post_install_frontend, pre_install_backend,
+                             pre_install_frontend, reload_backend,
+                             reload_frontend, rollback, set_app_down,
+                             set_app_up, wrap_deploy)
 
 
 class ReleasesManagerCheck(TestCase):
@@ -237,3 +236,11 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(api_execute.called)
         self.assertTrue(str(api_execute.call_args_list[0]).find(
             'call(<function install_oracle_client') == 0)
+
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_install_sap_client(self, api_execute):
+
+        install_sap_client()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function install_sap_client') == 0)
