@@ -130,7 +130,18 @@ class ReleasesManagerCheck(TestCase):
             str(api_execute.call_args_list[8]).find('call(<function app_reload') == 0)
         self.assertTrue(
             str(api_execute.call_args_list[9]).find('call(<function cleanup') == 0)
-        #self.assertRaises(SystemExit, api_execute, "")
+
+        #api_execute.return_value = Mock(side_effect=Exception(SystemExit))
+        try:
+            api_execute.side_effect = Exception(SystemExit)
+            deploy_backend()
+        except:
+            pass
+        self.assertTrue(api_execute.called)
+        print str(api_execute.call_args_list)
+
+
+
 
 
     @patch('fabric.api.execute', return_value=Mock())
