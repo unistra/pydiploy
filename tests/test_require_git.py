@@ -50,6 +50,12 @@ class GitCheck(TestCase):
         self.assertEqual(api_local.call_args, call(
             'git archive --format=tar --remote=remote --prefix=prefix HEAD |gzip > /tmp/myfile.tar.gz'))
 
+        # if remote and prefix and specific folder
+        archive(self.filename, remote=self.remote, prefix=self.prefix, specific_folder='/myfolder')
+        self.assertTrue(api_local.called)
+        self.assertEqual(api_local.call_args, call(
+            'git archive --format=tar --remote=remote --prefix=prefix HEAD /myfolder |gzip > /tmp/myfile.tar.gz'))
+
         # if format not supported
         archive(self.filename, format="error")
         self.assertTrue(api_abort.called)

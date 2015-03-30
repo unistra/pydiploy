@@ -80,6 +80,7 @@ class CircusCheck(TestCase):
             python_install.call_args_list[1], call(
                 'https://github.com/githubaccount/circus/archive/master.zip', use_sudo=True)
         )
+
         # test no_circus_web
         del env['no_circus_web']
         del env['circus_package_name']
@@ -87,6 +88,13 @@ class CircusCheck(TestCase):
         self.assertEqual(
             python_install.call_args_list[-3:], [call('circus', use_sudo=True),
                                                  call('circus-web', use_sudo=True), call('gevent', use_sudo=True)])
+
+        # test circus_backend
+        env.circus_backend = "test_circus_backend"
+        circus_pkg()
+        self.assertEqual(
+            python_install.call_args_list[-4:], [call('circus', use_sudo=True),
+                                                 call('circus-web', use_sudo=True), call('gevent', use_sudo=True),call('test_circus_backend', use_sudo=True)])
 
     @patch('fabtools.files.upload_template', return_value=Mock())
     def test_app_circus_conf(self, upload_template):
