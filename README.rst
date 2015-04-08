@@ -29,6 +29,10 @@ Pydiploy
     :target: https://pypi.python.org/pypi/pydiploy
     :alt: Download
 
+.. image:: https://landscape.io/github/unistra/pydiploy/master/landscape.svg?style=flat
+  :target: https://landscape.io/github/unistra/pydiploy/master
+  :alt: Code Health
+
 `Pydiploy` is a library used to deal with administration and deployment of applications on several environments (i.e : dev, test, pre-production, production) The library is based on fabric and fabtools.
 The purpose of the project is to deliver bunch of tools as generic as possible to standardize deployments and administrations tasks.
 To use it : create a fabfile (fabfile.py or fabfile/__init__.py) and start playing with your new toy !
