@@ -174,7 +174,7 @@ def set_website_up():
         with fabric.api.cd(nginx_enabled):
             fabric.api.sudo('ln -s %s .' % app_conf)
 
-    fabric.api.execute(nginx_restart)
+    fabric.api.execute(nginx_reload)
 
 
 @do_verbose
@@ -200,7 +200,7 @@ def set_website_down():
         with fabric.api.cd(nginx_enabled):
             fabric.api.sudo('ln -s %s .' % app_down_conf)
 
-    fabric.api.execute(nginx_restart)
+    fabric.api.execute(nginx_reload)
 
 
 @do_verbose

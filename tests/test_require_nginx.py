@@ -224,13 +224,13 @@ class NginxCheck(TestCase):
         self.assertEqual(api_sudo.call_args, call(
             'ln -s /etc/nginx/sites-available/server_name.conf .'))
 
-    @patch('pydiploy.require.nginx.nginx_restart', return_value=Mock())
+    @patch('pydiploy.require.nginx.nginx_reload', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
     @patch('fabric.api.cd', return_value=Mock())
     @patch('fabtools.files.is_link', return_value=True)
     @patch('pydiploy.require.nginx.up_site_config', return_value=Mock())
     @patch('fabtools.files.is_file', return_value=True)
-    def test_set_website_up(self, is_file, up_site_config, is_link, api_cd, api_sudo, nginx_restart):
+    def test_set_website_up(self, is_file, up_site_config, is_link, api_cd, api_sudo, nginx_reload):
 
         api_cd.return_value.__exit__ = Mock()
         api_cd.return_value.__enter__ = Mock()
@@ -261,13 +261,13 @@ class NginxCheck(TestCase):
         self.assertEqual(api_sudo.call_args, call(
             'ln -s /etc/nginx/sites-available/server_name.conf .'))
 
-    @patch('pydiploy.require.nginx.nginx_restart', return_value=Mock())
+    @patch('pydiploy.require.nginx.nginx_reload', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
     @patch('fabric.api.cd', return_value=Mock())
     @patch('fabtools.files.is_link', return_value=True)
     @patch('pydiploy.require.nginx.down_site_config', return_value=Mock())
     @patch('fabtools.files.is_file', return_value=True)
-    def test_set_website_down(self, is_file, down_site_config, is_link, api_cd, api_sudo, nginx_restart):
+    def test_set_website_down(self, is_file, down_site_config, is_link, api_cd, api_sudo, nginx_reload):
 
         api_cd.return_value.__exit__ = Mock()
         api_cd.return_value.__enter__ = Mock()

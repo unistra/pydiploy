@@ -20,6 +20,7 @@ from pydiploy.require.databases.postgres import (add_postgres_database,
                                                  install_postgres_server,
                                                  postgres_pkg)
 from pydiploy.require.databases.sqlite import sqlite3_pkg
+from pydiploy.require.databases.sap import install_sap_client
 
 
 class LdapCheck(TestCase):
@@ -351,3 +352,66 @@ class MongoCheck(TestCase):
         self.assertTrue(deb_package.called)
         self.assertEqual(deb_package.call_args,
                          call('mongodb-10gen'))
+
+
+class SAPCheck(TestCase):
+
+    """
+    test database
+    """
+
+    def setUp(self):
+
+        self.previous_env = copy.deepcopy(env)
+        env.default_db_user = 'bill'
+        env.default_db_password = 'g@t3s'
+        env.default_db_name = 'kr0s0ft'
+        env.remote_home = '/home/django'
+        env.remote_owner = 'django'
+        env.remote_group = 'di'
+        env.sap_download_url = 'http://librepo.net/lib/sap/'
+        env.sap_packages = ['rfcsdk_64.tar.gz']
+        env.locale = 'fr_FR.UTF-8'
+
+    def tearDown(self):
+        env.clear()
+        env.update(self.previous_env)
+
+    @patch('fabric.api.abort', return_value=Mock())
+    @patch("fabtools.files.is_link", return_value=False)
+    @patch("fabric.api.sudo", return_value=Mock())
+    @patch("fabric.api.cd", return_value=Mock())
+    @patch("fabtools.require.files.directory", return_value=Mock())
+    @patch("fabtools.require.deb.packages", return_value=Mock())
+    def test_install_sap_client(self, deb_packages, files_directory,
+                                api_cd, api_sudo, files_is_link, api_abort):
+
+        api_cd.return_value.__exit__ = Mock()
+        api_cd.return_value.__enter__ = Mock()
+
+        install_sap_client()
+
+        self.assertTrue(deb_packages.called)
+        self.assertEqual(deb_packages.call_args,
+                         call(['libstdc++5']))
+
+        self.assertTrue(files_directory.called)
+        self.assertEqual(files_directory.call_args,
+                         call(path='/usr/sap', use_sudo=True, mode='755'))
+
+        self.assertTrue(api_cd.called)
+        self.assertEqual(api_cd.call_args_list,
+                         [call('/usr/sap'), call('/lib')])
+
+        self.assertTrue(api_sudo.called)
+        self.assertEqual(api_sudo.call_args_list, [
+            call('wget -c http://librepo.net/lib/sap/rfcsdk_64.tar.gz'),
+            call('tar xvf rfcsdk_64.tar.gz'),
+            call('chmod -R 755 rfcsdk'),
+            call('rm rfcsdk_64.tar.gz'),
+            call('ln -s /usr/sap/rfcsdk/lib/librfccm.so .')
+        ])
+
+        del env['sap_download_url']
+        install_sap_client()
+        self.assertTrue(api_abort.called)

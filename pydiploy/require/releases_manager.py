@@ -140,8 +140,10 @@ def deploy_code():
     fabric.api.execute(symlink)
     # set current directory with new release
     fabric.api.execute(set_current)
-
+    # remove git local git archive tarball
     fabric.api.lcd('rm %s' % tarball)
+    # remove local temp dir unarchived directory
+    fabric.api.lcd('rm -rf /tmp/%s-%s' % (env.application_name, env.tag.lower()))
 
 
 @do_verbose

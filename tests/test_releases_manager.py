@@ -127,8 +127,8 @@ class ReleasesManagerCheck(TestCase):
             "chown -R remote_owner:remote_group remote_releases_path/") > 0)
 
         self.assertTrue(api_lcd.called)
-        self.assertEqual(api_lcd.call_args, call('rm myarchive'))
-
+        self.assertTrue(str(api_lcd.call_args_list[1]).find('rm myarchive') > 0 )
+        self.assertTrue(str(api_lcd.call_args_list[2]).find('rm -rf /tmp/appliname-mytag') > 0 )
         self.assertTrue(api_local.called)
         self.assertEqual(api_local.call_args, call('tar xvf myarchive'))
 

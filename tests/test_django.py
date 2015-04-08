@@ -9,12 +9,11 @@ from mock import call, Mock, patch
 from pydiploy.django import (application_packages, custom_manage_command,
                              deploy_backend, deploy_frontend, dump_database,
                              install_oracle_client, install_postgres_server,
-                             post_install_backend, post_install_frontend,
-                             pre_install_backend, pre_install_frontend,
-                             reload_backend, reload_frontend, rollback,
-                             set_app_down, set_app_up, wrap_deploy)
-
-
+                             install_sap_client, post_install_backend,
+                             post_install_frontend, pre_install_backend,
+                             pre_install_frontend, reload_backend,
+                             reload_frontend, rollback, set_app_down,
+                             set_app_up, wrap_deploy)
 
 
 class ReleasesManagerCheck(TestCase):
@@ -131,7 +130,18 @@ class ReleasesManagerCheck(TestCase):
             str(api_execute.call_args_list[8]).find('call(<function app_reload') == 0)
         self.assertTrue(
             str(api_execute.call_args_list[9]).find('call(<function cleanup') == 0)
-        #self.assertRaises(SystemExit, api_execute, "")
+
+        #api_execute.return_value = Mock(side_effect=Exception(SystemExit))
+        try:
+            api_execute.side_effect = Exception(SystemExit)
+            deploy_backend()
+        except:
+            pass
+        self.assertTrue(api_execute.called)
+        print str(api_execute.call_args_list)
+
+
+
 
 
     @patch('fabric.api.execute', return_value=Mock())
@@ -237,3 +247,11 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(api_execute.called)
         self.assertTrue(str(api_execute.call_args_list[0]).find(
             'call(<function install_oracle_client') == 0)
+
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_install_sap_client(self, api_execute):
+
+        install_sap_client()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(str(api_execute.call_args_list[0]).find(
+            'call(<function install_sap_client') == 0)

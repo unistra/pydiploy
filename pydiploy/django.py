@@ -158,6 +158,12 @@ def install_postgres_server(user=None,dbname=None,password=None):
     fabric.api.execute(pydiploy.require.databases.postgres.add_postgres_user,user,password=password)
     fabric.api.execute(pydiploy.require.databases.postgres.add_postgres_database,dbname,owner=user,locale=env.locale)
 
+
 def install_oracle_client():
-    """ Installs oracle client """
+    """ Install oracle client. """
     fabric.api.execute(pydiploy.require.databases.oracle.install_oracle_client)
+
+
+def install_sap_client():
+    """ Install saprfc bindings to an SAP instance. """
+    fabric.api.execute(pydiploy.require.databases.sap.install_sap_client)
