@@ -82,6 +82,8 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 
 # env.socket_host='localhost' # use it in env method to force a socket host
 
+# env.run_tests_command = 'tox'
+
 # fill and uncomment not to pass parameters in term (eg: fab tag:master test --set default_db_host='localhost',default_db_name='my_app_db' )
 # env.default_db_host = 'localhost'
 # env.default_db_name = 'myapp_db'

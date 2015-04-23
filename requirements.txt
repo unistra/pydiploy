@@ -2,3 +2,4 @@ fabric
 fabtools
 jinja2
 six
+tox

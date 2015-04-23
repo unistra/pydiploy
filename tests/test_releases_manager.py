@@ -44,6 +44,7 @@ class ReleasesManagerCheck(TestCase):
         env.remote_shared_path = "remote_shared_path"
         env.root_package_name = "root_package_name"
         env.tag = "mytag"
+        env.run_tests_command = 'tox'
 
     def tearDown(self):
         env.clear()
@@ -106,7 +107,7 @@ class ReleasesManagerCheck(TestCase):
             "extra_opts='--rsync-path=\"sudo -u remote_owner rsync\"'") > 0)
         self.assertTrue(str(rsync_project.call_args).find("delete=True") > 0)
         self.assertTrue(str(rsync_project.call_args).find(
-            "exclude=['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'log', 'bin', 'manage.py', 'root_package_name/wsgi.py', '*.db', '.gitignore', 'root_package_name/settings/dev.py', 'root_package_name/settings/test.py', 'root_package_name/settings/prod.py'") > 0)
+            "exclude=['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'log', 'bin', 'manage.py', '.tox', 'root_package_name/wsgi.py', '*.db', '.gitignore', 'root_package_name/settings/dev.py', 'root_package_name/settings/test.py', 'root_package_name/settings/prod.py'") > 0)
 
         self.assertTrue(git_archive.called)
         self.assertEqual(git_archive.call_args, call(
@@ -127,10 +128,12 @@ class ReleasesManagerCheck(TestCase):
             "chown -R remote_owner:remote_group remote_releases_path/") > 0)
 
         self.assertTrue(api_lcd.called)
-        self.assertTrue(str(api_lcd.call_args_list[1]).find('rm myarchive') > 0 )
-        self.assertTrue(str(api_lcd.call_args_list[2]).find('rm -rf /tmp/appliname-mytag') > 0 )
+        self.assertTrue(str(api_lcd.call_args_list[1]).find('/tmp/appliname-mytag/') > 0)
+        self.assertTrue(str(api_lcd.call_args_list[2]).find('rm myarchive') > 0 )
+        self.assertTrue(str(api_lcd.call_args_list[3]).find('rm -rf /tmp/appliname-mytag') > 0 )
         self.assertTrue(api_local.called)
-        self.assertEqual(api_local.call_args, call('tar xvf myarchive'))
+        self.assertTrue(str(api_local.call_args_list[0]).find('tar xvf myarchive'))
+        self.assertTrue(str(api_local.call_args_list[1]).find(env.run_tests_command))
 
         self.assertTrue(api_require.called)
         self.assertEqual(

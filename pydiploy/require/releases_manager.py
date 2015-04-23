@@ -87,10 +87,13 @@ def deploy_code():
     with fabric.api.lcd('/tmp'):
         fabric.api.local('tar xvf %s' % os.path.basename(tarball))
 
+    if 'run_tests_command' in env and env.run_tests_command:
+        run_tests()
+
     # TODO: see if some excluded files / dir
     # are not in fact usefull in certain projects
     exclude_files = ['fabfile', 'MANIFEST.in', '*.ignore', 'docs',
-                     'log', 'bin', 'manage.py',
+                     'log', 'bin', 'manage.py', '.tox',
                      '%s/wsgi.py' % env.root_package_name, '*.db',
                      '.gitignore']
     exclude_files += ['%s/settings/%s.py' % (env.root_package_name, goal)
@@ -191,3 +194,13 @@ def symlink():
                             {'shared_path': env.remote_shared_path,
                              'current_release': env.remote_current_release,
                              'dir_name':  extra_symlink_dir})
+
+@do_verbose
+def run_tests():
+    # run local unit test
+    authorized_commands = ['tox']
+    if env.run_tests_command in authorized_commands:
+        with fabric.api.lcd('/tmp/%s-%s/' % (env.application_name, env.tag.lower())):
+            fabric.api.local(env.run_tests_command)
+    else:
+        fabric.api.abort(fabric.colors.red("wrong test command. Currently, only tox is supported"))

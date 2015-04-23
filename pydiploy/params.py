@@ -71,7 +71,8 @@ PARAMS = {
                             'socket_host': 'force a socket host',
                             'no_circus_web': 'provides a way to not install circus-web',
                             'circus_backend': 'name of the backend to use with circus',
-                            'chaussette_backend': 'name of the backend to use with chaussette'}
+                            'chaussette_backend': 'name of the backend to use with chaussette',
+                            'run_tests_command': 'name of the command to run tests'}
 
     }
 }
