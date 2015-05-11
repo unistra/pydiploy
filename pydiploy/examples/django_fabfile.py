@@ -199,7 +199,7 @@ def deploy():
 @task
 def deploy_backend(update_pkg=False):
     """Deploy code on server"""
-    execute(pydiploy_deploy_backend)
+    execute(pydiploy_deploy_backend, update_pkg)
 
 
 @roles('lb')
