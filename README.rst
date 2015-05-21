@@ -41,11 +41,12 @@ Pydiploy
 The purpose of the project is to deliver bunch of tools as generic as possible to standardize deployments and administrations tasks.
 To use it : create a fabfile (fabfile.py or fabfile/__init__.py) and start playing with your new toy !
 
+Currently, it only works with django applications based on the `django-drybones <https://github.com/unistra/django-drybones>`_ template.
 
 Install
 -------
 
-    - Requirements : python2.7, fabtools and fabric
+    - Requirements : python2.7, fabtools, fabric and a django application based on django-drybones
 
     - Installation : ::
 
