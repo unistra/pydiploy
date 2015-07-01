@@ -104,10 +104,10 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(
             str(rsync_project.call_args).find("'/tmp/appliname-mytag/'") > 0)
         self.assertTrue(str(rsync_project.call_args).find(
-            "extra_opts='--rsync-path=\"sudo -u remote_owner rsync\"'") > 0)
+            "extra_opts='--links --rsync-path=\"sudo -u remote_owner rsync\"'") > 0)
         self.assertTrue(str(rsync_project.call_args).find("delete=True") > 0)
         self.assertTrue(str(rsync_project.call_args).find(
-            "exclude=['fabfile', 'MANIFEST.in', '*.ignore', 'docs', 'log', 'bin', 'manage.py', '.tox', 'root_package_name/wsgi.py', '*.db', '.gitignore', 'root_package_name/settings/dev.py', 'root_package_name/settings/test.py', 'root_package_name/settings/prod.py'") > 0)
+            "exclude=['fabfile', 'MANIFEST.in', '*.ignore', 'docs', '*.log', 'bin', 'manage.py', '.tox', 'root_package_name/wsgi.py', '*.db', '.gitignore', '.gitattributes', 'root_package_name/settings/dev.py', 'root_package_name/settings/test.py', 'root_package_name/settings/prod.py'") > 0)
 
         self.assertTrue(git_archive.called)
         self.assertEqual(git_archive.call_args, call(

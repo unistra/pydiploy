@@ -93,9 +93,9 @@ def deploy_code():
     # TODO: see if some excluded files / dir
     # are not in fact usefull in certain projects
     exclude_files = ['fabfile', 'MANIFEST.in', '*.ignore', 'docs',
-                     'log', 'bin', 'manage.py', '.tox',
+                     '*.log', 'bin', 'manage.py', '.tox',
                      '%s/wsgi.py' % env.root_package_name, '*.db',
-                     '.gitignore']
+                     '.gitignore', '.gitattributes']
     exclude_files += ['%s/settings/%s.py' % (env.root_package_name, goal)
                       for goal in env.goals]
 
@@ -117,11 +117,11 @@ def deploy_code():
                                                env.remote_shared_path, 'config'),
                                                use_sudo=True)
 
-            exclude_files += cfg_shared_file
+            exclude_files += [cfg_shared_file]
 
     if env.has_key('extra_symlink_dirs'):
         for symlink_dir in env.extra_symlink_dirs:
-            exclude_files += symlink_dir
+            exclude_files += [symlink_dir]
 
     env.remote_current_release = "%(releases_path)s/%(time).0f" % {
         'releases_path': env.remote_releases_path, 'time': time()}
@@ -132,7 +132,7 @@ def deploy_code():
                                              env.tag.lower(
                                              )),
                                          delete=True,
-                                         extra_opts='--rsync-path="sudo -u %s rsync"' % env.remote_owner,
+                                         extra_opts='--links --rsync-path="sudo -u %s rsync"' % env.remote_owner,
                                          exclude=exclude_files)
 
     fabric.api.sudo(
@@ -176,6 +176,8 @@ def symlink():
     """
     Updates symlink stuff to the current deployed version
     """
+
+    # TODO : really usefull ? (eg : for php apps ...)
     fabric.api.sudo("ln -nfs %(shared_path)s/log %(current_release)s/log" %
                     {'shared_path': env.remote_shared_path,
                      'current_release': env.remote_current_release})

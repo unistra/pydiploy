@@ -126,7 +126,7 @@ def set_app_down():
 
 
 def set_app_up():
-    """ Sets app in maintenance mode """
+    """ Sets app up """
     fabric.api.execute(pydiploy.require.nginx.set_website_up)
 
 
