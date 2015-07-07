@@ -13,23 +13,23 @@ Pydiploy
     :target: http://coveralls.io/r/unistra/pydiploy?branch=master
     :alt: Coverage
 
-.. image:: https://pypip.in/version/pydiploy/badge.png
+.. image:: https://img.shields.io/pypi/v/pydiploy.svg
     :target: https://pypi.python.org/pypi/pydiploy
     :alt: Version
 
-.. image:: https://pypip.in/py_versions/pydiploy/badge.png
+.. image:: https://img.shields.io/pypi/pyversions/pydiploy.svg
     :target: https://pypi.python.org/pypi/pydiploy
     :alt: Python Version
 
-.. image:: https://pypip.in/status/pydiploy/badge.png
+.. image:: https://img.shields.io/pypi/status/pydiploy.svg
     :target: https://pypi.python.org/pypi/pydiploy
     :alt: Status
 
-.. image:: https://pypip.in/license/pydiploy/badge.png
+.. image:: https://img.shields.io/pypi/l/pydiploy.svg
     :target: https://docs.python.org/2/license.html
     :alt: Licence
 
-.. image:: https://pypip.in/download/pydiploy/badge.png
+.. image:: https://img.shields.io/pypi/dm/pydiploy.svg
     :target: https://pypi.python.org/pypi/pydiploy
     :alt: Download
 
