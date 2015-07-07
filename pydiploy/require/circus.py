@@ -37,15 +37,15 @@ def circus_pkg(update=False):
         'libevent-dev'], update=update)
     # not used anymore installed in venv !
     fabtools.require.python.install(env.get('circus_package_name', 'circus'),
-                                    use_sudo=True)
+                                    use_sudo=True, upgrade=update)
 
     if 'no_circus_web' not in env or not env.no_circus_web:
-        fabtools.require.python.install('circus-web', use_sudo=True)
-        fabtools.require.python.install('gevent', use_sudo=True)
+        fabtools.require.python.install('circus-web', use_sudo=True, upgrade=update)
+        fabtools.require.python.install('gevent', use_sudo=True, upgrade=update)
 
     # install circus backend sets in fabfile
     if 'circus_backend' in env:
-        fabtools.require.python.install(env.circus_backend, use_sudo=True)
+        fabtools.require.python.install(env.circus_backend, use_sudo=True, upgrade=update)
 
     # base configuration file for circus
     fabtools.files.upload_template(
