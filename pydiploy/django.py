@@ -45,14 +45,14 @@ def application_packages(update=False):
             pydiploy.require.system.install_extra_packages, env.extra_pkg_to_install)
 
 
-def pre_install_backend(commands='/usr/bin/rsync'):
+def pre_install_backend(commands='/usr/bin/rsync', upgrade_circus=False):
     """ Installs requirements for circus & virtualenv env """
     fabric.api.execute(pydiploy.require.system.add_user, commands=commands)
     fabric.api.execute(pydiploy.require.system.set_locale)
     fabric.api.execute(pydiploy.require.system.set_timezone)
     fabric.api.execute(pydiploy.require.system.update_pkg_index)
     fabric.api.execute(application_packages)
-    fabric.api.execute(pydiploy.require.circus.circus_pkg)
+    fabric.api.execute(pydiploy.require.circus.circus_pkg, update=upgrade_circus)
     fabric.api.execute(pydiploy.require.python.virtualenv.virtualenv)
     fabric.api.execute(pydiploy.require.circus.upstart)
 
