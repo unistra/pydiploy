@@ -6,12 +6,12 @@ from unittest import TestCase
 
 from fabric.api import env
 from mock import call, Mock, patch
-from pydiploy.require.nginx import (down_site_config, nginx_confirm_start,
+from pydiploy.require.nginx import (down_site_config, web_static_files,
                                     nginx_pkg, nginx_reload, nginx_restart,
                                     nginx_start, nginx_started, root_web,
                                     set_website_down, set_website_up,
                                     up_site_config, upload_maintenance_page,
-                                    web_configuration, web_static_files)
+                                    web_configuration)
 
 
 class NginxCheck(TestCase):
@@ -27,6 +27,7 @@ class NginxCheck(TestCase):
         env.server_name = "server_name"
         env.lib_path = "lib_path"
         env.application_name = "application_name"
+        env.host_string = 'hosttest'
 
     def tearDown(self):
         env.clear()
@@ -45,62 +46,87 @@ class NginxCheck(TestCase):
         self.assertTrue(deb_packages.called)
         self.assertEqual(deb_packages.call_args, call(['nginx'], update=False))
 
-    @patch('fabric.contrib.console.confirm', return_value=False)
+    @patch('fabtools.service.is_running', return_value=False)
     @patch('fabtools.service.start', return_value=Mock())
-    def test_nginx_start(self, service_start, console_confirm):
-
-        # env var sets + confirm start = no
-        env.nginx_start_confirmation = True
+    def test_nginx_start(self, service_start, is_running):
+        # is_running False + Force start to false
+        env.nginx_force_start = False
         nginx_start()
         self.assertFalse(service_start.called)
-        # env var + confirm start = yes
-        console_confirm.return_value = True
+        # is_running False + No force start option
+        del env['nginx_force_start']
+        nginx_start()
+        self.assertFalse(service_start.called)
+        # is_running False + Force start to True
+        env.nginx_force_start = True
         nginx_start()
         self.assertTrue(service_start.called)
-        # no env.nginx_start_confirmation
-        del env['nginx_start_confirmation']
+
+        is_running.return_value = True
+
+        # is_running True + Force start to false
+        env.nginx_force_start = False
+        nginx_start()
+        self.assertTrue(service_start.called)
+        # is_running True + No force start option
+        del env['nginx_force_start']
+        nginx_start()
+        self.assertTrue(service_start.called)
+        # is_running True + Force start to True
+        env.nginx_force_start = True
         nginx_start()
         self.assertTrue(service_start.called)
 
     @patch('fabtools.service.is_running', return_value=True)
-    @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabtools.service.start', return_value=Mock())
     @patch('fabtools.service.reload', return_value=Mock())
-    def test_nginx_reload(self, reload, start, confirm_start, is_running):
+    def test_nginx_reload(self, reload, start, is_running):
+        # Nginx run
         nginx_reload()
         self.assertTrue(reload.called)
         self.assertEqual(reload.call_args, call('nginx'))
         self.assertTrue(is_running.called)
         self.assertFalse(start.called)
-
+        # Nginx stopped
         is_running.return_value = False
         reload.called = False
         is_running.called = False
         start.called = False
-
         nginx_reload()
-
+        self.assertTrue(is_running.called)
+        self.assertFalse(reload.called)
+        self.assertFalse(start.called)
+        # Force reload
+        env.nginx_force_start = True
+        nginx_reload()
         self.assertTrue(is_running.called)
         self.assertFalse(reload.called)
         self.assertTrue(start.called)
         self.assertEqual(start.call_args, call('nginx'))
 
+
+
     @patch('fabtools.service.is_running', return_value=True)
     @patch('fabtools.service.start', return_value=Mock())
     @patch('fabtools.service.restart', return_value=Mock())
     def test_nginx_restart(self, restart, start, is_running):
+        # Nginx run
         nginx_restart()
         self.assertTrue(is_running.called)
         self.assertFalse(start.called)
         self.assertTrue(restart.called)
-
+        # Nginx stopped
         is_running.return_value = False
         restart.called = False
         is_running.called = False
         start.called = False
-
         nginx_restart()
-
+        self.assertFalse(restart.called)
+        self.assertTrue(is_running.called)
+        self.assertFalse(start.called)
+        # Force reload
+        env.nginx_force_start = True
+        nginx_restart()
         self.assertFalse(restart.called)
         self.assertTrue(is_running.called)
         self.assertTrue(start.called)

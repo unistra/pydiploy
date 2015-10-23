@@ -78,7 +78,7 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 # env.chaussette_backend = 'waitress' # name of chaussette backend to use. You need to add this backend in the app requirement file.
 
 # env.nginx_location_extra_directives = ['proxy_read_timeout 120'] # add directive(s) to nginx config file in location part
-# env.nginx_start_confirmation = True # if True when nginx is not started needs confirmation to start it.
+# env.nginx_force_start = True # if True, it forces to start nginx when nginx is not started
 
 # env.socket_host='localhost' # use it in env method to force a socket host
 

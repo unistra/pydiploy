@@ -67,7 +67,7 @@ PARAMS = {
                             'map_settings': 'settings to map in django settings files',
                             'maintenance_title': 'customize maintenance page title',
                             'maintenance_text': 'customize maintenance page text',
-                            'nginx_start_confirmation': 'if nginx not started needs confirmation to start',
+                            'nginx_force_start': 'if True, it forces to start nginx when nginx is not started',
                             'socket_host': 'force a socket host',
                             'no_circus_web': 'provides a way to not install circus-web',
                             'circus_backend': 'name of the backend to use with circus',
