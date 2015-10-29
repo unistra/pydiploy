@@ -75,11 +75,16 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 
 # env.circus_package_name = 'https://github.com/githubaccount/circus/archive/master.zip' # change the package to use to install circus
 # env.no_circus_web = True # true if you don't want circus-web
+# env.circus_backend = 'gevent' # name of circus backend to use
+
+# env.chaussette_backend = 'waitress' # name of chaussette backend to use. You need to add this backend in the app requirement file.
 
 # env.nginx_location_extra_directives = ['proxy_read_timeout 120'] # add directive(s) to nginx config file in location part
 # env.nginx_start_confirmation = True # if True when nginx is not started needs confirmation to start it.
 
 # env.socket_host='localhost' # use it in env method to force a socket host
+
+# env.run_tests_command = 'tox'
 
 # fill and uncomment not to pass parameters in term (eg: fab tag:master test --set default_db_host='localhost',default_db_name='my_app_db' )
 # env.default_db_host = 'localhost'
@@ -101,6 +106,7 @@ def test():
     env.short_server_name = 'myapp-dev'
     env.static_folder = '/site_media/'
     env.server_ip = '192.168.1.3'
+    #env.port = '1664'
     env.no_shared_sessions = False
     env.server_ssl_on = False
     env.goal = 'test'
@@ -125,6 +131,7 @@ def prod():
     env.short_server_name = 'myapp'
     env.static_folder = '/site_media/'
     env.server_ip = ''
+    #env.port = ''
     env.no_shared_sessions = False
     env.server_ssl_on = True
     env.path_to_cert = '/etc/ssl/certs/myapp.net.pem'
@@ -196,7 +203,7 @@ def deploy():
 @task
 def deploy_backend(update_pkg=False):
     """Deploy code on server"""
-    execute(pydiploy_deploy_backend)
+    execute(pydiploy_deploy_backend, update_pkg)
 
 
 @roles('lb')

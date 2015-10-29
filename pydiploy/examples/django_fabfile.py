@@ -104,6 +104,7 @@ def test():
     env.short_server_name = 'myapp-dev'
     env.static_folder = '/site_media/'
     env.server_ip = '192.168.1.3'
+    #env.port = '1664'
     env.no_shared_sessions = False
     env.server_ssl_on = False
     env.goal = 'test'
@@ -128,6 +129,7 @@ def prod():
     env.short_server_name = 'myapp'
     env.static_folder = '/site_media/'
     env.server_ip = ''
+    #env.port = ''
     env.no_shared_sessions = False
     env.server_ssl_on = True
     env.path_to_cert = '/etc/ssl/certs/myapp.net.pem'
