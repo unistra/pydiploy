@@ -5,8 +5,6 @@
 import os
 import random
 import re
-import string
-
 import fabric
 import fabtools
 from fabric.api import env
@@ -17,7 +15,7 @@ from pydiploy.decorators import do_verbose
 def generate_secret_key():
     """ Generates the django's secret key. """
 
-    letters = string.ascii_letters + string.punctuation.replace('\'', '')
+    letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*(-_=+)'
     random_letters = map(lambda i: random.SystemRandom().choice(letters),
                          range(50))
 
