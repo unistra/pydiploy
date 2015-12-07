@@ -49,6 +49,7 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 
 # optional parameters
 
+# env.remote_repo_specific_folder = '' # specify a subfolder for the remote repository
 # env.user = 'my_user'  # user for ssh
 # env.dest_path = '' # if not set using env_local_tmp_dir
 # env.excluded_files = ['pron.jpg'] # file(s) that rsync should exclude when deploying app

@@ -66,7 +66,7 @@ def archive(filename, path='/tmp', format="tar.gz", tag="HEAD", remote="",
     if prefix:
         options.append('--prefix=%s' % prefix)
     if specific_folder:
-        command = 'git archive %s %s ' + specific_folder
+        command = 'git archive %s %s:' + specific_folder
     else:
         command = 'git archive %s %s'
     if gzip:
