@@ -85,6 +85,9 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 
 # env.run_tests_command = 'tox'
 
+# env.media_folder = '/media' # path of the application's media files
+# env.remote_media_folder = '/srv/media/myapp' # remote folder of the application's media files
+
 # fill and uncomment not to pass parameters in term (eg: fab tag:master test --set default_db_host='localhost',default_db_name='my_app_db' )
 # env.default_db_host = 'localhost'
 # env.default_db_name = 'myapp_db'

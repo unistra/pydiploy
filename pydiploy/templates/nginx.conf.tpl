@@ -37,6 +37,14 @@ server {
 
     }
 
+{% if media_folder is defined and remote_media_folder is defined %}
+    location {{ media_folder }} {
+                alias {{ remote_media_folder }};
+                autoindex off;
+                allow all;
+
+    }
+{% endif %}
 
     location / {
         # Correspond au nom defini dans 'upstream'
