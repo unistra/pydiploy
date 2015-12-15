@@ -37,12 +37,15 @@ def tag(version):
             "tag/branch provided is not in the repository please fix this first"))
 
 
-def init_params():
+def init_params(application_type='default'):
     """ Sets required params and its description """
 
-    # TODO implement mechanism to deploy other technos with specific required
-    # and optional parameters !
-    return PARAMS['default']['required_params'], PARAMS['default']['optional_params']
+    try:
+        required_params, optional_params = PARAMS[application_type]['required_params'], PARAMS[application_type]['optional_params']
+    except KeyError:
+        fabric.api.abort(fabric.colors.red(
+            "application_type '%s' doesn't exists" % application_type))
+    return required_params, optional_params
 
 
 def build_env():
@@ -105,13 +108,18 @@ def build_env():
     else:
         verbose_value = True
 
-    if not test_config(verbose=verbose_value):
+    if 'application_type' in env:
+        application_type = env.application_type
+    else:
+        application_type = 'default'
+
+    if not test_config(verbose=verbose_value, application_type=application_type):
         if not fabric.contrib.console.confirm("Configuration test %s! Do you want to continue?" % fabric.colors.red('failed'), default=False):
             fabric.api.abort("Aborting at user request.")
 
 
 @fabric.api.task
-def test_config(verbose=True):
+def test_config(verbose=True, application_type='default'):
     """ Checks fabfile for required params and optional params """
 
     if "no_config_test" in env:
@@ -121,7 +129,7 @@ def test_config(verbose=True):
     err = []
     req_parameters = []
     opt_parameters = []
-    req_params, opt_params = init_params()
+    req_params, opt_params = init_params(application_type)
     max_req_param_length = max(map(len, req_params.keys()))
     max_req_desc_length = max(map(len, req_params.values()))
     max_opt_param_length = max(map(len, opt_params.keys()))

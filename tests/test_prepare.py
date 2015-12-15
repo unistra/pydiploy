@@ -204,6 +204,9 @@ class PrepareCheck(TestCase):
         env.req_pydiploy_version = version.__version__
         build_env()
 
+        # test with application type
+        env.application_type = 'default'
+        build_env()
 
     @patch('fabric.api.puts', return_value=Mock())
     def test_config(self, api_puts):

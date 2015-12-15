@@ -49,6 +49,8 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 
 # optional parameters
 
+# env.application_type = 'default' # specify another type of application
+
 # env.remote_repo_specific_folder = '' # specify a subfolder for the remote repository
 # env.user = 'my_user'  # user for ssh
 # env.dest_path = '' # if not set using env_local_tmp_dir

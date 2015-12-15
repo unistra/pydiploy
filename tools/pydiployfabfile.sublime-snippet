@@ -51,6 +51,9 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 
 # optional parameters
 
+# env.application_type = 'default' # specify another type of application
+
+# env.remote_repo_specific_folder = '' # specify a subfolder for the remote repository
 # env.user = 'my_user'  # user for ssh
 # env.dest_path = '' # if not set using env_local_tmp_dir
 # env.excluded_files = ['pron.jpg'] # file(s) that rsync should exclude when deploying app
@@ -75,11 +78,19 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 
 # env.circus_package_name = 'https://github.com/githubaccount/circus/archive/master.zip' # change the package to use to install circus
 # env.no_circus_web = True # true if you don't want circus-web
+# env.circus_backend = 'gevent' # name of circus backend to use
+
+# env.chaussette_backend = 'waitress' # name of chaussette backend to use. You need to add this backend in the app requirement file.
 
 # env.nginx_location_extra_directives = ['proxy_read_timeout 120'] # add directive(s) to nginx config file in location part
-# env.nginx_start_confirmation = True # if True when nginx is not started needs confirmation to start it.
+# env.nginx_force_start = True # if True, it forces to start nginx when nginx is not started
 
 # env.socket_host='localhost' # use it in env method to force a socket host
+
+# env.run_tests_command = 'tox'
+
+# env.media_folder = '/media' # path of the application's media files
+# env.remote_media_folder = '/srv/media/myapp' # remote folder of the application's media files
 
 # fill and uncomment not to pass parameters in term (eg: fab tag:master test --set default_db_host='localhost',default_db_name='my_app_db' )
 # env.default_db_host = 'localhost'
@@ -196,7 +207,7 @@ def deploy():
 @task
 def deploy_backend(update_pkg=False):
     """Deploy code on server"""
-    execute(pydiploy_deploy_backend)
+    execute(pydiploy_deploy_backend, update_pkg)
 
 
 @roles('lb')
@@ -288,7 +299,7 @@ def custom_manage_cmd(cmd):
     execute(pydiploy_custom_command,cmd)
 
 ]]></content>
-<description>Pydiploy fabfile 1.1.4.0</description>
+<description>Pydiploy fabfile 1.1.4.4</description>
 <tabTrigger>pydiployfab</tabTrigger>
 <scope>source.python</scope>
 </snippet>
