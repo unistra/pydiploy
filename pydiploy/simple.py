@@ -58,7 +58,7 @@ def deploy_backend(upgrade_pkg=False, **kwargs):
             pydiploy.require.python.utils.application_dependencies,
             upgrade_pkg)
         # TODO PUT THIS METHOD IN OTHER PACKAGE
-        fabric.api.execute(pydiploy.require.django.utils.app_settings,
+        fabric.api.execute(pydiploy.require.simple.utils.app_settings,
                            **kwargs)
         fabric.api.execute(pydiploy.require.simple.utils.deploy_environ_file)
         fabric.api.execute(pydiploy.require.system.permissions)
