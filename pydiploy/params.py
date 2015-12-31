@@ -134,8 +134,8 @@ PARAMS = {
                             # 'circus_backend': 'name of the backend to use with circus',
                             # 'chaussette_backend': 'name of the backend to use with chaussette',
                             'run_tests_command': 'name of the command to run tests',
-                            'remote_repo_specific_folder': 'specify a subfolder for the remote repository',
-                            'remote_media_folder': "remote folder of the application's media files"
+                            'remote_repo_specific_folder': 'specify a subfolder for the remote repository'
+                            # 'remote_media_folder': "remote folder of the application's media files"
                             # 'media_folder': "path of the application's media files"
                             }
 
