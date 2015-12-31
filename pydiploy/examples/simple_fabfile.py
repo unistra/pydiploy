@@ -68,8 +68,8 @@ def test():
     env.roledefs = {
         'web': ['192.168.1.4']
     }
-    env.server_name = 'myapp-folder'
     env.goal = "test"
+    # env.server_name = "myapp.net"  # optional: if you want to use an url for the name of the remote app folder instead of the application name (manual bottle or flask app)
     env.map_settings = {
         # uncomment to use :
         #'ldap_user': "DATABASES['ldap']['USER']",
@@ -81,10 +81,10 @@ def test():
 def prod():
     """Define prod stage"""
     env.roledefs = {
-        'web': ['myapp.net']
+        'web': ['myserver.net']
     }
-    env.server_name = 'myapp-folder'
     env.goal = "prod"
+    # env.server_name = "myapp.net"  # optional: if you want to use an url for the name of the remote app folder instead of the application name (manual bottle or flask app)
     env.map_settings = {
         # uncomment to use :
         #'ldap_user': "DATABASES['ldap']['USER']",

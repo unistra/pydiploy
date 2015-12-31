@@ -70,7 +70,7 @@ def set_timezone():
     Sets the timezone
     """
     if fabtools.system.distrib_id() not in('Ubuntu', 'Debian'):
-        print("Cannot deploy to non-debian/ubuntu host: %s" % env.server_name)
+        print("Cannot deploy to non-debian/ubuntu host")
         return
 
     return fabric.api.sudo("cp -f /usr/share/zoneinfo/%s /etc/localtime" % env.timezone)

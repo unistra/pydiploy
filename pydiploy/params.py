@@ -97,7 +97,7 @@ PARAMS = {
                             'keep_releases': "number of old releases to keep",
                             'roledefs': "Role to use to deploy",
                             # 'backends': "backend to use to deploy",
-                            'server_name': "name of webserver",
+                            # 'server_name': "name of webserver",
                             # 'short_server_name': "short name of webserver",
                             # 'static_folder': "path of static folder",
                             'goal': "stage to use to deploy (dev,prod,test...)"
@@ -134,9 +134,10 @@ PARAMS = {
                             # 'circus_backend': 'name of the backend to use with circus',
                             # 'chaussette_backend': 'name of the backend to use with chaussette',
                             'run_tests_command': 'name of the command to run tests',
-                            'remote_repo_specific_folder': 'specify a subfolder for the remote repository'
+                            'remote_repo_specific_folder': 'specify a subfolder for the remote repository',
                             # 'remote_media_folder': "remote folder of the application's media files"
                             # 'media_folder': "path of the application's media files"
+                            'server_name': "if you want to use an url for the name of the remote app folder instead of the application name (manual bottle or flask app)",
                             }
 
     }

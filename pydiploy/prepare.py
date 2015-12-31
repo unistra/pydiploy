@@ -69,7 +69,10 @@ def build_env():
     if "dest_path" not in env:
         env.dest_path = env.local_tmp_dir
 
-    env.remote_project_dir = os.path.join(env.remote_home, env.server_name)
+    if "server_name" in env:
+        env.remote_project_dir = os.path.join(env.remote_home, env.server_name)
+    else:
+        env.remote_project_dir = os.path.join(env.remote_home, env.application_name)
 
     if "tag" in env:
         env.local_tmp_root_app = os.path.join(env.local_tmp_dir,
