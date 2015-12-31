@@ -218,6 +218,14 @@ def generate_fabfile():
         return f.read()
 
 
+def generate_fabfile_simple():
+
+    fab_sample_simple = resource_filename("pydiploy", "examples/simple_fabfile.py")
+
+    with open(fab_sample_simple) as f:
+        return f.read()
+
+
 def process_releases():
     """ Populates env vars for releases (current, old...) """
     if fabtools.files.is_dir(env.remote_releases_path):

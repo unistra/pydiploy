@@ -10,7 +10,8 @@ from mock import call, Mock, patch
 from pydiploy import version
 from pydiploy.prepare import (_get_current_role, build_env,
                               check_req_pydiploy_version, generate_fabfile,
-                              init_params, process_releases, tag, test_config)
+                              init_params, process_releases, tag, test_config,
+                              generate_fabfile_simple)
 
 
 class PrepareCheck(TestCase):
@@ -225,6 +226,9 @@ class PrepareCheck(TestCase):
 
     def test_generate_fabfile(self):
         generate_fabfile()
+
+    def test_generate_fabfile_simple(self):
+        generate_fabfile_simple()
 
     @patch('fabtools.files.is_dir', return_value=True)
     @patch('fabric.api.run', return_value="4.0")
