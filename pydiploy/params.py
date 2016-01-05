@@ -120,7 +120,7 @@ PARAMS = {
                             'no_config_test': "don't check config params (True/False)",
                             'req_pydiploy_version': "pydiploy version required for checking fabfile syntax",
                             'extra_symlink_dirs': 'extra dirs to symlink to shared folder',
-                            # 'tag': 'tag to deploy',
+                            'tag': 'tag to deploy',
                             # 'no_shared_sessions': 'if True add ip_hash to nginx config',
                             # 'server_ssl_on': 'use ssl on nginx',
                             # 'path_to_cert': 'ssl certificate path',
