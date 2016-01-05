@@ -91,3 +91,19 @@ def deploy_environ_file():
                                    chown=True,
                                    mode='644',
                                    use_jinja=True)
+
+
+@do_verbose
+def deploy_wsgi_file():
+    """ Uploads wsgi.py template on remote """
+
+    fabtools.files.upload_template('wsgi.py',
+                                   os.path.join(
+                                       env.remote_base_package_dir, 'wsgi.py'),
+                                   template_dir=env.local_tmp_root_app_package,
+                                   context=env,
+                                   use_sudo=True,
+                                   user=env.remote_owner,
+                                   chown=True,
+                                   mode='644',
+                                   use_jinja=True)
