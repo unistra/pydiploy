@@ -229,6 +229,14 @@ def generate_fabfile_simple():
         return f.read()
 
 
+def generate_fabfile_bottle():
+
+    fab_sample_bottle = resource_filename("pydiploy", "examples/bottle_fabfile.py")
+
+    with open(fab_sample_bottle) as f:
+        return f.read()
+
+
 def process_releases():
     """ Populates env vars for releases (current, old...) """
     if fabtools.files.is_dir(env.remote_releases_path):
