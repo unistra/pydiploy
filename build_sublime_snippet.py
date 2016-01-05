@@ -77,9 +77,30 @@ def simple_app():
     install_snippet(dest_filename, "simple")
 
 
+def bottle_app():
+    # bottle snippets
+    src_filename = 'pydiploy/examples/bottle_fabfile.py'
+    dest_filename = 'tools/pydiployfabfilebottle.sublime-snippet'
+
+    source = open(src_filename, 'r')
+    target = open(dest_filename, 'w')
+
+    snippet_header = '<snippet>\n<content><![CDATA[\n'
+    snippet_footer = '\n]]></content>\n<description>Pydiploy fabfile bottle %s</description>\n<tabTrigger>pydiployfabbottle</tabTrigger>\n<scope>source.python</scope>\n</snippet>' % __version__
+
+    target.write(snippet_header)
+    target.write(source.read())
+    target.write(snippet_footer)
+    source.close()
+    target.close()
+
+    install_snippet(dest_filename, "bottle")
+
+
 def main():
     django_app()
     simple_app()
+    bottle_app()
 
 
 
