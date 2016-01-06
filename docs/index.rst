@@ -56,11 +56,9 @@ Dev tools
 Sublime text 2/3
 ----------------
 
-You can use the snippet in the tools folder which can help you to generate a standard fabfile for the library.
-Trigger is "pydiployfab"
-
-.. literalinclude:: /../tools/pydiployfabfile.sublime-snippet
-   :language: python
+You can use snippets in the tools folder which can help you to generate a standard fabfile for the library.
+Trigger is "pydiployfab" for django application, "pydiployfabsimple" for simple python application and "pydiployfabbottle"
+for bottle application
 
 .. seealso::
 
@@ -70,10 +68,8 @@ Trigger is "pydiployfab"
 Vim plugin
 ----------
 
-.. literalinclude:: /../tools/pydiploy-vim/plugin/pydiployfabfile.vim
-   :language: bash
-
-Install this plugin in your ~/.vim/plugin or ~/.vim/bundle directory when editing a file in vim first save the file (type :file fabfile.py for example) and then use the command :PYDIPLOYFAB to generate a standard fabfile.
+Install plugins in your ~/.vim/plugin or ~/.vim/bundle directory when editing a file in vim first save the file
+(type :file fabfile.py for example) and then use commands :PYDIPLOYFAB, :PYDIPLOYFABSIMPLE or :PYDIPLOYFABBOTTLE to generate a standard fabfile.
 
 Indices and tables
 ==================
@@ -81,4 +77,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
