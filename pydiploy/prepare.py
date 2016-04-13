@@ -65,6 +65,10 @@ def build_env():
                         fabric.colors.red(__version__)), default=False):
                 fabric.api.abort("Aborting at user request.")
 
+    # remote home cannot be empty or / path
+    if not 'remote_home' in env or not env.remote_home or env.remote_home == "/":
+        fabric.api.abort("The remote home cannot be empty or /.")
+
     # defines destination path for fetched file(s)
     if "dest_path" not in env:
         env.dest_path = env.local_tmp_dir
