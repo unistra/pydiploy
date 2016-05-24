@@ -31,7 +31,7 @@ def application_dependencies(upgrade_pkg, staging=True):
                                              '%s.txt' % env.goal) if staging else 'requirements.txt'
             # ugly fix for error when pip install fail and error raises while /home/user/.pip not writable
             pip_log = "%s/pip_error.log " % env.remote_home
-            pip_cmd = 'pip --log-file %s' % pip_log
+            pip_cmd = 'pip --no-cache-dir --log-file %s' % pip_log
             if 'oracle_client_version' in env:
                 oracle_dir = 'instantclient_%s' % '_'.join(
                     env.oracle_client_version.split('.')[:2])

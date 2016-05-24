@@ -10,6 +10,7 @@ from fabric.api import env
 from mock import call, Mock, patch
 from pydiploy.require.django.command import (django_custom_cmd,
                                              django_dump_database,
+                                             django_get_version,
                                              django_prepare)
 from pydiploy.require.django.utils import (app_settings, deploy_manage_file,
                                            deploy_wsgi_file, extract_settings,
@@ -79,8 +80,9 @@ class CommandCheck(TestCase):
 
         self.assertTrue(api_sudo.called)
         self.assertEqual(
-            api_sudo.call_args_list, [call(
-                'python manage.py syncdb --noinput'),
+            api_sudo.call_args_list, [
+                call('python -c "import django;print(django.get_version())"'),
+                call('python manage.py syncdb --noinput'),
                 call('python manage.py migrate'),
                 call('python manage.py compilemessages'),
                 call('python manage.py collectstatic --noinput -i rest_framework -i django_extensions')])
@@ -137,6 +139,40 @@ class CommandCheck(TestCase):
         api_settings.return_value.__exit__ = Mock()
         api_settings.return_value.__enter__ = Mock()
         django_custom_cmd('test')
+
+
+    @patch('fabtools.python.virtualenv', return_value=Mock())
+    @patch('fabric.api.cd', return_value=Mock())
+    @patch('fabric.api.settings', return_value=Mock())
+    @patch('fabric.api.sudo', return_value=Mock())
+    def test_django_get_version(self, api_sudo, api_settings, api_cd, python_virtualenv):
+
+        python_virtualenv.return_value.__exit__ = Mock()
+        python_virtualenv.return_value.__enter__ = Mock()
+
+        api_cd.return_value.__exit__ = Mock()
+        api_cd.return_value.__enter__ = Mock()
+
+        api_settings.return_value.__exit__ = Mock()
+        api_settings.return_value.__enter__ = Mock()
+
+        django_get_version()
+
+        self.assertTrue(python_virtualenv.called)
+        self.assertEqual(
+            python_virtualenv.call_args, call('remote_virtualenv_dir'))
+
+        self.assertTrue(api_cd.called)
+        self.assertEqual(api_cd.call_args, call('remote_current_path'))
+
+        self.assertTrue(api_settings.called)
+        self.assertEqual(api_settings.call_args, call(sudo_user='remote_owner'))
+
+        self.assertTrue(api_sudo.called)
+        self.assertEqual(
+            api_sudo.call_args_list, [
+                call('python -c "import django;print(django.get_version())"')])
+
 
 
 class UtilsCheck(TestCase):
@@ -261,3 +297,4 @@ class UtilsCheck(TestCase):
         #     str(upload_template.call_args).find("use_jinja=True") > 0)
         # self.assertTrue(
         #     str(upload_template.call_args).find("user='owner'") > 0)
+        

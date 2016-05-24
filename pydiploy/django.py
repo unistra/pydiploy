@@ -30,9 +30,11 @@ def wrap_deploy():
 def application_packages(update=False):
     """ Installs all packages for django webapp """
     fabtools.require.deb.packages(['gettext'], update=update)
-    # TODO contextual installation of ldap packages & postgres packages !!!
+    # TODO contextual installation of ldap packages & postgres packages
+    # requirements !!!
     fabric.api.execute(pydiploy.require.databases.ldap.ldap_pkg, use_sudo=True)
     fabric.api.execute(pydiploy.require.databases.postgres.postgres_pkg)
+
     if env.remote_python_version >= 3:
         fabric.api.execute(pydiploy.require.system.check_python3_install,
                            version='python%s' % env.remote_python_version)

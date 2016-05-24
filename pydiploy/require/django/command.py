@@ -23,11 +23,15 @@ def django_prepare():
     # remove old statics from local tmp dir before collecting new ones
     with fabric.api.lcd(env.local_tmp_dir):
         fabric.api.local('rm -rf assets/*')
-
+    # TODO refactoring using django_get_version && django_custom_cmd
     with fabtools.python.virtualenv(env.remote_virtualenv_dir):
         with fabric.api.cd(env.remote_current_path):
             with fabric.api.settings(sudo_user=env.remote_owner):
-                fabric.api.sudo('python manage.py syncdb --noinput')
+                django_version = fabric.api.sudo(
+                    'python -c "import django;print(django.get_version())"')
+                # check if django >= 1.8 no more syncdb migrate only !
+                if django_version < "1.8":
+                    fabric.api.sudo('python manage.py syncdb --noinput')
                 # TODO add point in documentation
                 # south needed with django < 1.7 !!!!!
                 with fabric.api.settings(warn_only=True):
@@ -69,3 +73,16 @@ def django_custom_cmd(commands):
         with fabric.api.cd(env.remote_current_path):
             with fabric.api.settings(sudo_user=env.remote_owner):
                 fabric.api.sudo('python manage.py %s' % commands)
+
+
+@do_verbose
+def django_get_version():
+    """ Gets django version on remote """
+    with fabtools.python.virtualenv(env.remote_virtualenv_dir):
+        with fabric.api.cd(env.remote_current_path):
+            with fabric.api.settings(sudo_user=env.remote_owner):
+                django_version = fabric.api.sudo(
+                    'python -c "import django;print(django.get_version())"')
+
+
+
