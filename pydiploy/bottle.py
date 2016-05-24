@@ -1,12 +1,4 @@
 # -*- coding: utf-8 -*-
-
-""" This module is used to deploy a whole django webapp using chaussette/circus nginx on a remote/vagrant machine.
-
-This module shoud be imported in a fabfile to deploy an application using pydiploy.
-
-"""
-
-
 from contextlib import contextmanager
 
 import fabric
@@ -28,33 +20,34 @@ def wrap_deploy():
 
 @do_verbose
 def application_packages(update=False):
-    """ Installs all packages for django webapp """
+    """ Installs all packages for the app """
     fabtools.require.deb.packages(['gettext'], update=update)
-    # TODO contextual installation of ldap packages & postgres packages
-    # requirements !!!
+    # TODO contextual installation of ldap packages & postgres packages !!!
     fabric.api.execute(pydiploy.require.databases.ldap.ldap_pkg, use_sudo=True)
     fabric.api.execute(pydiploy.require.databases.postgres.postgres_pkg)
-
     if env.remote_python_version >= 3:
         fabric.api.execute(pydiploy.require.system.check_python3_install,
                            version='python%s' % env.remote_python_version)
     fabric.api.execute(pydiploy.require.python.utils.python_pkg)
-    if env.has_key('extra_ppa_to_install'):
+    if 'extra_ppa_to_install' in env:
         fabric.api.execute(
-            pydiploy.require.system.install_extra_ppa, env.extra_ppa_to_install)
-    if env.has_key('extra_pkg_to_install'):
+            pydiploy.require.system.install_extra_ppa,
+            env.extra_ppa_to_install)
+    if 'extra_pkg_to_install' in env:
         fabric.api.execute(
-            pydiploy.require.system.install_extra_packages, env.extra_pkg_to_install)
+            pydiploy.require.system.install_extra_packages,
+            env.extra_pkg_to_install)
 
 
 def pre_install_backend(commands='/usr/bin/rsync', upgrade_circus=False):
-    """ Installs requirements for circus & virtualenv env """
+    """ Installs requirements for virtualenv env """
     fabric.api.execute(pydiploy.require.system.add_user, commands=commands)
     fabric.api.execute(pydiploy.require.system.set_locale)
     fabric.api.execute(pydiploy.require.system.set_timezone)
     fabric.api.execute(pydiploy.require.system.update_pkg_index)
     fabric.api.execute(application_packages)
-    fabric.api.execute(pydiploy.require.circus.circus_pkg, update=upgrade_circus)
+    fabric.api.execute(pydiploy.require.circus.circus_pkg,
+                       update=upgrade_circus)
     fabric.api.execute(pydiploy.require.python.virtualenv.virtualenv)
     fabric.api.execute(pydiploy.require.circus.upstart)
 
@@ -67,18 +60,19 @@ def pre_install_frontend():
 
 
 def deploy_backend(upgrade_pkg=False, **kwargs):
-    """ Deploys django webapp with required tag """
+    """Deploy code on server"""
     with wrap_deploy():
         fabric.api.execute(pydiploy.require.releases_manager.setup)
         fabric.api.execute(pydiploy.require.releases_manager.deploy_code)
-        fabric.api.execute(pydiploy.require.django.utils.deploy_manage_file)
         fabric.api.execute(pydiploy.require.django.utils.deploy_wsgi_file)
         fabric.api.execute(
             pydiploy.require.python.utils.application_dependencies,
             upgrade_pkg)
-        fabric.api.execute(pydiploy.require.django.utils.app_settings,
-            **kwargs)
-        fabric.api.execute(pydiploy.require.django.command.django_prepare)
+        # TODO PUT THIS METHOD IN OTHER PACKAGE
+        fabric.api.execute(pydiploy.require.bottle.utils.app_settings,
+                           **kwargs)
+        fabric.api.execute(pydiploy.require.bottle.utils.deploy_environ_file)
+        fabric.api.execute(pydiploy.require.bottle.command.bottle_prepare)
         fabric.api.execute(pydiploy.require.system.permissions)
         fabric.api.execute(pydiploy.require.circus.app_reload)
         fabric.api.execute(pydiploy.require.releases_manager.cleanup)
@@ -90,7 +84,7 @@ def deploy_frontend():
 
 
 def rollback():
-    """ Rolls back django webapp """
+    """ Rollback code (current-1 release). """
     fabric.api.execute(pydiploy.require.releases_manager.rollback_code)
     fabric.api.execute(pydiploy.require.circus.app_reload)
 
@@ -104,11 +98,6 @@ def post_install_backend():
 def post_install_frontend():
     fabric.api.execute(pydiploy.require.nginx.web_configuration)
     fabric.api.execute(pydiploy.require.nginx.nginx_restart)
-
-
-def dump_database():
-    """ Dumps database in json """
-    fabric.api.execute(pydiploy.require.django.command.django_dump_database)
 
 
 def reload_frontend():
@@ -130,11 +119,6 @@ def set_app_down():
 def set_app_up():
     """ Sets app up """
     fabric.api.execute(pydiploy.require.nginx.set_website_up)
-
-
-def custom_manage_command(cmd):
-    """ Passes custom commandes to manage.py """
-    fabric.api.execute(pydiploy.require.django.command.django_custom_cmd, cmd)
 
 
 def install_postgres_server(user=None,dbname=None,password=None):

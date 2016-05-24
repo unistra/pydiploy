@@ -36,7 +36,7 @@ env.application_name = 'myapp'   # name of webapp
 env.root_package_name = 'myapp'  # name of app in webapp
 
 env.remote_home = '/home/django'  # remote home root
-env.remote_python_version = 3.3  # python version
+env.remote_python_version = 3.4  # python version
 env.remote_virtualenv_root = join(env.remote_home, '.virtualenvs')  # venv root
 env.remote_virtualenv_dir = join(env.remote_virtualenv_root,
                                  env.application_name)  # venv for webapp dir
@@ -49,6 +49,9 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 
 # optional parameters
 
+# env.application_type = 'default' # specify another type of application
+
+# env.remote_repo_specific_folder = '' # specify a subfolder for the remote repository
 # env.user = 'my_user'  # user for ssh
 # env.dest_path = '' # if not set using env_local_tmp_dir
 # env.excluded_files = ['pron.jpg'] # file(s) that rsync should exclude when deploying app
@@ -83,6 +86,9 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 # env.socket_host='localhost' # use it in env method to force a socket host
 
 # env.run_tests_command = 'tox'
+
+# env.media_folder = '/media' # path of the application's media files
+# env.remote_media_folder = '/srv/media/myapp' # remote folder of the application's media files
 
 # fill and uncomment not to pass parameters in term (eg: fab tag:master test --set default_db_host='localhost',default_db_name='my_app_db' )
 # env.default_db_host = 'localhost'

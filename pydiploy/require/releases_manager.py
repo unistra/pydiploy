@@ -82,6 +82,7 @@ def deploy_code():
     tarball = pydiploy.require.git.archive(env.application_name,
                                            prefix='%s-%s/' % (env.application_name,
                                                               env.tag.lower()),
+                                           specific_folder=env.remote_repo_specific_folder if "remote_repo_specific_folder" in env else "",
                                            tag=env.tag,
                                            remote=env.remote_repo_url)
     with fabric.api.lcd('/tmp'):

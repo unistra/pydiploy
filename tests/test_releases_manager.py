@@ -45,6 +45,7 @@ class ReleasesManagerCheck(TestCase):
         env.root_package_name = "root_package_name"
         env.tag = "mytag"
         env.run_tests_command = 'tox'
+        env.remote_repo_specific_folder = "mysubfolder"
 
     def tearDown(self):
         env.clear()
@@ -111,7 +112,7 @@ class ReleasesManagerCheck(TestCase):
 
         self.assertTrue(git_archive.called)
         self.assertEqual(git_archive.call_args, call(
-            'appliname', prefix='appliname-mytag/', tag='mytag', remote='remote_repo_url'))
+            'appliname', prefix='appliname-mytag/', tag='mytag', remote='remote_repo_url', specific_folder='mysubfolder'))
         self.assertTrue(upload_template.called)
         self.assertTrue(str(upload_template.call_args_list[0]).find(
             "'/tmp/appliname-mytag/README'") > 0)

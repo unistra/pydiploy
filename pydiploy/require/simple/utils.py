@@ -1,25 +1,10 @@
 # -*- coding: utf-8 -*-
-
-""" Utilities for django (settings...) """
-
 import os
-import random
 import re
 import fabric
 import fabtools
 from fabric.api import env
 from pydiploy.decorators import do_verbose
-
-
-@do_verbose
-def generate_secret_key():
-    """ Generates the django's secret key. """
-
-    letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*(-_=+)'
-    random_letters = map(lambda i: random.SystemRandom().choice(letters),
-                         range(50))
-
-    env.secret_key = ''.join(random_letters)
 
 
 @do_verbose
@@ -92,28 +77,13 @@ def app_settings(**kwargs):
 
 
 @do_verbose
-def deploy_manage_file():
-    """ uploads manage.py template on remote """
+def deploy_environ_file():
+    """ Uploads environ.py template on remote """
 
-    fabtools.files.upload_template('manage.py',
+    fabtools.files.upload_template('environ.py',
                                    os.path.join(
-                                       env.remote_current_release, 'manage.py'),
-                                   template_dir=env.local_tmp_root_app,
-                                   context=env,
-                                   use_sudo=True,
-                                   user=env.remote_owner,
-                                   chown=True,
-                                   mode='744',
-                                   use_jinja=True)
-
-
-@do_verbose
-def deploy_wsgi_file():
-    """ Uploads wsgi.py template on remote """
-
-    fabtools.files.upload_template('wsgi.py',
-                                   os.path.join(
-                                       env.remote_base_package_dir, 'wsgi.py'),
+                                       env.remote_base_package_dir,
+                                       'environ.py'),
                                    template_dir=env.local_tmp_root_app_package,
                                    context=env,
                                    use_sudo=True,

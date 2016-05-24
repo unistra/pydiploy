@@ -41,12 +41,16 @@ Pydiploy
 The purpose of the project is to deliver bunch of tools as generic as possible to standardize deployments and administrations tasks.
 To use it : create a fabfile (fabfile.py or fabfile/__init__.py) and start playing with your new toy !
 
-Currently, it only works with django applications based on the `django-drybones <https://github.com/unistra/django-drybones>`_ template.
+Currently, it only works with :
+
+* django applications based on the `django-drybones <https://github.com/unistra/django-drybones>`_ template (default).
+* simple python applications based on the `simple-python-drybones <https://github.com/unistra/simple-python-drybones>`_ template.
+* bottle applications based on the `bottle-drybones <https://github.com/unistra/bottle-drybones>`_ template.
 
 Install
 -------
 
-    - Requirements : python2.7, fabtools, fabric and a django application based on django-drybones
+    - Requirements : python2.7, fabtools, fabric and a application based on django-drybones, simple-python-drybones or bottle-drybones
 
     - Installation : ::
 
@@ -100,7 +104,7 @@ Databases
 
     - django+sqlite3 : if you use sqlite3 with django, don't put your .db file in the same folder as your application. It will be erased for each deployement !
 
-    - Specific oracle installation optional settings : ::
+    - Specific oracle installation optional settings for django and bottle applications : ::
 
         env.oracle_client_version = '11.2'
         env.oracle_download_url = 'http://librepo.net/lib/oracle/'
@@ -115,7 +119,7 @@ Databases
 Maintenance mode
 ~~~~~~~~~~~~~~~~
 
-    - For a django webapp deployement you can set the webserver to be in maintenance mode before deploying. For that purpose you could import in your fabfile pydiploy.django.set_app_up and pydiploy.django.set_app_down in a task :
+    - For a django (or bottle) webapp deployement you can set the webserver to be in maintenance mode before deploying. For that purpose you could import in your fabfile pydiploy.django.set_app_up and pydiploy.django.set_app_down in a task :
 
       .. code-block:: python
 

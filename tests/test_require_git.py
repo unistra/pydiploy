@@ -54,7 +54,7 @@ class GitCheck(TestCase):
         archive(self.filename, remote=self.remote, prefix=self.prefix, specific_folder='/myfolder')
         self.assertTrue(api_local.called)
         self.assertEqual(api_local.call_args, call(
-            'git archive --format=tar --remote=remote --prefix=prefix HEAD /myfolder |gzip > /tmp/myfile.tar.gz'))
+            'git archive --format=tar --remote=remote --prefix=prefix HEAD:/myfolder |gzip > /tmp/myfile.tar.gz'))
 
         # if format not supported
         archive(self.filename, format="error")
@@ -96,7 +96,3 @@ class GitCheck(TestCase):
         check_tag_exist(tag="master")
 
         check_tag_exist(tag="test")
-
-
-
-

@@ -37,12 +37,15 @@ def tag(version):
             "tag/branch provided is not in the repository please fix this first"))
 
 
-def init_params():
+def init_params(application_type='default'):
     """ Sets required params and its description """
 
-    # TODO implement mechanism to deploy other technos with specific required
-    # and optional parameters !
-    return PARAMS['default']['required_params'], PARAMS['default']['optional_params']
+    try:
+        required_params, optional_params = PARAMS[application_type]['required_params'], PARAMS[application_type]['optional_params']
+    except KeyError:
+        fabric.api.abort(fabric.colors.red(
+            "application_type '%s' doesn't exists" % application_type))
+    return required_params, optional_params
 
 
 def build_env():
@@ -62,11 +65,18 @@ def build_env():
                         fabric.colors.red(__version__)), default=False):
                 fabric.api.abort("Aborting at user request.")
 
+    # remote home cannot be empty or / path
+    if not 'remote_home' in env or not env.remote_home or env.remote_home == "/":
+        fabric.api.abort("The remote home cannot be empty or /.")
+
     # defines destination path for fetched file(s)
     if "dest_path" not in env:
         env.dest_path = env.local_tmp_dir
 
-    env.remote_project_dir = os.path.join(env.remote_home, env.server_name)
+    if "server_name" in env:
+        env.remote_project_dir = os.path.join(env.remote_home, env.server_name)
+    else:
+        env.remote_project_dir = os.path.join(env.remote_home, env.application_name)
 
     if "tag" in env:
         env.local_tmp_root_app = os.path.join(env.local_tmp_dir,
@@ -105,13 +115,18 @@ def build_env():
     else:
         verbose_value = True
 
-    if not test_config(verbose=verbose_value):
+    if 'application_type' in env:
+        application_type = env.application_type
+    else:
+        application_type = 'default'
+
+    if not test_config(verbose=verbose_value, application_type=application_type):
         if not fabric.contrib.console.confirm("Configuration test %s! Do you want to continue?" % fabric.colors.red('failed'), default=False):
             fabric.api.abort("Aborting at user request.")
 
 
 @fabric.api.task
-def test_config(verbose=True):
+def test_config(verbose=True, application_type='default'):
     """ Checks fabfile for required params and optional params """
 
     if "no_config_test" in env:
@@ -121,7 +136,7 @@ def test_config(verbose=True):
     err = []
     req_parameters = []
     opt_parameters = []
-    req_params, opt_params = init_params()
+    req_params, opt_params = init_params(application_type)
     max_req_param_length = max(map(len, req_params.keys()))
     max_req_desc_length = max(map(len, req_params.values()))
     max_opt_param_length = max(map(len, opt_params.keys()))
@@ -207,6 +222,22 @@ def generate_fabfile():
     fab_sample = resource_filename("pydiploy", "examples/django_fabfile.py")
 
     with open(fab_sample) as f:
+        return f.read()
+
+
+def generate_fabfile_simple():
+
+    fab_sample_simple = resource_filename("pydiploy", "examples/simple_fabfile.py")
+
+    with open(fab_sample_simple) as f:
+        return f.read()
+
+
+def generate_fabfile_bottle():
+
+    fab_sample_bottle = resource_filename("pydiploy", "examples/bottle_fabfile.py")
+
+    with open(fab_sample_bottle) as f:
         return f.read()
 
 
