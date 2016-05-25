@@ -42,9 +42,10 @@ class UtilsCheck(TestCase):
 
     @patch('fabtools.python.virtualenv', return_value=Mock())
     @patch('fabric.api.cd', return_value=Mock())
+    @patch('fabtools.require.python.install', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
     @patch('fabtools.python.install_requirements', return_value=Mock())
-    def test_application_dependencies(self, install_requirements, api_sudo, api_cd, python_virtualenv):
+    def test_application_dependencies(self, install_requirements, api_sudo, python_install, api_cd, python_virtualenv):
 
         python_virtualenv.return_value.__exit__ = Mock()
         python_virtualenv.return_value.__enter__ = Mock()
