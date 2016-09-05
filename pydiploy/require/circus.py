@@ -17,7 +17,7 @@ import os
 
 import fabric
 import fabtools
-from fabric.api import env
+from fabric.api import env, warn_only
 from pydiploy.decorators import do_verbose
 
 
@@ -95,26 +95,62 @@ def upstart():
     """
 
     # TODO: implement as systemd service !!!
-    # init files to declare circus as an upstart daemon
-    fabtools.files.upload_template('upstart.conf.tpl',
-                                   '/etc/init/circus.conf',
-                                   context=env,
-                                   template_dir=os.path.join(
-                                       env.lib_path, 'templates'),
-                                   use_sudo=True,
-                                   user='root',
-                                   chown=True,
-                                   mode='644',
-                                   use_jinja=True)
+
+    # Systemd
+    if is_systemd():
+        # init files to declare circus as a systemd daemon
+        fabtools.files.upload_template('circus.service.tpl',
+                                       '/etc/systemd/system/circus.service',
+                                       context=env,
+                                       template_dir=os.path.join(
+                                           env.lib_path, 'templates'),
+                                       use_sudo=True,
+                                       user='root',
+                                       chown=True,
+                                       mode='644',
+                                       use_jinja=True)
+        fabric.api.sudo('systemctl daemon-reload')
+    # Upstart
+    else:
+
+        # init files to declare circus as an upstart daemon
+        fabtools.files.upload_template('upstart.conf.tpl',
+                                       '/etc/init/circus.conf',
+                                       context=env,
+                                       template_dir=os.path.join(
+                                           env.lib_path, 'templates'),
+                                       use_sudo=True,
+                                       user='root',
+                                       chown=True,
+                                       mode='644',
+                                       use_jinja=True)
 
 
 @do_verbose
 def app_reload():
     """ Starts/restarts app using circus """
 
-    if not 'running' in fabric.api.sudo('status circus'):
-        fabric.api.sudo('start circus')
+    # Systemd
+    if is_systemd():
+        start_cmd = 'systemctl start circus.service'
+        status_cmd = 'systemctl is-active circus.service'
+        with warn_only():
+            running = 'inactive' not in fabric.api.sudo(status_cmd)
+    # Upstart
+    else:
+        start_cmd = 'start circus'
+        status_cmd = 'status circus'
+        running = 'running' in fabric.api.sudo(status_cmd)
+
+    if not running:
+        fabric.api.sudo(start_cmd)
     else:
         with fabric.api.settings(sudo_user=env.remote_owner):
             fabric.api.sudo('circusctl reloadconfig')
             fabric.api.sudo('circusctl restart %s' % env.application_name)
+
+
+@do_verbose
+def is_systemd():
+    """ return True if systemd is used """
+    return fabtools.files.is_dir("/run/systemd/system")
