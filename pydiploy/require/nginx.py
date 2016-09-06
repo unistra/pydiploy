@@ -9,6 +9,7 @@ import fabtools
 import pydiploy
 from fabric.api import env
 from pydiploy.decorators import do_verbose
+from .system import is_systemd
 
 
 @do_verbose
@@ -33,7 +34,10 @@ def nginx_start():
     if not nginx_started() and ('nginx_force_start' not in env or not env.nginx_force_start):
         fabric.api.puts("Nginx is not started")
     else:
-        fabtools.service.start('nginx')
+        if is_systemd():
+            fabtools.systemd.start('nginx')
+        else:
+            fabtools.service.start('nginx')
 
 
 
@@ -47,7 +51,10 @@ def nginx_reload():
         else:
             fabric.api.puts("Nginx is not started")
     else:
-        fabtools.service.reload('nginx')
+        if is_systemd():
+            fabtools.systemd.reload('nginx')
+        else:
+            fabtools.service.reload('nginx')
 
 
 @do_verbose
@@ -60,14 +67,20 @@ def nginx_restart():
         else:
             fabric.api.puts("Nginx is not started")
     else:
-        fabtools.service.restart('nginx')
+        if is_systemd():
+            fabtools.systemd.restart('nginx')
+        else:
+            fabtools.service.restart('nginx')
 
 
 @do_verbose
 def nginx_started():
     """ Returns true/false depending on nginx service is started """
-
-    return fabtools.service.is_running('nginx')
+    if is_systemd():
+        # return fabtools.systemd.is_running('nginx')
+        return 'inactive' not in fabric.api.sudo('systemctl is-active nginx.service')
+    else:
+        return fabtools.service.is_running('nginx')
 
 
 @do_verbose

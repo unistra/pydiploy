@@ -139,3 +139,9 @@ def install_extra_ppa(extra_ppa):
     """
     for ppa in extra_ppa:
         fabtools.require.deb.ppa(ppa)
+
+
+@do_verbose
+def is_systemd():
+    """ return True if systemd is used """
+    return fabtools.files.is_dir("/run/systemd/system")
