@@ -46,9 +46,10 @@ class NginxCheck(TestCase):
         self.assertTrue(deb_packages.called)
         self.assertEqual(deb_packages.call_args, call(['nginx'], update=False))
 
+    @patch('fabtools.files.is_dir', return_value=False)
     @patch('fabtools.service.is_running', return_value=False)
     @patch('fabtools.service.start', return_value=Mock())
-    def test_nginx_start(self, service_start, is_running):
+    def test_nginx_start(self, service_start, is_running, is_systemd):
         # is_running False + Force start to false
         env.nginx_force_start = False
         nginx_start()
@@ -77,10 +78,11 @@ class NginxCheck(TestCase):
         nginx_start()
         self.assertTrue(service_start.called)
 
+    @patch('fabtools.files.is_dir', return_value=False)
     @patch('fabtools.service.is_running', return_value=True)
     @patch('fabtools.service.start', return_value=Mock())
     @patch('fabtools.service.reload', return_value=Mock())
-    def test_nginx_reload(self, reload, start, is_running):
+    def test_nginx_reload(self, reload, start, is_running, is_systemd):
         # Nginx run
         nginx_reload()
         self.assertTrue(reload.called)
@@ -105,11 +107,11 @@ class NginxCheck(TestCase):
         self.assertEqual(start.call_args, call('nginx'))
 
 
-
+    @patch('fabtools.files.is_dir', return_value=False)
     @patch('fabtools.service.is_running', return_value=True)
     @patch('fabtools.service.start', return_value=Mock())
     @patch('fabtools.service.restart', return_value=Mock())
-    def test_nginx_restart(self, restart, start, is_running):
+    def test_nginx_restart(self, restart, start, is_running, is_systemd):
         # Nginx run
         nginx_restart()
         self.assertTrue(is_running.called)
@@ -132,8 +134,9 @@ class NginxCheck(TestCase):
         self.assertTrue(start.called)
         self.assertEqual(start.call_args, call('nginx'))
 
+    @patch('fabtools.files.is_dir', return_value=False)
     @patch('fabtools.service.is_running', return_value=True)
-    def test_nginx_started(self, is_running):
+    def test_nginx_started(self, is_running, is_systemd):
         res = nginx_started()
         self.assertTrue(is_running.called)
         self.assertEqual(res, True)

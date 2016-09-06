@@ -19,6 +19,7 @@ import fabric
 import fabtools
 from fabric.api import env, warn_only
 from pydiploy.decorators import do_verbose
+from .system import is_systemd
 
 
 @do_verbose
@@ -144,9 +145,3 @@ def app_reload():
         with fabric.api.settings(sudo_user=env.remote_owner):
             fabric.api.sudo('circusctl reloadconfig')
             fabric.api.sudo('circusctl restart %s' % env.application_name)
-
-
-@do_verbose
-def is_systemd():
-    """ return True if systemd is used """
-    return fabtools.files.is_dir("/run/systemd/system")
