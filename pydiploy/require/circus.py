@@ -93,9 +93,6 @@ def upstart():
     """
     Sets script to start circus at boot using templates in templates dir
     """
-
-    # TODO: implement as systemd service !!!
-
     # Systemd
     if is_systemd():
         # init files to declare circus as a systemd daemon
@@ -112,7 +109,6 @@ def upstart():
         fabric.api.sudo('systemctl daemon-reload')
     # Upstart
     else:
-
         # init files to declare circus as an upstart daemon
         fabtools.files.upload_template('upstart.conf.tpl',
                                        '/etc/init/circus.conf',

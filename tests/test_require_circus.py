@@ -113,8 +113,9 @@ class CircusCheck(TestCase):
         self.assertTrue(
             str(upload_template.call_args).find("user='remote_owner'") > 0)
 
+    @patch('fabtools.files.is_dir', return_value=False)
     @patch('fabtools.files.upload_template', return_value=Mock())
-    def test_upstart(self, upload_template):
+    def test_upstart(self, upload_template, is_systemd):
         upstart()
 
         self.assertTrue(upload_template.called)
@@ -126,9 +127,10 @@ class CircusCheck(TestCase):
                         .find("template_dir='lib_path/templates'") > 0)
         self.assertTrue(str(upload_template.call_args).find("user='root'") > 0)
 
+    @patch('fabtools.files.is_dir', return_value=False)
     @patch('fabric.api.settings', return_value=Mock())
     @patch('fabric.api.sudo', return_value='running')
-    def test_app_reload(self, api_sudo, api_settings):
+    def test_app_reload(self, api_sudo, api_settings, is_systemd):
 
         api_settings.return_value.__exit__ = Mock()
         api_settings.return_value.__enter__ = Mock()
