@@ -78,6 +78,38 @@ class NginxCheck(TestCase):
         nginx_start()
         self.assertTrue(service_start.called)
 
+    @patch('fabtools.files.is_dir', return_value=True)
+    @patch('fabric.api.sudo', return_value="inactive")
+    @patch('fabtools.systemd.start', return_value=Mock())
+    def test_nginx_start_systemd(self, service_start, is_active, is_systemd):
+        # is_running False + Force start to false
+        env.nginx_force_start = False
+        nginx_start()
+        self.assertFalse(service_start.called)
+        # is_running False + No force start option
+        del env['nginx_force_start']
+        nginx_start()
+        self.assertFalse(service_start.called)
+        # is_running False + Force start to True
+        env.nginx_force_start = True
+        nginx_start()
+        self.assertTrue(service_start.called)
+
+        is_active.return_value = "active"
+
+        # is_running True + Force start to false
+        env.nginx_force_start = False
+        nginx_start()
+        self.assertTrue(service_start.called)
+        # is_running True + No force start option
+        del env['nginx_force_start']
+        nginx_start()
+        self.assertTrue(service_start.called)
+        # is_running True + Force start to True
+        env.nginx_force_start = True
+        nginx_start()
+        self.assertTrue(service_start.called)
+
     @patch('fabtools.files.is_dir', return_value=False)
     @patch('fabtools.service.is_running', return_value=True)
     @patch('fabtools.service.start', return_value=Mock())
@@ -106,6 +138,33 @@ class NginxCheck(TestCase):
         self.assertTrue(start.called)
         self.assertEqual(start.call_args, call('nginx'))
 
+    @patch('fabtools.files.is_dir', return_value=True)
+    @patch('fabric.api.sudo', return_value="active")
+    @patch('fabtools.systemd.start', return_value=Mock())
+    @patch('fabtools.systemd.reload', return_value=Mock())
+    def test_nginx_reload_systemd(self, reload, start, is_active, is_systemd):
+        # Nginx run
+        nginx_reload()
+        self.assertTrue(reload.called)
+        self.assertEqual(reload.call_args, call('nginx'))
+        self.assertTrue(is_active.called)
+        self.assertFalse(start.called)
+        # Nginx stopped
+        is_active.return_value = "inactive"
+        reload.called = False
+        is_active.called = False
+        start.called = False
+        nginx_reload()
+        self.assertTrue(is_active.called)
+        self.assertFalse(reload.called)
+        self.assertFalse(start.called)
+        # Force reload
+        env.nginx_force_start = True
+        nginx_reload()
+        self.assertTrue(is_active.called)
+        self.assertFalse(reload.called)
+        self.assertTrue(start.called)
+        self.assertEqual(start.call_args, call('nginx'))
 
     @patch('fabtools.files.is_dir', return_value=False)
     @patch('fabtools.service.is_running', return_value=True)
@@ -134,6 +193,33 @@ class NginxCheck(TestCase):
         self.assertTrue(start.called)
         self.assertEqual(start.call_args, call('nginx'))
 
+    @patch('fabtools.files.is_dir', return_value=True)
+    @patch('fabric.api.sudo', return_value="active")
+    @patch('fabtools.systemd.start', return_value=Mock())
+    @patch('fabtools.systemd.restart', return_value=Mock())
+    def test_nginx_restart_systemd(self, restart, start, is_active, is_systemd):
+        # Nginx run
+        nginx_restart()
+        self.assertTrue(is_active.called)
+        self.assertFalse(start.called)
+        self.assertTrue(restart.called)
+        # Nginx stopped
+        is_active.return_value = "inactive"
+        restart.called = False
+        is_active.called = False
+        start.called = False
+        nginx_restart()
+        self.assertFalse(restart.called)
+        self.assertTrue(is_active.called)
+        self.assertFalse(start.called)
+        # Force reload
+        env.nginx_force_start = True
+        nginx_restart()
+        self.assertFalse(restart.called)
+        self.assertTrue(is_active.called)
+        self.assertTrue(start.called)
+        self.assertEqual(start.call_args, call('nginx'))
+
     @patch('fabtools.files.is_dir', return_value=False)
     @patch('fabtools.service.is_running', return_value=True)
     def test_nginx_started(self, is_running, is_systemd):
@@ -143,6 +229,17 @@ class NginxCheck(TestCase):
         is_running.return_value = False
         res = nginx_started()
         self.assertTrue(is_running.called)
+        self.assertEqual(res, False)
+
+    @patch('fabtools.files.is_dir', return_value=True)
+    @patch('fabric.api.sudo', return_value="active")
+    def test_nginx_started_systemd(self, is_active, is_systemd):
+        res = nginx_started()
+        self.assertTrue(is_active.called)
+        self.assertEqual(res, True)
+        is_active.return_value = "inactive"
+        res = nginx_started()
+        self.assertTrue(is_active.called)
         self.assertEqual(res, False)
 
     @patch('fabric.contrib.project.rsync_project', return_value=Mock())
