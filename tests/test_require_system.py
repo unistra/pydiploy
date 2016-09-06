@@ -8,9 +8,9 @@ from fabric.api import env
 from mock import call, Mock, patch
 from pydiploy.require.system import (check_python3_install, add_group,
                                      add_user, install_extra_packages,
-                                     install_extra_ppa, package_installed,
-                                     permissions, set_locale, set_timezone,
-                                     update_pkg_index)
+                                     install_extra_ppa, install_extra_source,
+                                     package_installed, permissions, set_locale,
+                                     set_timezone, update_pkg_index)
 
 
 class SystemCheck(TestCase):
@@ -147,13 +147,21 @@ class SystemCheck(TestCase):
         self.assertTrue(deb_ppa.called)
         self.assertEqual(deb_ppa.call_args, call('ppa:myppa/ppa'))
 
+    @patch('fabtools.require.deb.source', return_value=Mock())
+    def test_install_extra_source(self, deb_source):
+
+        install_extra_source([['mongodb', 'http://downloads-distro.mongodb.org/repo/ubuntu-upstart', 'dist', '10gen'],])
+        self.assertTrue(deb_source.called)
+        self.assertEqual(deb_source.call_args, call('mongodb', 'http://downloads-distro.mongodb.org/repo/ubuntu-upstart', 'dist', '10gen'))
+
     @patch('fabtools.require.deb.package', return_value=Mock())
+    @patch('fabtools.require.deb.source', return_value=Mock())
     @patch('fabtools.require.deb.ppa', return_value=Mock())
     @patch('fabtools.require.deb.packages', return_value=Mock())
     @patch('fabtools.system.distrib_release', return_value='13')
     @patch('fabtools.system.distrib_id', return_value='Ubuntu')
     @patch('pydiploy.require.system.package_installed', return_value=False)
-    def test_check_python3_install(self, pkg_installed, sys_distrib, sys_distrib_id, deb_pkgs, deb_ppa, deb_pkg):
+    def test_check_python3_install(self, pkg_installed, sys_distrib, sys_distrib_id, deb_pkgs, deb_ppa, deb_source, deb_pkg):
 
         check_python3_install()
         self.assertTrue(deb_pkgs.called)

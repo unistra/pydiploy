@@ -45,6 +45,7 @@ PARAMS = {
 
         'optional_params': {'excluded_files': "file(s) to exclude when deploying",
                             'extra_ppa_to_install': "extra ppa(s) to install on remote",
+                            'extra_source_to_install': "extra debian source(s) to install on remote",
                             'extra_pkg_to_install': "extra package(s) to install on remote",
                             'cfg_shared_files': "shared file(s) to deploy in shared dir",
                             'extra_goals': "extra goal(s) to add to deploy",
@@ -106,6 +107,7 @@ PARAMS = {
 
         'optional_params': {'excluded_files': "file(s) to exclude when deploying",
                             'extra_ppa_to_install': "extra ppa(s) to install on remote",
+                            'extra_source_to_install': "extra debian source(s) to install on remote",
                             'extra_pkg_to_install': "extra package(s) to install on remote",
                             'cfg_shared_files': "shared file(s) to deploy in shared dir",
                             'extra_goals': "extra goal(s) to add to deploy",
@@ -169,6 +171,7 @@ PARAMS = {
 
         'optional_params': {'excluded_files': "file(s) to exclude when deploying",
                             'extra_ppa_to_install': "extra ppa(s) to install on remote",
+                            'extra_source_to_install': "extra debian source(s) to install on remote",
                             'extra_pkg_to_install': "extra package(s) to install on remote",
                             'cfg_shared_files': "shared file(s) to deploy in shared dir",
                             'extra_goals': "extra goal(s) to add to deploy",

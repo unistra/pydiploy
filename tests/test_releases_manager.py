@@ -26,6 +26,7 @@ class ReleasesManagerCheck(TestCase):
         env.excluded_files = ["fabhappening.jpg"]
         env.extra_pkg_to_install = ["norton-utilities"]
         env.extra_ppa_to_install = ["ppa:/encyclopedia/dramatica"]
+        env.extra_source_to_install = [['deb-src http://site.example.com/debian', 'distribution', 'component1', 'component2', 'component3'],]
         env.goals = ['dev', 'test', 'prod']
         env.keep_releases = 3
         env.local_tmp_dir = "/tmp"

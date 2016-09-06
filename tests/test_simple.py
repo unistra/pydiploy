@@ -63,6 +63,13 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(
             str(api_execute.call_args_list[17]).find('call(<function install_extra_packages') == 0)
 
+        # test extra debian source
+        env.extra_source_to_install = {("cool debian source"),}
+        application_packages()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(
+            str(api_execute.call_args_list[23]).find('call(<function install_extra_source') == 0)            
+
     @patch('fabric.api.execute', return_value=Mock())
     def test_pre_install_backend(self, api_execute):
         pre_install_backend()

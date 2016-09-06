@@ -125,7 +125,7 @@ def check_python3_install(version='python3', update=False):
 @do_verbose
 def install_extra_packages(pkg, update=False):
     """
-    Install extra packages on remote server
+    Installs extra packages on remote server
     """
 
     fabtools.require.deb.packages(pkg, update=update)
@@ -135,7 +135,7 @@ def install_extra_packages(pkg, update=False):
 def install_extra_ppa(extra_ppa):
     """
 
-    Install extra ppa source on remote server
+    Installs extra ppa source on remote server
     """
     for ppa in extra_ppa:
         fabtools.require.deb.ppa(ppa)
@@ -143,5 +143,15 @@ def install_extra_ppa(extra_ppa):
 
 @do_verbose
 def is_systemd():
-    """ return True if systemd is used """
+    """ Returns True if systemd is used """
     return fabtools.files.is_dir("/run/systemd/system")
+
+
+@do_verbose
+def install_extra_source(extra_source):
+    """
+
+    Installs extra debian source on remote server
+    """
+    for source in extra_source:
+        fabtools.require.deb.source(*source)
