@@ -33,6 +33,10 @@ def application_packages(update=False):
         fabric.api.execute(
             pydiploy.require.system.install_extra_ppa,
             env.extra_ppa_to_install)
+    if 'extra_source_to_install' in env:
+        fabric.api.execute(
+            pydiploy.require.system.install_extra_source,
+            env.extra_source_to_install)
     if 'extra_pkg_to_install' in env:
         fabric.api.execute(
             pydiploy.require.system.install_extra_packages,

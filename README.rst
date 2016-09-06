@@ -227,6 +227,10 @@ Optional parameters
 
         extra_ppa_to_install = ['ppa:vincent-c/ponysay']
 
+    - extra_source_to_install adds extra(s) debian sourc(e)s when setting server : ::
+
+        extra_source_to_install = [['mongodb', 'http://downloads-distro.mongodb.org/repo/ubuntu-upstart', 'dist', '10gen'], ['deb-src', 'http://site.example.com/debian', 'distribution', 'component1', 'component2', 'component3']]   
+
     - extra_pkg_to_install adds extra(s) package(s) when setting server : ::
 
         env.extra_pkg_to_install = ['ponysay','cowsay']
