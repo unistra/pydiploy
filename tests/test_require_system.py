@@ -96,6 +96,24 @@ class SystemCheck(TestCase):
         self.assertEqual(api_sudo.call_args, call(
             'cp -f /usr/share/zoneinfo/mytimezone /etc/localtime'))
 
+    @patch('fabtools.files.is_link', return_value=True)
+    @patch('fabtools.system.distrib_id', return_value='Notsupported')
+    @patch('fabric.api.sudo', return_value=Mock())
+    def test_set_timezone_link(self, api_sudo, distrib_id, is_link):
+        set_timezone()
+        # test error
+        self.assertTrue(distrib_id.called)
+        self.assertFalse(api_sudo.called)
+
+        # test if it works
+        distrib_id.return_value = 'Ubuntu'
+        set_timezone()
+        self.assertTrue(distrib_id.called)
+        self.assertTrue(api_sudo.called)
+
+        self.assertEqual(api_sudo.call_args, call(
+            'ln -sf /usr/share/zoneinfo/mytimezone /etc/localtime'))
+
     @patch('fabric.api.sudo', return_value=Mock())
     def test_permissions(self, api_sudo):
         permissions()

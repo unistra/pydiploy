@@ -127,6 +127,22 @@ class CircusCheck(TestCase):
                         .find("template_dir='lib_path/templates'") > 0)
         self.assertTrue(str(upload_template.call_args).find("user='root'") > 0)
 
+    @patch('fabric.api.sudo', return_value=Mock())
+    @patch('fabtools.files.is_dir', return_value=True)
+    @patch('fabtools.files.upload_template', return_value=Mock())
+    def test_upstart_systemd(self, upload_template, is_systemd, mock_reload_daemon):
+        upstart()
+
+        self.assertTrue(upload_template.called)
+        self.assertTrue(
+            str(upload_template.call_args).find("'circus.service.tpl'") > 0)
+        self.assertTrue(
+            str(upload_template.call_args).find("'/etc/systemd/system/circus.service'") > 0)
+        self.assertTrue(str(upload_template.call_args)
+                        .find("template_dir='lib_path/templates'") > 0)
+        self.assertTrue(str(upload_template.call_args).find("user='root'") > 0)
+        self.assertTrue(mock_reload_daemon.called)
+
     @patch('fabtools.files.is_dir', return_value=False)
     @patch('fabric.api.settings', return_value=Mock())
     @patch('fabric.api.sudo', return_value='running')
@@ -155,4 +171,34 @@ class CircusCheck(TestCase):
 
         self.assertTrue(api_sudo.called)
         self.assertEqual(api_sudo.call_args, call('start circus'))
+        self.assertFalse(api_settings.called)
+
+    @patch('fabtools.files.is_dir', return_value=True)
+    @patch('fabric.api.settings', return_value=Mock())
+    @patch('fabric.api.sudo', return_value='active')
+    def test_app_reload_systemd(self, api_sudo, api_settings, is_systemd):
+
+        api_settings.return_value.__exit__ = Mock()
+        api_settings.return_value.__enter__ = Mock()
+
+        # test if running
+        app_reload()
+
+        self.assertTrue(api_sudo.called)
+        self.assertEqual(api_sudo.call_args_list, [call('systemctl is-active circus.service'), call(
+            'circusctl reloadconfig'), call('circusctl restart application_name')])
+
+        self.assertTrue(api_settings.called)
+        self.assertEqual(
+            api_settings.call_args, call(sudo_user='remote_owner'))
+
+        # test if not running
+        api_sudo.return_value = 'inactive'
+        api_sudo.called = False
+        api_settings.called = False
+
+        app_reload()
+
+        self.assertTrue(api_sudo.called)
+        self.assertEqual(api_sudo.call_args, call('systemctl start circus.service'))
         self.assertFalse(api_settings.called)
