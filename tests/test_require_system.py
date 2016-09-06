@@ -78,9 +78,10 @@ class SystemCheck(TestCase):
         self.assertEqual(api_sudo.call_args_list, [
                          call('locale-gen FR_fr'), call('/usr/sbin/update-locale LANG=FR_fr')])
 
+    @patch('fabtools.files.is_link', return_value=False)
     @patch('fabtools.system.distrib_id', return_value='Notsupported')
     @patch('fabric.api.sudo', return_value=Mock())
-    def test_set_timezone(self, api_sudo, distrib_id):
+    def test_set_timezone(self, api_sudo, distrib_id, is_link):
         set_timezone()
         # test error
         self.assertTrue(distrib_id.called)
