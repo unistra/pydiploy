@@ -79,13 +79,18 @@ def deploy_code():
     fabric.api.require('tag', provided_by=['tag', 'head'])
     fabric.api.require('remote_project_dir', provided_by=env.goals)
 
+    archive_prefix = '%s-%s' % (env.application_name, env.tag.lower())
+
     tarball = pydiploy.require.git.archive(env.application_name,
-                                           prefix='%s-%s/' % (env.application_name,
-                                                              env.tag.lower()),
+                                           prefix='%s/' % archive_prefix,
                                            specific_folder=env.remote_repo_specific_folder if "remote_repo_specific_folder" in env else "",
                                            tag=env.tag,
                                            remote=env.remote_repo_url)
-    with fabric.api.lcd('/tmp'):
+
+    with fabric.api.lcd(env.local_tmp_dir):
+        # remove existing extracted dir from tarball
+        if os.path.exists('%s/%s' % (env.local_tmp_dir,archive_prefix)):
+            fabric.api.local('rm -rf %s' % archive_prefix)
         fabric.api.local('tar xvf %s' % os.path.basename(tarball))
 
     if 'run_tests_command' in env and env.run_tests_command:
@@ -109,9 +114,9 @@ def deploy_code():
                     env.remote_shared_path, os.path.basename(cfg_shared_file)),
                 use_sudo=True)
             if cfg_present is None:
-                fabtools.files.upload_template('/tmp/%s-%s/%s' % (
-                                               env.application_name,
-                                               env.tag.lower(),
+                fabtools.files.upload_template('%s/%s/%s' % (
+                                               env.local_tmp_dir,
+                                               archive_prefix,
                                                cfg_shared_file
                                                ),
                                                os.path.join(
@@ -128,10 +133,9 @@ def deploy_code():
         'releases_path': env.remote_releases_path, 'time': time()}
 
     fabric.contrib.project.rsync_project(env.remote_current_release,
-                                         '/tmp/%s-%s/' % (
-                                             env.application_name,
-                                             env.tag.lower(
-                                             )),
+                                         '%s/%s/' % (
+                                             env.local_tmp_dir,
+                                             archive_prefix),
                                          delete=True,
                                          extra_opts='--links --rsync-path="sudo -u %s rsync"' % env.remote_owner,
                                          exclude=exclude_files)
@@ -144,10 +148,10 @@ def deploy_code():
     fabric.api.execute(symlink)
     # set current directory with new release
     fabric.api.execute(set_current)
+
     # remove git local git archive tarball
-    fabric.api.lcd('rm %s' % tarball)
-    # remove local temp dir unarchived directory
-    fabric.api.lcd('rm -rf /tmp/%s-%s' % (env.application_name, env.tag.lower()))
+    with fabric.api.lcd(env.local_tmp_dir):
+        fabric.api.local('rm %s' % os.path.basename(tarball))
 
 
 @do_verbose
@@ -200,10 +204,10 @@ def symlink():
 
 @do_verbose
 def run_tests():
-    # run local unit test
+    # Runs local unit test
     authorized_commands = ['tox']
     if env.run_tests_command in authorized_commands:
-        with fabric.api.lcd('/tmp/%s-%s/' % (env.application_name, env.tag.lower())):
+        with fabric.api.lcd('%s/%s-%s/' % (env.local_tmp_dir, env.application_name, env.tag.lower())):
             fabric.api.local(env.run_tests_command)
     else:
         fabric.api.abort(fabric.colors.red("wrong test command. Currently, only tox is supported"))

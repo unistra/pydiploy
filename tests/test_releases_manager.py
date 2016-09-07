@@ -7,8 +7,8 @@ from unittest import TestCase
 from fabric.api import env
 from mock import call, Mock, patch
 from pydiploy.require.releases_manager import (cleanup, deploy_code,
-                                               rollback_code, set_current,
-                                               setup, symlink)
+                                               rollback_code, run_tests,
+                                               set_current, setup, symlink)
 
 
 class ReleasesManagerCheck(TestCase):
@@ -41,12 +41,12 @@ class ReleasesManagerCheck(TestCase):
         env.remote_owner = "remote_owner"
         env.remote_project_dir = "remote_project_dir"
         env.remote_releases_path = "remote_releases_path"
+        env.remote_repo_specific_folder = "mysubfolder"
         env.remote_repo_url = "remote_repo_url"
         env.remote_shared_path = "remote_shared_path"
         env.root_package_name = "root_package_name"
-        env.tag = "mytag"
         env.run_tests_command = 'tox'
-        env.remote_repo_specific_folder = "mysubfolder"
+        env.tag = "mytag"
 
     def tearDown(self):
         env.clear()
@@ -96,7 +96,8 @@ class ReleasesManagerCheck(TestCase):
     @patch('pydiploy.require.git.archive', return_value="myarchive")
     @patch('fabric.contrib.project.rsync_project', return_value=Mock())
     @patch('fabtools.files.is_file', return_value=None)
-    def test_deploy_code(self, is_file, rsync_project, git_archive, upload_template, api_execute, api_sudo, api_lcd, api_require, api_local, api_prompt, tag_exist):
+    @patch('os.path.exists', return_value=False)
+    def test_deploy_code(self, path_exists, is_file, rsync_project, git_archive, upload_template, api_execute, api_sudo, api_lcd, api_require, api_local, api_prompt, tag_exist):
         api_lcd.return_value.__exit__ = Mock()
         api_lcd.return_value.__enter__ = Mock()
 
@@ -131,8 +132,8 @@ class ReleasesManagerCheck(TestCase):
 
         self.assertTrue(api_lcd.called)
         self.assertTrue(str(api_lcd.call_args_list[1]).find('/tmp/appliname-mytag/') > 0)
-        self.assertTrue(str(api_lcd.call_args_list[2]).find('rm myarchive') > 0 )
-        self.assertTrue(str(api_lcd.call_args_list[3]).find('rm -rf /tmp/appliname-mytag') > 0 )
+        #self.assertTrue(str(api_lcd.call_args_list[2]).find('rm myarchive') > 0 )
+        #self.assertTrue(str(api_lcd.call_args_list[3]).find('rm -rf /tmp/appliname-mytag') > 0 )
         self.assertTrue(api_local.called)
         self.assertTrue(str(api_local.call_args_list[0]).find('tar xvf myarchive'))
         self.assertTrue(str(api_local.call_args_list[1]).find(env.run_tests_command))
@@ -158,6 +159,10 @@ class ReleasesManagerCheck(TestCase):
         deploy_code()
         self.assertTrue(api_prompt.called)
         self.assertEqual(env.tag, '4.0')
+
+        path_exists.return_value=True
+        deploy_code()
+        self.assertTrue(api_local.called)
 
     @patch('fabric.api.puts', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
@@ -185,8 +190,6 @@ class ReleasesManagerCheck(TestCase):
                          call('rm remote_current_path; ln -s 3.0 remote_current_path && rm -rf remote_releases_path/4.0'))
 
 
-
-
     @patch('fabric.api.sudo', return_value=Mock())
     def test_symlink(self, api_sudo):
         symlink()
@@ -199,3 +202,13 @@ class ReleasesManagerCheck(TestCase):
         symlink()
         self.assertTrue(str(api_sudo.call_args_list[4]).find(
             "ln -nfs remote_shared_path/symdir remote_current_release/symdir") > 0)
+
+    @patch('fabric.api.abort', return_value=Mock())
+    @patch('fabric.api.local', return_value=Mock())
+    @patch('fabric.api.lcd', return_value=Mock())
+    def test_run_tests(self, api_lcd, api_local, api_abort):
+        api_lcd.return_value.__exit__ = Mock()
+        api_lcd.return_value.__enter__ = Mock()
+        run_tests()
+        env.run_tests_command = 'dtc_les_tests'
+        run_tests()
