@@ -36,39 +36,35 @@ class ReleasesManagerCheck(TestCase):
             deb_packages.call_args, call(['gettext'], update=False))
         self.assertTrue(api_execute.called)
         self.assertTrue(
-            str(api_execute.call_args_list[0]).find('call(<function ldap_pkg') == 0)
-        self.assertTrue(
-            str(api_execute.call_args_list[1]).find('call(<function postgres_pkg') == 0)
-        self.assertTrue(
-            str(api_execute.call_args_list[2]).find('call(<function python_pkg') == 0)
+            str(api_execute.call_args_list[0]).find('call(<function python_pkg') == 0)
 
         # env.remote_python_version >= 3
         env.remote_python_version = 3
         application_packages()
         self.assertTrue(api_execute.called)
         self.assertTrue(
-            str(api_execute.call_args_list[5]).find('call(<function check_python3_install') == 0)
+            str(api_execute.call_args_list[1]).find('call(<function check_python3_install') == 0)
 
         # test extra pppa
         env.extra_ppa_to_install = "ppa:myppa/ppafromhell"
         application_packages()
         self.assertTrue(api_execute.called)
         self.assertTrue(
-            str(api_execute.call_args_list[11]).find('call(<function install_extra_ppa') == 0)
+            str(api_execute.call_args_list[5]).find('call(<function install_extra_ppa') == 0)
 
         # test extra pkg
         env.extra_pkg_to_install = "pkgfromhell"
         application_packages()
         self.assertTrue(api_execute.called)
         self.assertTrue(
-            str(api_execute.call_args_list[17]).find('call(<function install_extra_packages') == 0)
+            str(api_execute.call_args_list[9]).find('call(<function install_extra_packages') == 0)
 
         # test extra debian source
         env.extra_source_to_install = {("cool debian source"),}
         application_packages()
         self.assertTrue(api_execute.called)
         self.assertTrue(
-            str(api_execute.call_args_list[23]).find('call(<function install_extra_source') == 0)            
+            str(api_execute.call_args_list[13]).find('call(<function install_extra_source') == 0)
 
     @patch('fabric.api.execute', return_value=Mock())
     def test_pre_install_backend(self, api_execute):
