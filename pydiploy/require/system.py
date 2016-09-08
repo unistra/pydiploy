@@ -115,9 +115,11 @@ def check_python3_install(version='python3', update=False):
     """
 
     if not package_installed(version):
-        if fabtools.system.distrib_id() == 'Ubuntu' and float(fabtools.system.distrib_release()) < 13.10:
-            fabtools.require.deb.packages(['python-software-properties'],
+        # TODO check for others ubuntu"s versions !!!!!
+        if fabtools.system.distrib_id() == 'Ubuntu' and float(fabtools.system.distrib_release()) < 13.10 or float(fabtools.system.distrib_release()) >= 16.04:
+            fabtools.require.deb.packages(['software-properties-common'],
                                           update=update)
+            # Install mighty PPA
             fabtools.require.deb.ppa('ppa:fkrull/deadsnakes')
         fabtools.require.deb.package(version, update=True)
 
