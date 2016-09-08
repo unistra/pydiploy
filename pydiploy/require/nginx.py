@@ -7,7 +7,7 @@ import os
 import fabric
 import fabtools
 import pydiploy
-from fabric.api import env
+from fabric.api import env, warn_only
 from pydiploy.decorators import do_verbose
 from .system import is_systemd
 
@@ -78,7 +78,8 @@ def nginx_started():
     """ Returns true/false depending on nginx service is started """
     if is_systemd():
         # return fabtools.systemd.is_running('nginx')
-        return 'inactive' not in fabric.api.sudo('systemctl is-active nginx.service')
+        with warn_only():
+            return 'inactive' not in fabric.api.sudo('systemctl is-active nginx.service')
     else:
         return fabtools.service.is_running('nginx')
 
