@@ -57,6 +57,7 @@ env.req_pydiploy_version = '1.1.6.0'
 # env.excluded_files = ['pron.jpg'] # file(s) that rsync should exclude when deploying app
 # env.extra_ppa_to_install = ['ppa:vincent-c/ponysay'] # extra ppa source(s) to use
 # env.extra_pkg_to_install = ['ponysay'] # extra debian/ubuntu package(s) to install on remote
+# env.extra_source_to_install = [['mongodb', 'http://downloads-distro.mongodb.org/repo/ubuntu-upstart', 'dist', '10gen'], ['deb-src', 'http://site.example.com/debian', 'distribution', 'component1', 'component2', 'component3']]
 # env.cfg_shared_files = ['config','/app/path/to/config/config_file'] # config files to be placed in shared config dir
 # env.extra_symlink_dirs = ['mydir','/app/mydir'] # dirs to be symlinked in shared directory
 # env.extra_goals = ['preprod'] # add extra goal(s) to defaults (test,dev,prod)
