@@ -36,11 +36,11 @@ setup(
             'pydiploy_sublime_snippet = pydiploy.scripts:sublime_text_snippet',
         ]
     },
-    classifiers=(
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.7'
-    )
+    ]
 )
