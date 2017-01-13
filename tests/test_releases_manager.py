@@ -79,7 +79,8 @@ class ReleasesManagerCheck(TestCase):
             "mkdir -p remote_shared_path/symdir") > 0)
 
     @patch('fabric.api.sudo', return_value=Mock())
-    def test_cleanup(self, api_sudo):
+    @patch('pydiploy.prepare.process_releases', return_value=Mock())
+    def test_cleanup(self, rel_manager, api_sudo):
         cleanup()
         self.assertTrue(api_sudo.called)
         self.assertEqual(

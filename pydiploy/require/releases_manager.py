@@ -44,6 +44,7 @@ def cleanup():
     """
     Cleans old stuff on remote server
     """
+    fabric.api.execute(pydiploy.prepare.process_releases)
     if 'releases' in env and len(env.releases) >= env.keep_releases:
         directories = env.releases
         directories.reverse()
