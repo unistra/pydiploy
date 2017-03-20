@@ -37,9 +37,10 @@ def django_prepare():
                 with fabric.api.settings(warn_only=True):
                     fabric.api.sudo('python manage.py migrate')
                     fabric.api.sudo('python manage.py compilemessages')
-                ignore = ('rest_framework',  'django_extensions')
-                fabric.api.sudo('python manage.py collectstatic --noinput -i %s' %
-                                ' -i '.join(ignore))
+                # ignore = ('rest_framework',  'django_extensions')
+                # fabric.api.sudo('python manage.py collectstatic --noinput -i %s' %
+                #                 ' -i '.join(ignore))
+                fabric.api.sudo('python manage.py collectstatic --noinput')
 
     fabric.api.get(os.path.join(env.remote_current_path, 'assets'),
                    local_path=env.local_tmp_dir)
@@ -83,6 +84,3 @@ def django_get_version():
             with fabric.api.settings(sudo_user=env.remote_owner):
                 django_version = fabric.api.sudo(
                     'python -c "import django;print(django.get_version())"')
-
-
-
