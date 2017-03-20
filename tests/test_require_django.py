@@ -85,7 +85,7 @@ class CommandCheck(TestCase):
                 call('python manage.py syncdb --noinput'),
                 call('python manage.py migrate'),
                 call('python manage.py compilemessages'),
-                call('python manage.py collectstatic --noinput -i rest_framework -i django_extensions')])
+                call('python manage.py collectstatic --noinput')])
 
     @patch('fabtools.python.virtualenv', return_value=Mock())
     @patch('fabric.api.cd', return_value=Mock())
@@ -297,4 +297,3 @@ class UtilsCheck(TestCase):
         #     str(upload_template.call_args).find("use_jinja=True") > 0)
         # self.assertTrue(
         #     str(upload_template.call_args).find("user='owner'") > 0)
-        
