@@ -11,6 +11,7 @@ import fabric
 import fabtools
 from fabric.api import env
 from pydiploy.decorators import do_verbose
+from distutils.version import LooseVersion
 
 
 @do_verbose
@@ -27,10 +28,10 @@ def django_prepare():
     with fabtools.python.virtualenv(env.remote_virtualenv_dir):
         with fabric.api.cd(env.remote_current_path):
             with fabric.api.settings(sudo_user=env.remote_owner):
-                django_version = fabric.api.sudo(
-                    'python -c "import django;print(django.get_version())"')
+                # django_version = fabric.api.sudo(
+                #     'python -c "import django;print(django.get_version())"')
                 # check if django >= 1.8 no more syncdb migrate only !
-                if django_version < "1.8":
+                if LooseVersion(django_get_version()) < LooseVersion("1.8"):
                     fabric.api.sudo('python manage.py syncdb --noinput')
                 # TODO add point in documentation
                 # south needed with django < 1.7 !!!!!
