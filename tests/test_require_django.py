@@ -45,7 +45,8 @@ class CommandCheck(TestCase):
     @patch('fabric.api.settings', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
     @patch('fabric.api.get', return_value=Mock())
-    def test_django_prepare(self, api_get, api_sudo, api_settings, api_cd, python_virtualenv, api_local, api_lcd):
+    @patch('pydiploy.require.django.command.django_get_version', return_value="1.8")
+    def test_django_prepare(self, django_get_version, api_get, api_sudo, api_settings, api_cd, python_virtualenv, api_local, api_lcd):
 
         api_lcd.return_value.__exit__ = Mock()
         api_lcd.return_value.__enter__ = Mock()
@@ -81,11 +82,11 @@ class CommandCheck(TestCase):
         self.assertTrue(api_sudo.called)
         self.assertEqual(
             api_sudo.call_args_list, [
-                call('python -c "import django;print(django.get_version())"'),
-                call('python manage.py syncdb --noinput'),
+                # call('python -c "import django;print(django.get_version())"'),
+                # call('python manage.py syncdb --noinput'),
                 call('python manage.py migrate'),
                 call('python manage.py compilemessages'),
-                call('python manage.py collectstatic --noinput')])
+                call('python manage.py collectstatic --noinput')]) 
 
     @patch('fabtools.python.virtualenv', return_value=Mock())
     @patch('fabric.api.cd', return_value=Mock())
