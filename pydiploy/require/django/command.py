@@ -80,6 +80,10 @@ def django_custom_cmd(commands):
 @do_verbose
 def django_get_version():
     """ Gets django version on remote """
+
+    # hopefully never compare with django_version=0 :)
+    django_version = 0
+    
     with fabtools.python.virtualenv(env.remote_virtualenv_dir):
         with fabric.api.cd(env.remote_current_path):
             with fabric.api.settings(sudo_user=env.remote_owner):
