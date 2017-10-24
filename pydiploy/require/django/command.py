@@ -85,3 +85,5 @@ def django_get_version():
             with fabric.api.settings(sudo_user=env.remote_owner):
                 django_version = fabric.api.sudo(
                     'python -c "import django;print(django.get_version())"')
+
+                return django_version
