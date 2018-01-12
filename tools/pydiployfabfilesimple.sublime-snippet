@@ -162,7 +162,7 @@ def post_install_backend():
     execute(pydiploy_postinstall_backend)
 
 ]]></content>
-<description>Pydiploy fabfile simple 1.1.7.5</description>
+<description>Pydiploy fabfile simple 1.1.7.6</description>
 <tabTrigger>pydiployfabsimple</tabTrigger>
 <scope>source.python</scope>
 </snippet>
