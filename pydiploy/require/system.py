@@ -120,7 +120,7 @@ def check_python3_install(version='python3', update=False):
             fabtools.require.deb.packages(['software-properties-common'],
                                           update=update)
             # Install mighty PPA
-            fabtools.require.deb.ppa('ppa:fkrull/deadsnakes')
+            fabtools.require.deb.ppa('ppa:deadsnakes/ppa')
         fabtools.require.deb.package(version, update=True)
 
 
