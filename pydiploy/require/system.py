@@ -5,7 +5,7 @@ This class is for sytem relatives tools and commands
 
 """
 
-
+from contextlib import contextmanager
 import fabric
 import fabtools
 from fabric.api import env
@@ -157,3 +157,10 @@ def install_extra_source(extra_source):
     """
     for source in extra_source:
         fabtools.require.deb.source(*source)
+
+
+@contextmanager
+def shell(new_shell):
+    old_shell, env.shell = env.shell, new_shell
+    yield
+    env.shell = old_shell
