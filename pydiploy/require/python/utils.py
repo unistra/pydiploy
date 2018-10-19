@@ -8,6 +8,7 @@ import fabric
 import fabtools
 from fabric.api import env
 from pydiploy.decorators import do_verbose
+from pydiploy.require.system import shell
 
 
 @do_verbose
@@ -41,22 +42,23 @@ def application_dependencies(upgrade_pkg, staging=True):
                     env.remote_home, oracle_root_path)
                 pip_cmd = 'ORACLE_HOME=%s pip' % oracle_full_path
 
-            # upgrade pip to latest version
-            fabtools.require.python.install('pip', 
-                                            upgrade=True, 
-                                            use_sudo=True,
-                                            user=env.remote_owner,
-                                            pip_cmd=pip_cmd,
-                                            quiet=True)
+            with shell("HOME=~%s %s" % (env.remote_owner, env.shell)):
+                # upgrade pip to latest version
+                fabtools.require.python.install('pip',
+                                                upgrade=True,
+                                                use_sudo=True,
+                                                user=env.remote_owner,
+                                                pip_cmd=pip_cmd,
+                                                quiet=True)
 
-            fabtools.python.install_requirements(requirements_file,
+                fabtools.python.install_requirements(requirements_file,
                                                  use_sudo=True,
                                                  user=env.remote_owner,
                                                  upgrade=upgrade_pkg,
                                                  pip_cmd='%s --no-cache-dir' % pip_cmd,
                                                  quiet=True)
 
-            fabric.api.sudo(
-                'pip install --log-file %s --quiet -e .' % pip_log ,
-                user=env.remote_owner,
-                pty=False)
+                fabric.api.sudo(
+                    'pip install --log-file %s --quiet -e .' % pip_log ,
+                    user=env.remote_owner,
+                    pty=False)
