@@ -9,7 +9,7 @@ import os
 
 import fabric
 import fabtools
-from fabric.api import env
+from fabric.api import env, hide
 from pydiploy.decorators import do_verbose
 from distutils.version import LooseVersion
 
@@ -37,7 +37,8 @@ def django_prepare():
                 # south needed with django < 1.7 !!!!!
                 with fabric.api.settings(warn_only=True):
                     fabric.api.sudo('python manage.py migrate')
-                    fabric.api.sudo('python manage.py compilemessages')
+                    with hide('warnings'):
+                        fabric.api.sudo('python manage.py compilemessages')
                 # ignore = ('rest_framework',  'django_extensions')
                 # fabric.api.sudo('python manage.py collectstatic --noinput -i %s' %
                 #                 ' -i '.join(ignore))

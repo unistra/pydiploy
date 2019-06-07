@@ -17,7 +17,7 @@ import os
 
 import fabric
 import fabtools
-from fabric.api import env, warn_only
+from fabric.api import env, warn_only, hide
 from pydiploy.decorators import do_verbose
 from .system import is_systemd
 
@@ -138,7 +138,8 @@ def app_reload():
         start_cmd = 'systemctl start circus.service'
         status_cmd = 'systemctl is-active circus.service'
         with warn_only():
-            running = 'inactive' not in fabric.api.sudo(status_cmd)
+            with hide():
+                running = 'inactive' not in fabric.api.sudo(status_cmd)
     # Upstart
     else:
         start_cmd = 'start circus'
@@ -150,4 +151,6 @@ def app_reload():
     else:
         with fabric.api.settings(sudo_user=env.remote_owner):
             fabric.api.sudo('circusctl reloadconfig')
-            fabric.api.sudo('circusctl restart %s' % env.application_name)
+            with warn_only():
+                with hide():
+                    fabric.api.sudo('circusctl restart %s' % env.application_name)

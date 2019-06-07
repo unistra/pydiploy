@@ -6,7 +6,8 @@ from time import time
 import fabric
 import fabtools
 import pydiploy
-from fabric.api import env
+
+from fabric.api import env, warn_only
 from pydiploy.decorators import do_verbose
 
 
@@ -133,13 +134,18 @@ def deploy_code():
     env.remote_current_release = "%(releases_path)s/%(time).0f" % {
         'releases_path': env.remote_releases_path, 'time': time()}
 
-    fabric.contrib.project.rsync_project(env.remote_current_release,
-                                         '%s/%s/' % (
-                                             env.local_tmp_dir,
-                                             archive_prefix),
-                                         delete=True,
-                                         extra_opts='--links --rsync-path="sudo -u %s rsync"' % env.remote_owner,
-                                         exclude=exclude_files)
+    with warn_only():
+        result = fabric.contrib.project.rsync_project(env.remote_current_release,
+                                            '%s/%s/' % (
+                                                env.local_tmp_dir,
+                                                archive_prefix),
+                                            delete=True,
+                                            extra_opts='--links --rsync-path="sudo -u %s rsync"' % env.remote_owner,
+                                            exclude=exclude_files)
+    
+    # Wrong repository url (git archive is empty)
+    if result.return_code == 23:
+        fabric.api.abort(fabric.colors.red("Unable to use repository, please check repository url !"))
 
     fabric.api.sudo(
         'chown -R %(user)s:%(group)s %(project_dir)s' % {'user': env.remote_owner,
