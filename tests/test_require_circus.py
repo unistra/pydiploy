@@ -29,7 +29,76 @@ class CircusCheck(TestCase):
         env.update(self.previous_env)
 
     @patch('fabtools.system.distrib_id', return_value='Ubuntu')
-    @patch('fabtools.system.distrib_release', return_value='10.04')
+    @patch('fabtools.system.distrib_release', return_value='16.04')
+    @patch('fabtools.require.deb.packages', return_value=Mock())
+    @patch('fabtools.require.deb.ppa', return_value=Mock())
+    @patch('fabtools.require.python.install', return_value=Mock())
+    @patch('fabtools.files.upload_template', return_value=Mock())
+    @patch('fabtools.require.files.directory', return_value=Mock())
+    def test_circus_pkg_old(self, files_directory, upload_template, python_install, deb_ppa, deb_packages, distrib_release, distrib_id):
+
+        # no_circus_web = True
+        env.no_circus_web = True
+        circus_pkg()
+
+        self.assertTrue(distrib_release.called)
+        self.assertTrue(distrib_id.called)
+
+        self.assertTrue(deb_packages.called)
+        self.assertEqual(
+            deb_packages.call_args_list, [call(['libzmq-dev', 'libevent-dev'], update=False)])
+
+        # self.assertTrue(deb_ppa.called)
+        # self.assertEqual(deb_ppa.call_args_list, [
+        #                  call('ppa:chris-lea/zeromq'), call('ppa:chris-lea/libpgm')])
+
+        self.assertTrue(python_install.called)
+
+        self.assertEqual(
+            python_install.call_args_list, [call('circus', upgrade=False, use_sudo=True)])
+
+        self.assertTrue(upload_template.called)
+        self.assertTrue(
+            str(upload_template.call_args).find("'circus.ini.tpl'") > 0)
+        self.assertTrue(
+            str(upload_template.call_args).find("'remote_home/.circus.ini'") > 0)
+        self.assertTrue(str(upload_template.call_args)
+                        .find("template_dir='lib_path/templates'") > 0)
+        self.assertTrue(
+            str(upload_template.call_args).find("user='remote_owner'") > 0)
+
+        self.assertTrue(files_directory.called)
+        self.assertEqual(files_directory.call_args,
+                         call(owner='remote_owner', path='remote_home/.circus.d', use_sudo=True, group='remote_group', mode='750'))
+
+        # test circus_package_name
+        env.circus_package_name = "https://github.com/githubaccount/circus/archive/master.zip"
+        circus_pkg()
+        self.assertEqual(
+            python_install.call_args_list[1], call(
+                'https://github.com/githubaccount/circus/archive/master.zip', upgrade=False, use_sudo=True)
+        )
+
+        # test no_circus_web
+        del env['no_circus_web']
+        del env['circus_package_name']
+        circus_pkg()
+        self.assertEqual(
+            python_install.call_args_list[-3:], [call('circus', use_sudo=True, upgrade=False),
+                                                 call('circus-web', use_sudo=True, upgrade=False),
+                                                 call('gevent', use_sudo=True, upgrade=False)])
+
+        # test circus_backend
+        env.circus_backend = "test_circus_backend"
+        circus_pkg()
+        self.assertEqual(
+            python_install.call_args_list[-4:], [call('circus', use_sudo=True, upgrade=False),
+                                                 call('circus-web', use_sudo=True, upgrade=False),
+                                                 call('gevent', use_sudo=True, upgrade=False),
+                                                 call('test_circus_backend', use_sudo=True, upgrade=False)])
+
+    @patch('fabtools.system.distrib_id', return_value='Ubuntu')
+    @patch('fabtools.system.distrib_release', return_value='18.04')
     @patch('fabtools.require.deb.packages', return_value=Mock())
     @patch('fabtools.require.deb.ppa', return_value=Mock())
     @patch('fabtools.require.python.install', return_value=Mock())
@@ -46,13 +115,11 @@ class CircusCheck(TestCase):
 
         self.assertTrue(deb_packages.called)
         self.assertEqual(
-            deb_packages.call_args_list, [call(
-                ['python-software-properties'], update=False),
-                call(['libzmq-dev', 'libevent-dev'], update=False)])
+            deb_packages.call_args_list, [call(['libzmq3-dev', 'libevent-dev'], update=False)])
 
-        self.assertTrue(deb_ppa.called)
-        self.assertEqual(deb_ppa.call_args_list, [
-                         call('ppa:chris-lea/zeromq'), call('ppa:chris-lea/libpgm')])
+        # self.assertTrue(deb_ppa.called)
+        # self.assertEqual(deb_ppa.call_args_list, [
+        #                  call('ppa:chris-lea/zeromq'), call('ppa:chris-lea/libpgm')])
 
         self.assertTrue(python_install.called)
 

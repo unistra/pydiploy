@@ -26,17 +26,23 @@ from .system import is_systemd
 def circus_pkg(update=False):
     """ Installs packages relatives to circus """
 
-    # install ubuntu ppa for libzmq-dev if ubuntu <= 10.04
-    if fabtools.system.distrib_id() == 'Ubuntu' and fabtools.system.distrib_release() == '10.04':
-        fabtools.require.deb.packages(['python-software-properties'],
-                                      update=update)
-        fabtools.require.deb.ppa('ppa:chris-lea/zeromq')
-        fabtools.require.deb.ppa('ppa:chris-lea/libpgm')
+    # TOOLD !
+    # install ubuntu ppa for libzmq-dev if ubuntu <= 10.04 
+    #if fabtools.system.distrib_id() == 'Ubuntu' and fabtools.system.distrib_release() == '10.04':
+    #    fabtools.require.deb.packages(['python-software-properties'],
+    #    fabtools.require.deb.ppa('ppa:chris-lea/zeromq')
+    #    fabtools.require.deb.ppa('ppa:chris-lea/libpgm')
 
-    fabtools.require.deb.packages([
-        'libzmq-dev',
-        'libevent-dev'], update=update)
-    # not used anymore installed in venv !
+    if fabtools.system.distrib_id() == 'Ubuntu' and fabtools.system.distrib_release() >= '18.04':
+        fabtools.require.deb.packages([
+            'libzmq3-dev',
+            'libevent-dev'], update=update)
+
+    if fabtools.system.distrib_id() == 'Ubuntu' and fabtools.system.distrib_release() < '18.04':
+        fabtools.require.deb.packages([
+            'libzmq-dev',
+            'libevent-dev'], update=update)            
+
     fabtools.require.python.install(env.get('circus_package_name', 'circus'),
                                     use_sudo=True, upgrade=update)
 
