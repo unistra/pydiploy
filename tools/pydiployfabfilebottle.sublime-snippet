@@ -293,7 +293,7 @@ def set_up():
     execute(pydiploy_set_up)
 
 ]]></content>
-<description>Pydiploy fabfile bottle 1.1.7.8</description>
+<description>Pydiploy fabfile bottle 1.1.8</description>
 <tabTrigger>pydiployfabbottle</tabTrigger>
 <scope>source.python</scope>
 </snippet>
