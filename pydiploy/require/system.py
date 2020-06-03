@@ -111,14 +111,17 @@ def check_python3_install(version='python3', update=False):
     Installs python 3 on ubuntu remote server
     """
 
-    # if not package_installed(version):
-    #     # TODO check for others ubuntu"s versions !!!!!
-    #     if fabtools.system.distrib_id() == 'Ubuntu' and float(fabtools.system.distrib_release()) < 13.10 or float(fabtools.system.distrib_release()) >= 16.04:
-    #         #fabtools.require.deb.packages(['software-properties-common'],
-    #         #                              update=update)
-    #         # Install mighty PPA
-    #         #fabtools.require.deb.ppa('ppa:deadsnakes/ppa')
-    fabtools.require.deb.package(version, update=True)
+    if not package_installed(version):
+        # TODO check for others ubuntu"s versions !!!!!
+        if float(fabtools.system.distrib_release()) >= 14.04:
+            # add-apt-repository moved to software-properties-common in 14.04
+            fabtools.require.deb.packages('software-properties-common')
+        else:
+            fabtools.require.deb.packages('python-software-properties')
+
+        # Install mighty PPA
+        fabtools.require.deb.ppa('ppa:deadsnakes/ppa')
+        fabtools.require.deb.package(version, update=True)
 
 
 @do_verbose

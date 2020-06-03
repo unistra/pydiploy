@@ -51,6 +51,7 @@ def application_dependencies(upgrade_pkg, staging=True):
         with fabric.api.cd(env.remote_current_path):
             requirements_file = os.path.join('requirements', '%s.txt' % env.goal) if staging else 'requirements.txt'
             # ugly fix for error when pip install fail and error raises while /home/user/.pip not writable
+            # TODO; maybe use app_name_pip_error.log file ? Or use a setting path for log file ?
             pip_log = '%s/pip_error.log' % env.remote_home
             pip_cmd = 'pip --log-file %s' % pip_log
             if 'oracle_client_version' in env:
