@@ -6,6 +6,7 @@ This class is for sytem relatives tools and commands
 """
 
 from contextlib import contextmanager
+
 import fabric
 import fabtools
 from fabric.api import env
@@ -27,16 +28,13 @@ def add_user(commands=None):
     """
 
     fabtools.require.group(env.remote_group)
-    fabtools.require.user(env.remote_owner,
-                          create_home=True,
-                          create_group=True,
-                          group=env.remote_group,
-                          shell='/bin/bash')
+    fabtools.require.user(
+        env.remote_owner, create_home=True, create_group=True, group=env.remote_group, shell='/bin/bash'
+    )
     if commands:
-        fabtools.require.sudoer('%%%s' % env.remote_group,
-                                operators='%s,root' % env.remote_owner,
-                                passwd=False,
-                                commands=commands)
+        fabtools.require.sudoer(
+            '%%%s' % env.remote_group, operators='%s,root' % env.remote_owner, passwd=False, commands=commands
+        )
 
 
 @do_verbose
@@ -59,7 +57,7 @@ def set_locale():
     Sets server's locales
     """
     locale = fabric.api.run("echo $LANG")
-    if(locale != env.locale):
+    if locale != env.locale:
         fabric.api.sudo('locale-gen ' + env.locale)
         fabric.api.sudo('/usr/sbin/update-locale LANG=' + env.locale)
 
@@ -69,7 +67,7 @@ def set_timezone():
     """
     Sets the timezone
     """
-    if fabtools.system.distrib_id() not in('Ubuntu', 'Debian'):
+    if fabtools.system.distrib_id() not in ('Ubuntu', 'Debian'):
         print("Cannot deploy to non-debian/ubuntu host")
         return
 
@@ -85,12 +83,11 @@ def permissions():
     Makes the release group-writable
     """
 
-    fabric.api.sudo("chown -R %(user)s:%(group)s %(domain_path)s" %
-                    {'domain_path': env.remote_project_dir,
-                     'user': env.remote_owner,
-                     'group': env.remote_group})
-    fabric.api.sudo("chmod -R g+w %(domain_path)s" %
-                    {'domain_path': env.remote_project_dir})
+    fabric.api.sudo(
+        "chown -R %(user)s:%(group)s %(domain_path)s"
+        % {'domain_path': env.remote_project_dir, 'user': env.remote_owner, 'group': env.remote_group}
+    )
+    fabric.api.sudo("chmod -R g+w %(domain_path)s" % {'domain_path': env.remote_project_dir})
 
 
 @do_verbose
@@ -114,14 +111,14 @@ def check_python3_install(version='python3', update=False):
     Installs python 3 on ubuntu remote server
     """
 
-    if not package_installed(version):
-        # TODO check for others ubuntu"s versions !!!!!
-        if fabtools.system.distrib_id() == 'Ubuntu' and float(fabtools.system.distrib_release()) < 13.10 or float(fabtools.system.distrib_release()) >= 16.04:
-            fabtools.require.deb.packages(['software-properties-common'],
-                                          update=update)
-            # Install mighty PPA
-            fabtools.require.deb.ppa('ppa:deadsnakes/ppa')
-        fabtools.require.deb.package(version, update=True)
+    # if not package_installed(version):
+    #     # TODO check for others ubuntu"s versions !!!!!
+    #     if fabtools.system.distrib_id() == 'Ubuntu' and float(fabtools.system.distrib_release()) < 13.10 or float(fabtools.system.distrib_release()) >= 16.04:
+    #         #fabtools.require.deb.packages(['software-properties-common'],
+    #         #                              update=update)
+    #         # Install mighty PPA
+    #         #fabtools.require.deb.ppa('ppa:deadsnakes/ppa')
+    fabtools.require.deb.package(version, update=True)
 
 
 @do_verbose
