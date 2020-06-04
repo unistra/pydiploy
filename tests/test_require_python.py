@@ -5,7 +5,7 @@ import copy
 from unittest import TestCase
 
 from fabric.api import env
-from mock import call, Mock, patch
+from mock import Mock, call, patch
 from pydiploy.require.python.utils import application_dependencies, python_pkg
 from pydiploy.require.python.virtualenv import virtualenv
 
@@ -31,14 +31,14 @@ class UtilsCheck(TestCase):
 
     @patch('fabtools.require.deb.packages', return_value=Mock())
     @patch('fabtools.require.python.install', return_value=Mock())
-    def test_python_pkg(self, python_install, deb_packages):
+    @patch('fabtools.system.distrib_release', return_value='13')
+    @patch('fabtools.system.distrib_id', return_value='Ubuntu')
+    def test_python_pkg(self, dist_id, dist_rls, python_install, deb_packages):
         python_pkg()
         self.assertTrue(deb_packages.called)
-        self.assertEqual(deb_packages.call_args, call(
-            ['python-dev', 'python-pip'], update=False))
+        self.assertEqual(deb_packages.call_args, call(['python-dev', 'python-pip'], update=False))
         self.assertTrue(python_install.called)
-        self.assertEqual(
-            python_install.call_args, call('pip', upgrade=True, use_sudo=True))
+        self.assertEqual(python_install.call_args, call('pip', upgrade=True, use_sudo=True))
 
     @patch('fabtools.python.virtualenv', return_value=Mock())
     @patch('fabric.api.cd', return_value=Mock())
@@ -59,8 +59,7 @@ class UtilsCheck(TestCase):
         self.assertEqual(api_cd.call_args, call('remote_current_path'))
 
         self.assertTrue(python_virtualenv.called)
-        self.assertEqual(
-            python_virtualenv.call_args, call('remote_virtualenv_dir'))
+        self.assertEqual(python_virtualenv.call_args, call('remote_virtualenv_dir'))
 
         # test oracle
 
@@ -95,9 +94,19 @@ class VirtualEnvCheck(TestCase):
         virtualenv()
 
         self.assertTrue(python_virtualenv.called)
-        self.assertEqual(python_virtualenv.call_args,
-                         call('remote_virtualenv_dir', clear=False, use_sudo=True, venv_python='/usr/bin/python2.7', user='remote_owner'))
+        self.assertEqual(
+            python_virtualenv.call_args,
+            call(
+                'remote_virtualenv_dir',
+                clear=False,
+                use_sudo=True,
+                venv_python='/usr/bin/python2.7',
+                user='remote_owner',
+            ),
+        )
 
         self.assertTrue(files_directory.called)
-        self.assertEqual(files_directory.call_args, call(
-            'remote_virtualenv_dir', owner='remote_owner', use_sudo=True, group='remote_group'))
+        self.assertEqual(
+            files_directory.call_args,
+            call('remote_virtualenv_dir', owner='remote_owner', use_sudo=True, group='remote_group'),
+        )
