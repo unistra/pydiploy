@@ -152,5 +152,5 @@ def app_reload():
             app_installed = fabtools.files.is_file(
                 path=os.path.join(env.remote_home, '.circus.d', '%s.ini' % env.application_name), use_sudo=True
             )
-            with warn_only(), hide('everything'):
+            with warn_only(), hide():
                 fabric.api.sudo('circusctl restart %s' % env.application_name)

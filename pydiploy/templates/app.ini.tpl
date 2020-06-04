@@ -11,13 +11,16 @@ gid = {{ remote_group }}
 
 stderr_stream.class = FileStream
 stderr_stream.filename = {{ remote_shared_path }}/log/circus_error.log
-stderr_stream.time_format = %Y-%m-%d %H:%M:%S
+# FIXME !
+# stderr_stream.time_format = %Y-%m-%d %H:%M:%S
 stderr_stream.max_bytes = 209715200
 stderr_stream.backup_count = 5
 
 stdout_stream.class = FileStream
 stdout_stream.filename = {{ remote_shared_path }}/log/circus.log
-stdout_stream.time_format = %Y-%m-%d %H:%M:%S
+
+# FIXME !
+# stdout_stream.time_format = %Y-%m-%d %H:%M:%S
 stdout_stream.max_bytes = 209715200
 stdout_stream.backup_count = 5
 
@@ -31,3 +34,6 @@ host = {{ host }}
 
 
 port = {{ socket_port }}
+
+[env:{{ application_name }}]
+#LANG=en_US.UTF-8
