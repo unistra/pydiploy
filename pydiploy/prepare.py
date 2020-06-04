@@ -18,7 +18,6 @@ import fabric
 import fabtools
 from fabric.api import env
 from pkg_resources import Requirement, resource_filename
-
 from pydiploy.params import PARAMS
 from pydiploy.require.git import check_tag_exist
 from pydiploy.version import __version__, __version_info__
@@ -264,4 +263,3 @@ def process_releases():
                 'releases_path': env.remote_releases_path,
                 'previous_revision': env.previous_revision,
             }
-

@@ -4,42 +4,40 @@
     Fabfile example file to deploy a standard django webapp
 """
 
-from fabric.api import (env, roles, execute, task)
 from os.path import join
 
-from pydiploy.prepare import (tag as pydiploy_tag,
-                              build_env as pydiploy_build_env)
-from pydiploy.django import (deploy_backend as pydiploy_deploy_backend,
-                             deploy_frontend as pydiploy_deploy_frontend,
-                             rollback as pydiploy_rollback,
-                             post_install_backend as pydiploy_postinstall_backend,
-                             post_install_frontend as pydiploy_postinstall_frontend,
-                             pre_install_backend as pydiploy_preinstall_backend,
-                             pre_install_frontend as pydiploy_preinstall_frontend,
-                             reload_frontend as pydiploy_reload_frontend,
-                             reload_backend as pydiploy_reload_backend,
-                             set_app_up as pydiploy_set_up,
-                             set_app_down as pydiploy_set_down,
-                             custom_manage_command as pydiploy_custom_command,
-                             install_oracle_client as pydiploy_setup_oracle,
-                             install_postgres_server as pydiploy_setup_postgres)
-
+from fabric.api import env, execute, roles, task
+from pydiploy.django import custom_manage_command as pydiploy_custom_command
+from pydiploy.django import deploy_backend as pydiploy_deploy_backend
+from pydiploy.django import deploy_frontend as pydiploy_deploy_frontend
+from pydiploy.django import install_oracle_client as pydiploy_setup_oracle
+from pydiploy.django import install_postgres_server as pydiploy_setup_postgres
+from pydiploy.django import post_install_backend as pydiploy_postinstall_backend
+from pydiploy.django import post_install_frontend as pydiploy_postinstall_frontend
+from pydiploy.django import pre_install_backend as pydiploy_preinstall_backend
+from pydiploy.django import pre_install_frontend as pydiploy_preinstall_frontend
+from pydiploy.django import reload_backend as pydiploy_reload_backend
+from pydiploy.django import reload_frontend as pydiploy_reload_frontend
+from pydiploy.django import rollback as pydiploy_rollback
+from pydiploy.django import set_app_down as pydiploy_set_down
+from pydiploy.django import set_app_up as pydiploy_set_up
+from pydiploy.prepare import build_env as pydiploy_build_env
+from pydiploy.prepare import tag as pydiploy_tag
 
 # edit config here !
 
-env.use_sudo = True # use sudo or not
+env.use_sudo = True  # use sudo or not
 
 env.remote_owner = 'django'  # remote server user
 env.remote_group = 'django'  # remote server group
 
-env.application_name = 'myapp'   # name of webapp
+env.application_name = 'myapp'  # name of webapp
 env.root_package_name = 'myapp'  # name of app in webapp
 
 env.remote_home = '/home/django'  # remote home root
 env.remote_python_version = 3.4  # python version
 env.remote_virtualenv_root = join(env.remote_home, '.virtualenvs')  # venv root
-env.remote_virtualenv_dir = join(env.remote_virtualenv_root,
-                                 env.application_name)  # venv for webapp dir
+env.remote_virtualenv_dir = join(env.remote_virtualenv_root, env.application_name)  # venv for webapp dir
 env.remote_repo_url = 'git@git.net:myapp.git'  # git repository url
 env.local_tmp_dir = '/tmp'  # tmp dir
 env.remote_static_root = '/var/www/static'  # root of static files
@@ -86,7 +84,7 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 
 # env.socket_host='localhost' # use it in env method to force a socket host
 
-# env.run_tests_command = 'tox'
+#  env.run_tests_command = 'tox'
 
 # env.media_folder = '/media' # path of the application's media files
 # env.remote_media_folder = '/srv/media/myapp' # remote folder of the application's media files
@@ -96,6 +94,8 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 # env.default_db_name = 'myapp_db'
 # env.default_db_user = 'myapp_db_user'
 # env.default_db_password = 'S3CR3T'
+
+# env.no_tag_check = True # When your fabfile is not in your project git repository be sure to set this var
 
 
 @task
@@ -111,7 +111,7 @@ def test():
     env.short_server_name = 'myapp-dev'
     env.static_folder = '/site_media/'
     env.server_ip = '192.168.1.3'
-    #env.port = '1664'
+    # env.port = '1664'
     env.no_shared_sessions = False
     env.server_ssl_on = False
     env.goal = 'test'
@@ -136,7 +136,7 @@ def prod():
     env.short_server_name = 'myapp'
     env.static_folder = '/site_media/'
     env.server_ip = ''
-    #env.port = ''
+    # env.port = ''
     env.no_shared_sessions = False
     env.server_ssl_on = True
     env.path_to_cert = '/etc/ssl/certs/myapp.net.pem'
@@ -153,7 +153,9 @@ def prod():
     }
     execute(build_env)
 
+
 # dont touch after that point if you don't know what you are doing !
+
 
 @task
 def tag(version_string):
@@ -167,7 +169,7 @@ def head_master():
     execute(pydiploy_tag, version='master')
 
 
-@roles(['web','lb'])
+@roles(['web', 'lb'])
 def build_env():
     execute(pydiploy_build_env)
 
@@ -201,7 +203,7 @@ def deploy():
     execute(deploy_backend)
     execute(deploy_frontend)
     # uncomment this to toggle app to up mode again :
-    #execute(set_up)
+    # execute(set_up)
 
 
 @roles('web')
@@ -297,4 +299,5 @@ def set_up():
 @task
 def custom_manage_cmd(cmd):
     """ Execute custom command in manage.py """
-    execute(pydiploy_custom_command,cmd)
+    execute(pydiploy_custom_command, cmd)
+

@@ -113,14 +113,18 @@ def check_python3_install(version='python3', update=False):
 
     if not package_installed(version):
         # TODO check for others ubuntu"s versions !!!!!
-        if float(fabtools.system.distrib_release()) >= 14.04:
-            # add-apt-repository moved to software-properties-common in 14.04
-            fabtools.require.deb.packages('software-properties-common')
-        else:
-            fabtools.require.deb.packages('python-software-properties')
-
+        fabric.api.puts(fabtools.system.distrib_release())
+        fabric.api.puts(fabtools.system.distrib_release() >= 14.04)
         # Install mighty PPA
-        fabtools.require.deb.ppa('ppa:deadsnakes/ppa')
+        if fabtools.system.distrib_release() >= 14.04:
+            # add-apt-repository moved to software-properties-common in 14.04
+            fabtools.require.deb.package('software-properties-common')
+            # deb.pap problem for 20.04 in fabtools
+            fabric.api.sudo('add-apt-repository --yes ppa:deadsnakes/ppa')
+        else:
+            fabtools.require.deb.package('python-software-properties')
+            fabtools.require.deb.ppa('ppa:deadsnakes/ppa')
+
         fabtools.require.deb.package(version, update=True)
 
 
