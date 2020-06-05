@@ -6,8 +6,9 @@ from time import time
 
 import fabric
 import fabtools
+from fabric.api import env, hide, warn_only
+
 import pydiploy
-from fabric.api import env, warn_only
 from pydiploy.decorators import do_verbose
 
 
@@ -116,6 +117,12 @@ def deploy_code():
         # remove existing extracted dir from tarball
         if os.path.exists('%s/%s' % (env.local_tmp_dir, archive_prefix)):
             fabric.api.local('rm -rf %s' % archive_prefix)
+        # use tarball to get commit id
+        with warn_only():
+            env.commit_id = fabric.api.local(
+                'zcat %s | git get-tar-commit-id' % os.path.basename(tarball),
+                capture=True,
+            )
         fabric.api.local('tar xvf %s' % os.path.basename(tarball))
         # add deployed.json file
         with open(
@@ -124,12 +131,13 @@ def deploy_code():
             data = {}
             data['info'] = [
                 {
-                    'tag': env.tag,
+                    'app_host': env.host_string,
+                    'repo_url': env.remote_repo_url,
                     'python_version': env.remote_python_version,
                     'local_user': env.local_user,
-                    'app_host': env.host_string,
                     'socket_port': env.socket_port,
-                    'repo_url': env.remote_repo_url,
+                    'tag': env.tag,
+                    'commit_id': env.commit_id,
                 }
             ]
 
