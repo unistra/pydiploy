@@ -229,7 +229,7 @@ Optional parameters
 
     - extra_source_to_install adds extra(s) debian sourc(e)s when setting server : ::
 
-        extra_source_to_install = [['mongodb', 'http://downloads-distro.mongodb.org/repo/ubuntu-upstart', 'dist', '10gen'], ['deb-src', 'http://site.example.com/debian', 'distribution', 'component1', 'component2', 'component3']]   
+        extra_source_to_install = [['mongodb', 'http://downloads-distro.mongodb.org/repo/ubuntu-upstart', 'dist', '10gen'], ['deb-src', 'http://site.example.com/debian', 'distribution', 'component1', 'component2', 'component3']]
 
     - extra_pkg_to_install adds extra(s) package(s) when setting server : ::
 
@@ -285,3 +285,7 @@ Optional parameters
     - socket_host used to force a socket host other thant hostname in circus app config file : ::
 
         env.socket_host = True
+
+    - no_tag_check : if True, not using tag/branch check mainly used when fabfile is not in a git repository : ::
+
+        env.no_tag_check = True
