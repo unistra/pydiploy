@@ -49,13 +49,24 @@ class SystemCheck(TestCase):
         self.assertTrue(require_group.called)
         self.assertEqual(
             require_group.call_args,
-            call('%remote_group', passwd=False, commands='mycommand', operators='remote_owner,root'),
+            call(
+                '%remote_group',
+                passwd=False,
+                commands='mycommand',
+                operators='remote_owner,root',
+            ),
         )
 
         self.assertTrue(require_user.called)
         self.assertEqual(
             require_user.call_args,
-            call('remote_owner', create_group=True, shell='/bin/bash', group='remote_group', create_home=True),
+            call(
+                'remote_owner',
+                create_group=True,
+                shell='/bin/bash',
+                group='remote_group',
+                create_home=True,
+            ),
         )
 
         self.assertTrue(require_sudoer.called)
@@ -88,7 +99,8 @@ class SystemCheck(TestCase):
         self.assertTrue(api_run.called)
         self.assertTrue(api_sudo.called)
         self.assertEqual(
-            api_sudo.call_args_list, [call('locale-gen FR_fr'), call('/usr/sbin/update-locale LANG=FR_fr')]
+            api_sudo.call_args_list,
+            [call('locale-gen FR_fr'), call('/usr/sbin/update-locale LANG=FR_fr')],
         )
 
     @patch('fabtools.files.is_link', return_value=False)
@@ -106,7 +118,10 @@ class SystemCheck(TestCase):
         self.assertTrue(distrib_id.called)
         self.assertTrue(api_sudo.called)
 
-        self.assertEqual(api_sudo.call_args, call('cp -f /usr/share/zoneinfo/mytimezone /etc/localtime'))
+        self.assertEqual(
+            api_sudo.call_args,
+            call('cp -f /usr/share/zoneinfo/mytimezone /etc/localtime'),
+        )
 
     @patch('fabtools.files.is_link', return_value=True)
     @patch('fabtools.system.distrib_id', return_value='Notsupported')
@@ -123,7 +138,10 @@ class SystemCheck(TestCase):
         self.assertTrue(distrib_id.called)
         self.assertTrue(api_sudo.called)
 
-        self.assertEqual(api_sudo.call_args, call('ln -sf /usr/share/zoneinfo/mytimezone /etc/localtime'))
+        self.assertEqual(
+            api_sudo.call_args,
+            call('ln -sf /usr/share/zoneinfo/mytimezone /etc/localtime'),
+        )
 
     @patch('fabric.api.sudo', return_value=Mock())
     def test_permissions(self, api_sudo):
@@ -140,7 +158,9 @@ class SystemCheck(TestCase):
 
         package_installed("package")
         self.assertTrue(api_sudo.called)
-        self.assertEqual(api_sudo.call_args, call('dpkg-query -l "package" | grep -q ^.i'))
+        self.assertEqual(
+            api_sudo.call_args, call('dpkg-query -l "package" | grep -q ^.i')
+        )
 
     @patch('fabtools.require.deb.packages', return_value=Mock())
     def test_install_extra_packages(self, deb_pkgs):
@@ -162,12 +182,24 @@ class SystemCheck(TestCase):
     def test_install_extra_source(self, deb_source):
 
         install_extra_source(
-            [['mongodb', 'http://downloads-distro.mongodb.org/repo/ubuntu-upstart', 'dist', '10gen'],]
+            [
+                [
+                    'mongodb',
+                    'http://downloads-distro.mongodb.org/repo/ubuntu-upstart',
+                    'dist',
+                    '10gen',
+                ],
+            ]
         )
         self.assertTrue(deb_source.called)
         self.assertEqual(
             deb_source.call_args,
-            call('mongodb', 'http://downloads-distro.mongodb.org/repo/ubuntu-upstart', 'dist', '10gen'),
+            call(
+                'mongodb',
+                'http://downloads-distro.mongodb.org/repo/ubuntu-upstart',
+                'dist',
+                '10gen',
+            ),
         )
 
     @patch('fabtools.require.deb.package', return_value=Mock())
@@ -179,7 +211,15 @@ class SystemCheck(TestCase):
     @patch('fabtools.system.distrib_id', return_value='Ubuntu')
     @patch('pydiploy.require.system.package_installed', return_value=False)
     def test_check_python3_install(
-        self, pkg_installed, sys_distrib, sys_distrib_id, deb_pkgs, fab_sudo, deb_ppa, deb_source, deb_pkg
+        self,
+        pkg_installed,
+        sys_distrib,
+        sys_distrib_id,
+        deb_pkgs,
+        fab_sudo,
+        deb_ppa,
+        deb_source,
+        deb_pkg,
     ):
 
         check_python3_install()

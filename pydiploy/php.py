@@ -22,8 +22,9 @@ def wrap_deploy():
         yield
     except SystemExit:
         fabric.api.execute(rollback)
-        fabric.api.abort(fabric.colors.red(
-            "Deploy failed rollbacking process launched"))
+        fabric.api.abort(
+            fabric.colors.red("Deploy failed rollbacking process launched")
+        )
 
 
 @do_verbose
@@ -31,10 +32,12 @@ def application_packages(update=False):
     """ Installs all packages for php webapp """
     if env.has_key('extra_ppa_to_install'):
         fabric.api.execute(
-            pydiploy.require.system.install_extra_ppa, env.extra_ppa_to_install)
+            pydiploy.require.system.install_extra_ppa, env.extra_ppa_to_install
+        )
     if env.has_key('extra_pkg_to_install'):
         fabric.api.execute(
-            pydiploy.require.system.install_extra_packages, env.extra_pkg_to_install)
+            pydiploy.require.system.install_extra_packages, env.extra_pkg_to_install
+        )
 
 
 def pre_install_backend(commands='/usr/bin/rsync'):
@@ -44,7 +47,7 @@ def pre_install_backend(commands='/usr/bin/rsync'):
     fabric.api.execute(pydiploy.require.system.set_timezone)
     fabric.api.execute(pydiploy.require.system.update_pkg_index)
     fabric.api.execute(pydiploy.require.apache.apache_pkg)
-    fabtools.require.deb.packages(['php5','libapache2-mod-php5'], update=True)
+    fabtools.require.deb.packages(['php5', 'libapache2-mod-php5'], update=True)
     fabric.api.execute(application_packages)
 
 
@@ -55,6 +58,7 @@ def deploy_backend(upgrade_pkg=False, **kwargs):
         fabric.api.execute(pydiploy.require.releases_manager.deploy_code)
         fabric.api.execute(pydiploy.require.system.permissions)
         fabric.api.execute(pydiploy.require.releases_manager.cleanup)
+
 
 def post_install_backend():
     fabric.api.execute(pydiploy.require.apache.web_configuration)
@@ -82,7 +86,7 @@ def set_app_up():
     fabric.api.execute(pydiploy.require.apache.set_website_up)
 
 
-def install_postgres_server(user=None,dbname=None,password=None):
+def install_postgres_server(user=None, dbname=None, password=None):
     """ Install postgres server & add user for postgres
 
         if no parameters are provided using (if exists) ::
@@ -94,16 +98,30 @@ def install_postgres_server(user=None,dbname=None,password=None):
     """
 
     if not (user and dbname and password):
-        if all([e in env.keys() for e in ('default_db_user', 'default_db_name', 'default_db_password')]):
+        if all(
+            [
+                e in env.keys()
+                for e in ('default_db_user', 'default_db_name', 'default_db_password')
+            ]
+        ):
             user = env.default_db_user
             dbname = env.default_db_name
             password = env.default_db_password
         else:
-            fabric.api.abort('Please provide user,dbname,password parameters for postgres.')
+            fabric.api.abort(
+                'Please provide user,dbname,password parameters for postgres.'
+            )
 
     fabric.api.execute(pydiploy.require.databases.postgres.install_postgres_server)
-    fabric.api.execute(pydiploy.require.databases.postgres.add_postgres_user,user,password=password)
-    fabric.api.execute(pydiploy.require.databases.postgres.add_postgres_database,dbname,owner=user,locale=env.locale)
+    fabric.api.execute(
+        pydiploy.require.databases.postgres.add_postgres_user, user, password=password
+    )
+    fabric.api.execute(
+        pydiploy.require.databases.postgres.add_postgres_database,
+        dbname,
+        owner=user,
+        locale=env.locale,
+    )
 
 
 def install_oracle_client():

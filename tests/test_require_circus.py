@@ -35,7 +35,14 @@ class CircusCheck(TestCase):
     @patch('fabtools.files.upload_template', return_value=Mock())
     @patch('fabtools.require.files.directory', return_value=Mock())
     def test_circus_pkg_old(
-        self, files_directory, upload_template, python_install, deb_ppa, deb_packages, distrib_release, distrib_id
+        self,
+        files_directory,
+        upload_template,
+        python_install,
+        deb_ppa,
+        deb_packages,
+        distrib_release,
+        distrib_id,
     ):
 
         # no_circus_web = True
@@ -46,7 +53,10 @@ class CircusCheck(TestCase):
         self.assertTrue(distrib_id.called)
 
         self.assertTrue(deb_packages.called)
-        self.assertEqual(deb_packages.call_args_list, [call(['libzmq-dev', 'libevent-dev'], update=False)])
+        self.assertEqual(
+            deb_packages.call_args_list,
+            [call(['libzmq-dev', 'libevent-dev'], update=False)],
+        )
 
         # self.assertTrue(deb_ppa.called)
         # self.assertEqual(deb_ppa.call_args_list, [
@@ -54,26 +64,45 @@ class CircusCheck(TestCase):
 
         self.assertTrue(python_install.called)
 
-        self.assertEqual(python_install.call_args_list, [call('circus', upgrade=False, use_sudo=True)])
+        self.assertEqual(
+            python_install.call_args_list,
+            [call('circus', upgrade=False, use_sudo=True)],
+        )
 
         self.assertTrue(upload_template.called)
         self.assertTrue(str(upload_template.call_args).find("'circus.ini.tpl'") > 0)
-        self.assertTrue(str(upload_template.call_args).find("'remote_home/.circus.ini'") > 0)
-        self.assertTrue(str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0)
+        self.assertTrue(
+            str(upload_template.call_args).find("'remote_home/.circus.ini'") > 0
+        )
+        self.assertTrue(
+            str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0
+        )
         self.assertTrue(str(upload_template.call_args).find("user='remote_owner'") > 0)
 
         self.assertTrue(files_directory.called)
         self.assertEqual(
             files_directory.call_args,
-            call(owner='remote_owner', path='remote_home/.circus.d', use_sudo=True, group='remote_group', mode='750'),
+            call(
+                owner='remote_owner',
+                path='remote_home/.circus.d',
+                use_sudo=True,
+                group='remote_group',
+                mode='750',
+            ),
         )
 
         # test circus_package_name
-        env.circus_package_name = "https://github.com/githubaccount/circus/archive/master.zip"
+        env.circus_package_name = (
+            "https://github.com/githubaccount/circus/archive/master.zip"
+        )
         circus_pkg()
         self.assertEqual(
             python_install.call_args_list[1],
-            call('https://github.com/githubaccount/circus/archive/master.zip', upgrade=False, use_sudo=True),
+            call(
+                'https://github.com/githubaccount/circus/archive/master.zip',
+                upgrade=False,
+                use_sudo=True,
+            ),
         )
 
         # test no_circus_web
@@ -110,7 +139,14 @@ class CircusCheck(TestCase):
     @patch('fabtools.files.upload_template', return_value=Mock())
     @patch('fabtools.require.files.directory', return_value=Mock())
     def test_circus_pkg(
-        self, files_directory, upload_template, python_install, deb_ppa, deb_packages, distrib_release, distrib_id
+        self,
+        files_directory,
+        upload_template,
+        python_install,
+        deb_ppa,
+        deb_packages,
+        distrib_release,
+        distrib_id,
     ):
 
         # no_circus_web = True
@@ -121,7 +157,10 @@ class CircusCheck(TestCase):
         self.assertTrue(distrib_id.called)
 
         self.assertTrue(deb_packages.called)
-        self.assertEqual(deb_packages.call_args_list, [call(['libzmq3-dev', 'libevent-dev'], update=False)])
+        self.assertEqual(
+            deb_packages.call_args_list,
+            [call(['libzmq3-dev', 'libevent-dev'], update=False)],
+        )
 
         # self.assertTrue(deb_ppa.called)
         # self.assertEqual(deb_ppa.call_args_list, [
@@ -129,26 +168,45 @@ class CircusCheck(TestCase):
 
         self.assertTrue(python_install.called)
 
-        self.assertEqual(python_install.call_args_list, [call('circus', upgrade=False, use_sudo=True)])
+        self.assertEqual(
+            python_install.call_args_list,
+            [call('circus', upgrade=False, use_sudo=True)],
+        )
 
         self.assertTrue(upload_template.called)
         self.assertTrue(str(upload_template.call_args).find("'circus.ini.tpl'") > 0)
-        self.assertTrue(str(upload_template.call_args).find("'remote_home/.circus.ini'") > 0)
-        self.assertTrue(str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0)
+        self.assertTrue(
+            str(upload_template.call_args).find("'remote_home/.circus.ini'") > 0
+        )
+        self.assertTrue(
+            str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0
+        )
         self.assertTrue(str(upload_template.call_args).find("user='remote_owner'") > 0)
 
         self.assertTrue(files_directory.called)
         self.assertEqual(
             files_directory.call_args,
-            call(owner='remote_owner', path='remote_home/.circus.d', use_sudo=True, group='remote_group', mode='750'),
+            call(
+                owner='remote_owner',
+                path='remote_home/.circus.d',
+                use_sudo=True,
+                group='remote_group',
+                mode='750',
+            ),
         )
 
         # test circus_package_name
-        env.circus_package_name = "https://github.com/githubaccount/circus/archive/master.zip"
+        env.circus_package_name = (
+            "https://github.com/githubaccount/circus/archive/master.zip"
+        )
         circus_pkg()
         self.assertEqual(
             python_install.call_args_list[1],
-            call('https://github.com/githubaccount/circus/archive/master.zip', upgrade=False, use_sudo=True),
+            call(
+                'https://github.com/githubaccount/circus/archive/master.zip',
+                upgrade=False,
+                use_sudo=True,
+            ),
         )
 
         # test no_circus_web
@@ -183,8 +241,15 @@ class CircusCheck(TestCase):
 
         self.assertTrue(upload_template.called)
         self.assertTrue(str(upload_template.call_args).find("'app.ini.tpl'") > 0)
-        self.assertTrue(str(upload_template.call_args).find("'remote_home/.circus.d/application_name.ini'") > 0)
-        self.assertTrue(str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0)
+        self.assertTrue(
+            str(upload_template.call_args).find(
+                "'remote_home/.circus.d/application_name.ini'"
+            )
+            > 0
+        )
+        self.assertTrue(
+            str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0
+        )
         self.assertTrue(str(upload_template.call_args).find("user='remote_owner'") > 0)
 
     @patch('fabtools.files.is_dir', return_value=False)
@@ -194,8 +259,12 @@ class CircusCheck(TestCase):
 
         self.assertTrue(upload_template.called)
         self.assertTrue(str(upload_template.call_args).find("'upstart.conf.tpl'") > 0)
-        self.assertTrue(str(upload_template.call_args).find("'/etc/init/circus.conf'") > 0)
-        self.assertTrue(str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0)
+        self.assertTrue(
+            str(upload_template.call_args).find("'/etc/init/circus.conf'") > 0
+        )
+        self.assertTrue(
+            str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0
+        )
         self.assertTrue(str(upload_template.call_args).find("user='root'") > 0)
 
     @patch('fabric.api.sudo', return_value=Mock())
@@ -206,8 +275,13 @@ class CircusCheck(TestCase):
 
         self.assertTrue(upload_template.called)
         self.assertTrue(str(upload_template.call_args).find("'circus.service.tpl'") > 0)
-        self.assertTrue(str(upload_template.call_args).find("'/etc/systemd/system/circus.service'") > 0)
-        self.assertTrue(str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0)
+        self.assertTrue(
+            str(upload_template.call_args).find("'/etc/systemd/system/circus.service'")
+            > 0
+        )
+        self.assertTrue(
+            str(upload_template.call_args).find("template_dir='lib_path/templates'") > 0
+        )
         self.assertTrue(str(upload_template.call_args).find("user='root'") > 0)
         self.assertTrue(mock_reload_daemon.called)
 
@@ -224,7 +298,8 @@ class CircusCheck(TestCase):
 
         self.assertTrue(api_sudo.called)
         self.assertEqual(
-            api_sudo.call_args_list, [call('status circus'), call('circusctl reloadconfig')],
+            api_sudo.call_args_list,
+            [call('status circus'), call('circusctl reloadconfig')],
         )
 
         self.assertTrue(api_settings.called)

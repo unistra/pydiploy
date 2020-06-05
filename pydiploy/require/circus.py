@@ -34,13 +34,21 @@ def circus_pkg(update=False):
     #    fabtools.require.deb.ppa('ppa:chris-lea/zeromq')
     #    fabtools.require.deb.ppa('ppa:chris-lea/libpgm')
 
-    if fabtools.system.distrib_id() == 'Ubuntu' and fabtools.system.distrib_release() >= '18.04':
+    if (
+        fabtools.system.distrib_id() == 'Ubuntu'
+        and fabtools.system.distrib_release() >= '18.04'
+    ):
         fabtools.require.deb.packages(['libzmq3-dev', 'libevent-dev'], update=update)
 
-    if fabtools.system.distrib_id() == 'Ubuntu' and fabtools.system.distrib_release() < '18.04':
+    if (
+        fabtools.system.distrib_id() == 'Ubuntu'
+        and fabtools.system.distrib_release() < '18.04'
+    ):
         fabtools.require.deb.packages(['libzmq-dev', 'libevent-dev'], update=update)
 
-    fabtools.require.python.install(env.get('circus_package_name', 'circus'), use_sudo=True, upgrade=update)
+    fabtools.require.python.install(
+        env.get('circus_package_name', 'circus'), use_sudo=True, upgrade=update
+    )
 
     if 'no_circus_web' not in env or not env.no_circus_web:
         fabtools.require.python.install('circus-web', use_sudo=True, upgrade=update)
@@ -48,7 +56,9 @@ def circus_pkg(update=False):
 
     # install circus backend sets in fabfile
     if 'circus_backend' in env:
-        fabtools.require.python.install(env.circus_backend, use_sudo=True, upgrade=update)
+        fabtools.require.python.install(
+            env.circus_backend, use_sudo=True, upgrade=update
+        )
 
     # base configuration file for circus
     fabtools.files.upload_template(
@@ -150,7 +160,10 @@ def app_reload():
         with fabric.api.settings(sudo_user=env.remote_owner):
             fabric.api.sudo('circusctl reloadconfig')
             app_installed = fabtools.files.is_file(
-                path=os.path.join(env.remote_home, '.circus.d', '%s.ini' % env.application_name), use_sudo=True
+                path=os.path.join(
+                    env.remote_home, '.circus.d', '%s.ini' % env.application_name
+                ),
+                use_sudo=True,
             )
             with warn_only(), hide():
                 fabric.api.sudo('circusctl restart %s' % env.application_name)

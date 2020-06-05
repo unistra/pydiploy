@@ -19,8 +19,9 @@ from pydiploy.decorators import do_verbose
 def root_web():
     """ Creates web root for webserver """
 
-    fabtools.require.files.directory(env.remote_static_root, use_sudo=True,
-                                     owner='root', group='root', mode='755')
+    fabtools.require.files.directory(
+        env.remote_static_root, use_sudo=True, owner='root', group='root', mode='755'
+    )
 
 
 @do_verbose
@@ -75,9 +76,10 @@ def apache_confirm_start():
     current_role = pydiploy.prepare._get_current_role()
     if fabric.contrib.console.confirm(
         "\napache on %s (role %s) seems not to be started ! \
-                    \n\nDo you want to try to start it?" %
-        (fabric.colors.red(env.host),
-         fabric.colors.red(current_role)), default=False):
+                    \n\nDo you want to try to start it?"
+        % (fabric.colors.red(env.host), fabric.colors.red(current_role)),
+        default=False,
+    ):
         fabtools.service.start('apache2')
 
 
@@ -99,16 +101,17 @@ def up_site_config():
     apache_enabled = os.path.join(apache_root, 'sites-enabled')
     app_conf = os.path.join(apache_available, '%s.conf' % env.server_name)
 
-    fabtools.files.upload_template('apache_host.conf.tpl',
-                                   app_conf,
-                                   context=env,
-                                   template_dir=os.path.join(
-                                       env.lib_path, 'templates'),
-                                   use_jinja=True,
-                                   use_sudo=True,
-                                   user='root',
-                                   chown=True,
-                                   mode='644')
+    fabtools.files.upload_template(
+        'apache_host.conf.tpl',
+        app_conf,
+        context=env,
+        template_dir=os.path.join(env.lib_path, 'templates'),
+        use_jinja=True,
+        use_sudo=True,
+        user='root',
+        chown=True,
+        mode='644',
+    )
 
     fabric.api.execute(apache_enable_site, env.server_name)
 
@@ -121,16 +124,17 @@ def down_site_config():
     apache_available = os.path.join(apache_root, 'sites-available')
     app_conf = os.path.join(apache_available, '%s_down.conf' % env.server_name)
 
-    fabtools.files.upload_template('apache_host_down.conf.tpl',
-                                   app_conf,
-                                   context=env,
-                                   template_dir=os.path.join(
-                                       env.lib_path, 'templates'),
-                                   use_jinja=True,
-                                   use_sudo=True,
-                                   user='root',
-                                   chown=True,
-                                   mode='644')
+    fabtools.files.upload_template(
+        'apache_host_down.conf.tpl',
+        app_conf,
+        context=env,
+        template_dir=os.path.join(env.lib_path, 'templates'),
+        use_jinja=True,
+        use_sudo=True,
+        user='root',
+        chown=True,
+        mode='644',
+    )
 
     # fabric.api.execute(upload_maintenance_page)
 
@@ -193,25 +197,26 @@ def set_website_down():
 def upload_maintenance_page():
     """ Uploads and forges maintenance.html according to template """
 
-    maintenance_file = os.path.join(env.remote_static_root,
-                                    env.application_name,
-                                    'maintenance.html')
+    maintenance_file = os.path.join(
+        env.remote_static_root, env.application_name, 'maintenance.html'
+    )
     vars_required = ['maintenance_text', 'maintenance_title']
 
     for v in vars_required:
         if v in env:
             env[v] = env[v].decode('utf-8')
 
-    fabtools.files.upload_template('maintenance.html.tpl',
-                                   maintenance_file,
-                                   context=env,
-                                   template_dir=os.path.join(
-                                       env.lib_path, 'templates'),
-                                   use_jinja=True,
-                                   use_sudo=True,
-                                   user='root',
-                                   chown=True,
-                                   mode='644')
+    fabtools.files.upload_template(
+        'maintenance.html.tpl',
+        maintenance_file,
+        context=env,
+        template_dir=os.path.join(env.lib_path, 'templates'),
+        use_jinja=True,
+        use_sudo=True,
+        user='root',
+        chown=True,
+        mode='644',
+    )
 
 
 @do_verbose
@@ -238,7 +243,8 @@ def apache_enable_site(site=None, restart=False):
 
     if site:
         fabtools.require.apache.site_enabled(
-            site) if restart else fabtools.require.apache.site_enabled(site)
+            site
+        ) if restart else fabtools.require.apache.site_enabled(site)
 
 
 @do_verbose

@@ -26,7 +26,8 @@ def bottle_prepare():
     with fabtools.python.virtualenv(env.remote_virtualenv_dir):
         with fabric.api.cd(env.remote_current_path):
             with fabric.api.settings(sudo_user=env.remote_owner):
-                    fabric.api.sudo('cp -R %s/static assets' % env.root_package_name)
+                fabric.api.sudo('cp -R %s/static assets' % env.root_package_name)
 
-    fabric.api.get(os.path.join(env.remote_current_path, 'assets'),
-                   local_path=env.local_tmp_dir)
+    fabric.api.get(
+        os.path.join(env.remote_current_path, 'assets'), local_path=env.local_tmp_dir
+    )

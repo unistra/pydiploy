@@ -36,16 +36,22 @@ class UtilsCheck(TestCase):
     def test_python_pkg(self, dist_id, dist_rls, python_install, deb_packages):
         python_pkg()
         self.assertTrue(deb_packages.called)
-        self.assertEqual(deb_packages.call_args, call(['python-dev', 'python-pip'], update=False))
+        self.assertEqual(
+            deb_packages.call_args, call(['python-dev', 'python-pip'], update=False)
+        )
         self.assertTrue(python_install.called)
-        self.assertEqual(python_install.call_args, call('pip', upgrade=True, use_sudo=True))
+        self.assertEqual(
+            python_install.call_args, call('pip', upgrade=True, use_sudo=True)
+        )
 
     @patch('fabtools.python.virtualenv', return_value=Mock())
     @patch('fabric.api.cd', return_value=Mock())
     @patch('fabtools.require.python.install', return_value=Mock())
     @patch('fabric.api.sudo', return_value=Mock())
     @patch('fabtools.python.install_requirements', return_value=Mock())
-    def test_application_dependencies(self, install_requirements, api_sudo, python_install, api_cd, python_virtualenv):
+    def test_application_dependencies(
+        self, install_requirements, api_sudo, python_install, api_cd, python_virtualenv
+    ):
 
         python_virtualenv.return_value.__exit__ = Mock()
         python_virtualenv.return_value.__enter__ = Mock()
@@ -108,5 +114,10 @@ class VirtualEnvCheck(TestCase):
         self.assertTrue(files_directory.called)
         self.assertEqual(
             files_directory.call_args,
-            call('remote_virtualenv_dir', owner='remote_owner', use_sudo=True, group='remote_group'),
+            call(
+                'remote_virtualenv_dir',
+                owner='remote_owner',
+                use_sudo=True,
+                group='remote_group',
+            ),
         )

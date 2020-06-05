@@ -18,5 +18,5 @@ def sqlite3_pkg(use_sudo=False, user=None):
 
     fabtools.require.deb.package('libsqlite3-dev', update=True)
     fabtools.require.python.package(
-        'pysqlite', upgrade=True, use_sudo=use_sudo,
-        user=user)
+        'pysqlite', upgrade=True, use_sudo=use_sudo, user=user
+    )

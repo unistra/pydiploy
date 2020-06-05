@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-This class is for sytem relatives tools and commands
+This class is for system relatives tools and commands
 
 """
 
@@ -113,8 +113,6 @@ def check_python3_install(version='python3', update=False):
 
     if not package_installed(version):
         # TODO check for others ubuntu"s versions !!!!!
-        fabric.api.puts(fabtools.system.distrib_release())
-        fabric.api.puts(fabtools.system.distrib_release() >= 14.04)
         # Install mighty PPA
         if fabtools.system.distrib_release() >= 14.04:
             # add-apt-repository moved to software-properties-common in 14.04

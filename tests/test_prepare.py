@@ -3,15 +3,24 @@
 
 import copy
 import re
-from unittest import TestCase
 from os.path import join
+from unittest import TestCase
+
 from fabric.api import env
-from mock import call, Mock, patch
+from mock import Mock, call, patch
 from pydiploy import version
-from pydiploy.prepare import (_get_current_role, build_env,
-                              check_req_pydiploy_version, generate_fabfile,
-                              init_params, process_releases, tag, test_config,
-                              generate_fabfile_simple, generate_fabfile_bottle)
+from pydiploy.prepare import (
+    _get_current_role,
+    build_env,
+    check_req_pydiploy_version,
+    generate_fabfile,
+    generate_fabfile_bottle,
+    generate_fabfile_simple,
+    init_params,
+    process_releases,
+    tag,
+    test_config,
+)
 
 
 class PrepareCheck(TestCase):
@@ -41,7 +50,10 @@ class PrepareCheck(TestCase):
         env.remote_releases_path = "remote_home/server_name/releases"
         env.remote_repo_url = "remote_repo_url"
         env.remote_shared_path = "remote_shared_path"
-        env.roledefs = {'web': ['192.168.1.2'], 'lb': ['192.168.1.3'], }
+        env.roledefs = {
+            'web': ['192.168.1.2'],
+            'lb': ['192.168.1.3'],
+        }
         env.root_package_name = "root_package_name"
         env.server_name = "server_name"
         env.tag = "4.0"
@@ -50,8 +62,9 @@ class PrepareCheck(TestCase):
         env.locale = 'fr_FR.UTF-8'
         env.timezone = 'Europe/Paris'
         env.remote_virtualenv_root = join(env.remote_home, '.virtualenvs')
-        env.remote_virtualenv_dir = join(env.remote_virtualenv_root,
-                                         env.application_name)
+        env.remote_virtualenv_dir = join(
+            env.remote_virtualenv_root, env.application_name
+        )
         env.user = 'toto'
         env.remote_python_version = 3.4
         env.keep_releases = 2
@@ -66,7 +79,7 @@ class PrepareCheck(TestCase):
 
     @patch('fabric.api.abort', return_value=Mock())
     @patch('pydiploy.require.git.collect_tags', return_value=[''])
-    @patch('pydiploy.require.git.collect_branches', return_value=['master','4.0'])
+    @patch('pydiploy.require.git.collect_branches', return_value=['master', '4.0'])
     @patch('pydiploy.require.git.check_tag_exist', return_value=Mock())
     def test_tag(self, tag_exist, collect_branches, collect_tags, api_abort):
 
@@ -96,7 +109,9 @@ class PrepareCheck(TestCase):
     @patch('fabric.api.execute', return_value=True)
     @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabric.api.abort', return_value=Mock())
-    def test_build_env_ok(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+    def test_build_env_ok(
+        self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt
+    ):
         build_env()
         self.assertFalse(api_prompt.called)
         self.assertFalse(api_abort.called)
@@ -106,22 +121,26 @@ class PrepareCheck(TestCase):
         self.assertFalse(is_dir.called)
         self.assertFalse(api_run.called)
         self.assertEqual(env.remote_project_dir, "remote_home/server_name")
+        self.assertEqual(env.local_tmp_root_app, "local_tmp_dir/application_name-4.0")
         self.assertEqual(
-            env.local_tmp_root_app, "local_tmp_dir/application_name-4.0")
-        self.assertEqual(env.local_tmp_root_app_package,
-                         "local_tmp_dir/application_name-4.0/root_package_name")
+            env.local_tmp_root_app_package,
+            "local_tmp_dir/application_name-4.0/root_package_name",
+        )
+        self.assertEqual(env.remote_current_path, "remote_home/server_name/current")
+        self.assertEqual(env.remote_releases_path, "remote_home/server_name/releases")
+        self.assertEqual(env.remote_shared_path, "remote_home/server_name/shared")
         self.assertEqual(
-            env.remote_current_path, "remote_home/server_name/current")
+            env.remote_base_package_dir,
+            "remote_home/server_name/current/root_package_name",
+        )
         self.assertEqual(
-            env.remote_releases_path, "remote_home/server_name/releases")
+            env.remote_settings_dir,
+            "remote_home/server_name/current/root_package_name/settings",
+        )
         self.assertEqual(
-            env.remote_shared_path, "remote_home/server_name/shared")
-        self.assertEqual(env.remote_base_package_dir,
-                         "remote_home/server_name/current/root_package_name")
-        self.assertEqual(env.remote_settings_dir,
-                         "remote_home/server_name/current/root_package_name/settings")
-        self.assertEqual(env.remote_settings_file,
-                         "remote_home/server_name/current/root_package_name/settings/goal.py")
+            env.remote_settings_file,
+            "remote_home/server_name/current/root_package_name/settings/goal.py",
+        )
         self.assertTrue(re.match("^.*pydiploy$", env.lib_path))
         self.assertEqual(env.goals, ['dev', 'test', 'prod'])
 
@@ -131,7 +150,9 @@ class PrepareCheck(TestCase):
     @patch('fabric.api.execute', return_value=True)
     @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabric.api.abort', return_value=Mock())
-    def test_build_env_no_releases(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+    def test_build_env_no_releases(
+        self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt
+    ):
         del env['releases']
         build_env()
         self.assertFalse(api_prompt.called)
@@ -141,15 +162,15 @@ class PrepareCheck(TestCase):
         self.assertFalse(api_run.called)
         self.assertFalse(is_dir.called)
         self.assertFalse(api_run.called)
-
-
     @patch('fabric.api.prompt', return_value="4.0")
     @patch('fabtools.files.is_dir', return_value=True)
     @patch('fabric.api.run', return_value="4.0")
     @patch('fabric.api.execute', return_value=True)
     @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabric.api.abort', return_value=Mock())
-    def test_build_env_extra_goals(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+    def test_build_env_extra_goals(
+        self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt
+    ):
         env.extra_goals = ['toto']
         build_env()
         self.assertFalse(api_prompt.called)
@@ -167,7 +188,9 @@ class PrepareCheck(TestCase):
     @patch('fabric.api.execute', return_value=True)
     @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabric.api.abort', return_value=Mock())
-    def test_build_env_verbose(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+    def test_build_env_verbose(
+        self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt
+    ):
         env.verbose_output = True
         build_env()
         self.assertFalse(api_prompt.called)
@@ -185,7 +208,9 @@ class PrepareCheck(TestCase):
     @patch('fabric.api.execute', return_value=True)
     @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabric.api.abort', return_value=Mock())
-    def test_build_env_no_required_packages(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+    def test_build_env_no_required_packages(
+        self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt
+    ):
         env.root_package_name = ''
         env.server_name = ''
         env.remote_static_root = ''
@@ -223,7 +248,9 @@ class PrepareCheck(TestCase):
     @patch('fabric.api.execute', return_value=True)
     @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabric.api.abort', return_value=Mock())
-    def test_build_env_req_pydiploy_version(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+    def test_build_env_req_pydiploy_version(
+        self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt
+    ):
         env.req_pydiploy_version = version.__version__
         build_env()
         self.assertFalse(api_prompt.called)
@@ -240,7 +267,9 @@ class PrepareCheck(TestCase):
     @patch('fabric.api.execute', return_value=True)
     @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabric.api.abort', return_value=Mock())
-    def test_build_env_wron_req_pydiploy_version(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+    def test_build_env_wron_req_pydiploy_version(
+        self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt
+    ):
         env.req_pydiploy_version = '0.9'
         build_env()
         self.assertFalse(api_prompt.called)
@@ -250,15 +279,15 @@ class PrepareCheck(TestCase):
         self.assertFalse(api_run.called)
         self.assertFalse(is_dir.called)
         self.assertFalse(api_run.called)
-
-
     @patch('fabric.api.prompt', return_value="4.0")
     @patch('fabtools.files.is_dir', return_value=True)
     @patch('fabric.api.run', return_value="4.0")
     @patch('fabric.api.execute', return_value=True)
     @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabric.api.abort', return_value=Mock())
-    def test_build_env_application_type(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+    def test_build_env_application_type(
+        self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt
+    ):
         env.application_type = 'default'
         build_env()
         self.assertFalse(api_prompt.called)
@@ -268,15 +297,15 @@ class PrepareCheck(TestCase):
         self.assertFalse(api_run.called)
         self.assertFalse(is_dir.called)
         self.assertFalse(api_run.called)
-
-
     @patch('fabric.api.prompt', return_value="4.0")
     @patch('fabtools.files.is_dir', return_value=True)
     @patch('fabric.api.run', return_value="4.0")
     @patch('fabric.api.execute', return_value=True)
     @patch('fabric.contrib.console.confirm', return_value=Mock())
     @patch('fabric.api.abort', return_value=Mock())
-    def test_build_env_wrong_remote_home(self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt):
+    def test_build_env_wrong_remote_home(
+        self, api_abort, console_confirm, api_execute, api_run, is_dir, api_prompt
+    ):
         env.remote_home = '/'
         build_env()
         self.assertFalse(api_prompt.called)
@@ -287,7 +316,8 @@ class PrepareCheck(TestCase):
         self.assertFalse(is_dir.called)
         self.assertFalse(api_run.called)
         self.assertEqual(
-            api_abort.call_args, call('The remote home cannot be empty or /.'))
+            api_abort.call_args, call('The remote home cannot be empty or /.')
+        )
 
     @patch('fabric.api.puts', return_value=Mock())
     def test_config(self, api_puts):
@@ -322,18 +352,18 @@ class PrepareCheck(TestCase):
 
         self.assertTrue(is_dir.called)
         self.assertTrue(api_run.called)
-        self.assertEqual(api_run.call_args, call(
-            'ls -x remote_home/server_name/releases'))
+        self.assertEqual(
+            api_run.call_args, call('ls -x remote_home/server_name/releases')
+        )
 
-        #with 1 release
+        # with 1 release
         api_run.return_value = "4.0"
         process_releases()
 
         self.assertEqual(env.releases, ['4.0'])
         self.assertEqual(env.remote_project_dir, "remote_home/server_name")
         self.assertEqual(env.current_revision, "4.0")
-        self.assertEqual(
-            env.current_release, "remote_home/server_name/releases/4.0")
+        self.assertEqual(env.current_release, "remote_home/server_name/releases/4.0")
 
         # with 2 release
         del env['releases']
@@ -343,8 +373,7 @@ class PrepareCheck(TestCase):
         self.assertEqual(env.releases, ['3.0', '4.0'])
         self.assertEqual(env.remote_project_dir, "remote_home/server_name")
         self.assertEqual(env.current_revision, "4.0")
-        self.assertEqual(
-            env.current_release, "remote_home/server_name/releases/4.0")
+        self.assertEqual(env.current_release, "remote_home/server_name/releases/4.0")
         self.assertEqual(env.previous_revision, "3.0")
-        self.assertEqual(
-            env.previous_release, "remote_home/server_name/releases/3.0")
+        self.assertEqual(env.previous_release, "remote_home/server_name/releases/3.0")
+

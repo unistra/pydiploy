@@ -16,17 +16,19 @@ from six import StringIO
 SUBLIME_SNIPPET_FILENAME = 'pydiployfabfile.sublime-snippet'
 # TODO manage other os (Darwin,windoz...)
 SUBLIME_CONFIG_DIRS = {
-    'Linux' : [
+    'Linux': [
         '.config/sublime-text-3/Packages/User',
-        '.config/sublime-text-2/Packages/User'
+        '.config/sublime-text-2/Packages/User',
     ],
 }
 
 
 def get_dest_files(system):
     try:
-        return (join(expanduser('~'), cfg_dir, SUBLIME_SNIPPET_FILENAME)
-                for cfg_dir in SUBLIME_CONFIG_DIRS[system])
+        return (
+            join(expanduser('~'), cfg_dir, SUBLIME_SNIPPET_FILENAME)
+            for cfg_dir in SUBLIME_CONFIG_DIRS[system]
+        )
     except KeyError:
         raise NotImplementedError(system)
 
@@ -38,7 +40,10 @@ def sublime_text_snippet():
     stream = StringIO()
 
     snippet_header = '<snippet>\n<content><![CDATA[\n'
-    snippet_footer = '\n]]></content>\n<description>Pydiploy fabfile %s</description>\n<tabTrigger>pydiployfab</tabTrigger>\n<scope>source.python</scope>\n</snippet>' % __version__
+    snippet_footer = (
+        '\n]]></content>\n<description>Pydiploy fabfile %s</description>\n<tabTrigger>pydiployfab</tabTrigger>\n<scope>source.python</scope>\n</snippet>'
+        % __version__
+    )
 
     stream.write(snippet_header)
     with open(src_filename, 'r') as src_h:

@@ -16,7 +16,14 @@ from pydiploy.decorators import do_verbose
 
 @do_verbose
 def archive(
-    filename, path='/tmp', format="tar.gz", tag="HEAD", remote="", prefix="", project_path=".", specific_folder=""
+    filename,
+    path='/tmp',
+    format="tar.gz",
+    tag="HEAD",
+    remote="",
+    prefix="",
+    project_path=".",
+    specific_folder="",
 ):
     """ Creates an archive from a git repository or directly from a project
 
@@ -120,6 +127,10 @@ def collect_branches(project_path='.', remote=""):
 def check_tag_exist(tag=None):
     """ Checks if a tag/branch exists in the repository """
     if tag:
-        if tag not in collect_branches() and tag not in collect_tags() and 'no_tag_check' not in env:
+        if (
+            tag not in collect_branches()
+            and tag not in collect_tags()
+            and 'no_tag_check' not in env
+        ):
             return False
         return True

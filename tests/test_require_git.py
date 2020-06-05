@@ -5,9 +5,13 @@ import copy
 from unittest import TestCase
 
 from fabric.api import env
-from mock import call, Mock, patch
-from pydiploy.require.git import (archive, check_tag_exist, collect_branches,
-                                  collect_tags)
+from mock import Mock, call, patch
+from pydiploy.require.git import (
+    archive,
+    check_tag_exist,
+    collect_branches,
+    collect_tags,
+)
 
 
 class GitCheck(TestCase):
@@ -41,26 +45,42 @@ class GitCheck(TestCase):
         self.assertEqual(api_lcd.call_args, call('.'))
 
         self.assertTrue(api_local.called)
-        self.assertEqual(api_local.call_args, call(
-            'git archive --format=tar HEAD |gzip > /tmp/myfile.tar.gz'))
+        self.assertEqual(
+            api_local.call_args,
+            call('git archive --format=tar HEAD |gzip > /tmp/myfile.tar.gz'),
+        )
 
         # if remote and prefix
         archive(self.filename, remote=self.remote, prefix=self.prefix)
         self.assertTrue(api_local.called)
-        self.assertEqual(api_local.call_args, call(
-            'git archive --format=tar --remote=remote --prefix=prefix HEAD |gzip > /tmp/myfile.tar.gz'))
+        self.assertEqual(
+            api_local.call_args,
+            call(
+                'git archive --format=tar --remote=remote --prefix=prefix HEAD |gzip > /tmp/myfile.tar.gz'
+            ),
+        )
 
         # if remote and prefix and specific folder
-        archive(self.filename, remote=self.remote, prefix=self.prefix, specific_folder='/myfolder')
+        archive(
+            self.filename,
+            remote=self.remote,
+            prefix=self.prefix,
+            specific_folder='/myfolder',
+        )
         self.assertTrue(api_local.called)
-        self.assertEqual(api_local.call_args, call(
-            'git archive --format=tar --remote=remote --prefix=prefix HEAD:/myfolder |gzip > /tmp/myfile.tar.gz'))
+        self.assertEqual(
+            api_local.call_args,
+            call(
+                'git archive --format=tar --remote=remote --prefix=prefix HEAD:/myfolder |gzip > /tmp/myfile.tar.gz'
+            ),
+        )
 
         # if format not supported
         archive(self.filename, format="error")
         self.assertTrue(api_abort.called)
-        self.assertEqual(api_abort.call_args, call(
-            'Git archive format not supported: error'))
+        self.assertEqual(
+            api_abort.call_args, call('Git archive format not supported: error')
+        )
 
     @patch('fabric.api.lcd', return_value=Mock())
     @patch('fabric.context_managers.hide', return_value=Mock())

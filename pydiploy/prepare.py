@@ -28,11 +28,19 @@ def tag(version):
     """ Defines tag to deploy """
 
     if "pydiploy_version" in env:
-        fabric.api.abort(fabric.colors.red("tag should be set before calling goal (ex: fab tag:master test deploy)"))
+        fabric.api.abort(
+            fabric.colors.red(
+                "tag should be set before calling goal (ex: fab tag:master test deploy)"
+            )
+        )
     if check_tag_exist(version):
         env.tag = version
     else:
-        fabric.api.abort(fabric.colors.red("tag/branch provided is not in the repository please fix this first"))
+        fabric.api.abort(
+            fabric.colors.red(
+                "tag/branch provided is not in the repository please fix this first"
+            )
+        )
 
 
 def init_params(application_type='default'):
@@ -44,7 +52,9 @@ def init_params(application_type='default'):
             PARAMS[application_type]['optional_params'],
         )
     except KeyError:
-        fabric.api.abort(fabric.colors.red("application_type '%s' doesn't exists" % application_type))
+        fabric.api.abort(
+            fabric.colors.red("application_type '%s' doesn't exists" % application_type)
+        )
     return required_params, optional_params
 
 
@@ -61,7 +71,10 @@ def build_env():
                     \nBe sure that your fabfile complies last pydiploy evolutions. \
                     \nContinue at your own risks ! \
                     \n\nDo you want to continue?"
-                % (fabric.colors.red(env.req_pydiploy_version), fabric.colors.red(__version__)),
+                % (
+                    fabric.colors.red(env.req_pydiploy_version),
+                    fabric.colors.red(__version__),
+                ),
                 default=False,
             ):
                 fabric.api.abort("Aborting at user request.")
@@ -80,13 +93,19 @@ def build_env():
         env.remote_project_dir = os.path.join(env.remote_home, env.application_name)
 
     if "tag" in env:
-        env.local_tmp_root_app = os.path.join(env.local_tmp_dir, '%(application_name)s-%(tag)s' % env)
-        env.local_tmp_root_app_package = os.path.join(env.local_tmp_root_app, env.root_package_name)
+        env.local_tmp_root_app = os.path.join(
+            env.local_tmp_dir, '%(application_name)s-%(tag)s' % env
+        )
+        env.local_tmp_root_app_package = os.path.join(
+            env.local_tmp_root_app, env.root_package_name
+        )
 
     env.remote_current_path = os.path.join(env.remote_project_dir, 'current')
     env.remote_releases_path = os.path.join(env.remote_project_dir, 'releases')
     env.remote_shared_path = os.path.join(env.remote_project_dir, 'shared')
-    env.remote_base_package_dir = os.path.join(env.remote_current_path, env.root_package_name)
+    env.remote_base_package_dir = os.path.join(
+        env.remote_current_path, env.root_package_name
+    )
     env.remote_settings_dir = os.path.join(env.remote_base_package_dir, 'settings')
     env.remote_settings_file = os.path.join(env.remote_settings_dir, '%s.py' % env.goal)
     env.lib_path = os.path.dirname(__file__)
@@ -118,7 +137,9 @@ def build_env():
 
     if not test_config(verbose=verbose_value, application_type=application_type):
         if not fabric.contrib.console.confirm(
-            "Configuration test %s! Do you want to continue?" % fabric.colors.red('failed'), default=False
+            "Configuration test %s! Do you want to continue?"
+            % fabric.colors.red('failed'),
+            default=False,
         ):
             fabric.api.abort("Aborting at user request.")
 
@@ -147,9 +168,15 @@ def test_config(verbose=True, application_type='default'):
     )
     for param, desc in sorted(req_params.items()):
         if param not in env:
-            err.append("%s -> %s : missing" % (param.ljust(max_req_param_length), desc.ljust(max_req_desc_length)))
+            err.append(
+                "%s -> %s : missing"
+                % (param.ljust(max_req_param_length), desc.ljust(max_req_desc_length))
+            )
         elif not bool(env[param]):
-            err.append("%s -> %s : not set" % (param.ljust(max_req_param_length), desc.ljust(max_req_desc_length)))
+            err.append(
+                "%s -> %s : not set"
+                % (param.ljust(max_req_param_length), desc.ljust(max_req_desc_length))
+            )
         elif verbose:
             req_parameters.append((param, env[param], desc))
 
@@ -162,10 +189,13 @@ def test_config(verbose=True, application_type='default'):
     if err:
         err_nb = len(err)
         if err_nb == len(req_params):
-            fabric.api.puts('You need to configure correctly the fabfile please RTFM first !')
+            fabric.api.puts(
+                'You need to configure correctly the fabfile please RTFM first !'
+            )
         else:
             fabric.api.puts(
-                'Config test failed (%s error%s) for role %s:' % (err_nb, 's' if err_nb > 1 else '', current_role)
+                'Config test failed (%s error%s) for role %s:'
+                % (err_nb, 's' if err_nb > 1 else '', current_role)
             )
             fabric.api.puts('%s\n\n* %s\n' % ('-' * 30, '\n* '.join(err)))
             fabric.api.puts('Please fix them or continue with possible errors.')
@@ -173,7 +203,10 @@ def test_config(verbose=True, application_type='default'):
     elif verbose:
         fabric.api.puts('\n\nRequired parameters list : \n\n')
         for param, value, description in req_parameters:
-            fabric.api.puts('* %s %s' % (param.ljust(max_req_param_length), fabric.colors.green(value)))
+            fabric.api.puts(
+                '* %s %s'
+                % (param.ljust(max_req_param_length), fabric.colors.green(value))
+            )
         fabric.api.puts('\n\nOptional parameters list : \n\n')
         if len(opt_parameters):
             for param, value, description in opt_parameters:
@@ -186,7 +219,8 @@ def test_config(verbose=True, application_type='default'):
         else:
             fabric.api.puts("No optional parameter found")
     fabric.api.puts(
-        '\n\nRole : %s -> configuration %s!\n\n' % (fabric.colors.green(current_role), fabric.colors.green("OK"))
+        '\n\nRole : %s -> configuration %s!\n\n'
+        % (fabric.colors.green(current_role), fabric.colors.green("OK"))
     )
     return True
 
@@ -208,7 +242,9 @@ def check_req_pydiploy_version():
 
     if "req_pydiploy_version" in env:
         major_version_installed = __version_info__[0:2]
-        major_version_required = tuple([int(num) for num in env.req_pydiploy_version.split('.')])
+        major_version_required = tuple(
+            [int(num) for num in env.req_pydiploy_version.split('.')]
+        )
         if major_version_installed != major_version_required[0:2]:
             return False
         return True
@@ -243,7 +279,9 @@ def process_releases():
     """ Populates env vars for releases (current, old...) """
     if fabtools.files.is_dir(env.remote_releases_path):
         env.releases = sorted(
-            fabric.api.run('ls -x %(releases_path)s' % {'releases_path': env.remote_releases_path}).split()
+            fabric.api.run(
+                'ls -x %(releases_path)s' % {'releases_path': env.remote_releases_path}
+            ).split()
         )
         if len(env.releases) >= 1:
             env.current_revision = env.releases[-1]
@@ -252,9 +290,15 @@ def process_releases():
                 'current_revision': env.current_revision,
             }
             # warning previous settings file before deployement !!!!!
-            env.previous_release_base_package_dir = os.path.join(env.current_release, env.root_package_name)
-            env.previous_release_settings_dir = os.path.join(env.previous_release_base_package_dir, 'settings')
-            env.previous_settings_file = os.path.join(env.previous_release_settings_dir, '%s.py' % env.goal)
+            env.previous_release_base_package_dir = os.path.join(
+                env.current_release, env.root_package_name
+            )
+            env.previous_release_settings_dir = os.path.join(
+                env.previous_release_base_package_dir, 'settings'
+            )
+            env.previous_settings_file = os.path.join(
+                env.previous_release_settings_dir, '%s.py' % env.goal
+            )
             fabric.api.puts("settings :", env.previous_settings_file)
 
         if len(env.releases) > 1:
