@@ -1,8 +1,8 @@
-import pytest
-from fabric.api import run, env
-import pydiploy
 import os
 
+import pydiploy
+import pytest
+from fabric.api import env, run
 
 pytestmark = pytest.mark.network
 
@@ -13,14 +13,17 @@ def buildmyenv():
     env.remote_owner = 'django'  # remote server user
     env.remote_group = 'di'  # remote server group
 
-    env.application_name = 'myapp'   # name of webapp
+    env.application_name = 'myapp'  # name of webapp
     env.root_package_name = 'myapp'  # name of app in webapp
 
     env.remote_home = '/home/django'  # remote home root
     env.remote_python_version = 3.4  # python version
-    env.remote_virtualenv_root = os.path.join(env.remote_home, '.virtualenvs')  # venv root
-    env.remote_virtualenv_dir = os.path.join(env.remote_virtualenv_root,
-                                     env.application_name)  # venv for webapp dir
+    env.remote_virtualenv_root = os.path.join(
+        env.remote_home, '.virtualenvs'
+    )  # venv root
+    env.remote_virtualenv_dir = os.path.join(
+        env.remote_virtualenv_root, env.application_name
+    )  # venv for webapp dir
     env.remote_repo_url = 'git@git.net:myapp.git'  # git repository url
     env.local_tmp_dir = '/tmp'  # tmp dir
     env.remote_static_root = '/var/www/static'  # root of static files
@@ -60,8 +63,10 @@ def pre_install():
 
 def test_user_created(pre_install):
     django = run('getent passwd %s' % env.remote_owner)
-    assert django == '%s:x:1001:1003::/home/%s:/bin/bash' % (env.remote_owner,
-                                                             env.remote_owner)
+    assert django == '%s:x:1001:1003::/home/%s:/bin/bash' % (
+        env.remote_owner,
+        env.remote_owner,
+    )
 
     django = run('getent group %s' % env.remote_group)
     assert django == '%s:x:1003:' % env.remote_group
@@ -73,7 +78,9 @@ def test_locale(pre_install):
 
 
 def test_timezone(pre_install):
-    lang = run("cd /usr/share/zoneinfo && find * -type f -exec sh -c \"diff -q /etc/localtime '{}' > /dev/null && echo {}\" \;")
+    lang = run(
+        "cd /usr/share/zoneinfo && find * -type f -exec sh -c \"diff -q /etc/localtime '{}' > /dev/null && echo {}\" \;"
+    )
     assert lang == env.timezone
 
 
@@ -88,7 +95,9 @@ def test_app_packages(pre_install):
     assert install == 'install ok installed'
     install = run("dpkg-query -W -f='${Status}' python-pip")
     assert install == 'install ok installed'
-    install = run("dpkg-query -W -f='${Status}' python%s-dev" % env.remote_python_version)
+    install = run(
+        "dpkg-query -W -f='${Status}' python%s-dev" % env.remote_python_version
+    )
     assert install == 'install ok installed'
 
 
@@ -96,9 +105,13 @@ def test_circus(pre_install):
     install = run("pip freeze |grep circus |cut -d '=' -f1")
     assert install == 'circus\r\ncircus-web'
 
-    circusconf = run('[ -e %s/.circus.d ] && echo "Found" || echo "Not found"' % env.remote_home)
+    circusconf = run(
+        '[ -e %s/.circus.d ] && echo "Found" || echo "Not found"' % env.remote_home
+    )
     assert circusconf == "Found"
-    circusconf = run('[ -e %s/.circus.ini ] && echo "Found" || echo "Not found"' % env.remote_home)
+    circusconf = run(
+        '[ -e %s/.circus.ini ] && echo "Found" || echo "Not found"' % env.remote_home
+    )
     assert circusconf == "Found"
 
     start = run("status circus |cut -d '/' -f1")
@@ -106,5 +119,8 @@ def test_circus(pre_install):
 
 
 def test_virtualenv(pre_install):
-    right_lib = run('[ -e %s/.virtualenvs/%s/lib/python%s ] && echo "Found" || echo "Not found"' % (env.remote_home, env.application_name, env.remote_python_version))
+    right_lib = run(
+        '[ -e %s/.virtualenvs/%s/lib/python%s ] && echo "Found" || echo "Not found"'
+        % (env.remote_home, env.application_name, env.remote_python_version)
+    )
     assert right_lib == "Found"

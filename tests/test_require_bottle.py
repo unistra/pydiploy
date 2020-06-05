@@ -4,10 +4,14 @@
 import copy
 import datetime
 from unittest import TestCase
+
 from fabric.api import env
-from mock import call, Mock, patch
-from pydiploy.require.bottle.utils import (app_settings, deploy_environ_file,
-                                           extract_settings)
+from mock import Mock, call, patch
+from pydiploy.require.bottle.utils import (
+    app_settings,
+    deploy_environ_file,
+    extract_settings,
+)
 
 
 class UtilsCheck(TestCase):
@@ -24,8 +28,11 @@ class UtilsCheck(TestCase):
         env.map_settings = {
             "server_url": "SERVER_URL",
             "default_db_user": "DATABASES['default']['USER']",
-            'thanks_arno': ('THANKS_ARNAUD',
-                            r'environ.get\(["\']THANKS_ARNAUD[\'"], [\'"](.*)["\']\)')}
+            'thanks_arno': (
+                'THANKS_ARNAUD',
+                r'environ.get\(["\']THANKS_ARNAUD[\'"], [\'"](.*)["\']\)',
+            ),
+        }
         env.local_tmp_root_app_package = "local_tmp_root_app_package"
         env.remote_owner = "owner"
         env.previous_settings_file = "remote_settings_file"
@@ -43,8 +50,9 @@ class UtilsCheck(TestCase):
         extract_settings()
 
         self.assertTrue(api_get.called)
-        self.assertEqual(api_get.call_args, call(
-            'remote_settings_file', local_path='tests/data'))
+        self.assertEqual(
+            api_get.call_args, call('remote_settings_file', local_path='tests/data')
+        )
 
         self.assertEqual(env.server_url, '{{ server_url }}')
         self.assertEqual(env.default_db_user, '{{ default_db_user }}')
@@ -59,12 +67,12 @@ class UtilsCheck(TestCase):
         app_settings(test1='toto')
 
         self.assertTrue(is_file.called)
-        self.assertEqual(is_file.call_args, call(
-            path='remote_settings_file', use_sudo=True))
+        self.assertEqual(
+            is_file.call_args, call(path='remote_settings_file', use_sudo=True)
+        )
 
         self.assertTrue(api_execute.called)
-        self.assertTrue(
-            str(api_execute.call_args).find('extract_settings') > 0)
+        self.assertTrue(str(api_execute.call_args).find('extract_settings') > 0)
 
         self.assertEqual(env.test1, 'toto')
 
@@ -73,16 +81,18 @@ class UtilsCheck(TestCase):
         self.assertTrue(str(api_require.call_args).find('default_db_user') > 0)
 
         self.assertTrue(upload_template.called)
-        self.assertTrue(str(upload_template.call_args).find(
-            "template_dir='local_tmp_root_app_package/settings'") > 0)
         self.assertTrue(
-            str(upload_template.call_args).find("'settings.py'") > 0)
+            str(upload_template.call_args).find(
+                "template_dir='local_tmp_root_app_package/settings'"
+            )
+            > 0
+        )
+        self.assertTrue(str(upload_template.call_args).find("'settings.py'") > 0)
         self.assertTrue(
-            str(upload_template.call_args).find("'remote_settings_file'") > 0)
-        self.assertTrue(
-            str(upload_template.call_args).find("use_jinja=True") > 0)
-        self.assertTrue(
-            str(upload_template.call_args).find("user='owner'") > 0)
+            str(upload_template.call_args).find("'remote_settings_file'") > 0
+        )
+        self.assertTrue(str(upload_template.call_args).find("use_jinja=True") > 0)
+        self.assertTrue(str(upload_template.call_args).find("user='owner'") > 0)
 
         # is file false
         is_file.return_value = False
@@ -90,8 +100,9 @@ class UtilsCheck(TestCase):
         app_settings()
 
         self.assertTrue(is_file.called)
-        self.assertEqual(is_file.call_args, call(
-            path='remote_settings_file', use_sudo=True))
+        self.assertEqual(
+            is_file.call_args, call(path='remote_settings_file', use_sudo=True)
+        )
 
     @patch('fabtools.files.upload_template', return_value=Mock())
     def test_deploy_environ_file(self, upload_template):

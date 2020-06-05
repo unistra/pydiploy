@@ -14,8 +14,9 @@ def wrap_deploy():
         yield
     except SystemExit:
         fabric.api.execute(rollback)
-        fabric.api.abort(fabric.colors.red(
-            "Deploy failed rollbacking process launched"))
+        fabric.api.abort(
+            fabric.colors.red("Deploy failed rollbacking process launched")
+        )
 
 
 @do_verbose
@@ -23,21 +24,23 @@ def application_packages(update=False):
     """ Installs all packages for the app """
     fabtools.require.deb.packages(['gettext'], update=update)
     if env.remote_python_version >= 3:
-        fabric.api.execute(pydiploy.require.system.check_python3_install,
-                           version='python%s' % env.remote_python_version)
+        fabric.api.execute(
+            pydiploy.require.system.check_python3_install,
+            version='python%s' % env.remote_python_version,
+        )
     fabric.api.execute(pydiploy.require.python.utils.python_pkg)
     if 'extra_ppa_to_install' in env:
         fabric.api.execute(
-            pydiploy.require.system.install_extra_ppa,
-            env.extra_ppa_to_install)
+            pydiploy.require.system.install_extra_ppa, env.extra_ppa_to_install
+        )
     if 'extra_source_to_install' in env:
         fabric.api.execute(
-            pydiploy.require.system.install_extra_source,
-            env.extra_source_to_install)
+            pydiploy.require.system.install_extra_source, env.extra_source_to_install
+        )
     if 'extra_pkg_to_install' in env:
         fabric.api.execute(
-            pydiploy.require.system.install_extra_packages,
-            env.extra_pkg_to_install)
+            pydiploy.require.system.install_extra_packages, env.extra_pkg_to_install
+        )
 
 
 def pre_install_backend(commands='/usr/bin/rsync', upgrade_circus=False):
@@ -47,8 +50,7 @@ def pre_install_backend(commands='/usr/bin/rsync', upgrade_circus=False):
     fabric.api.execute(pydiploy.require.system.set_timezone)
     fabric.api.execute(pydiploy.require.system.update_pkg_index)
     fabric.api.execute(application_packages)
-    fabric.api.execute(pydiploy.require.circus.circus_pkg,
-                       update=upgrade_circus)
+    fabric.api.execute(pydiploy.require.circus.circus_pkg, update=upgrade_circus)
     fabric.api.execute(pydiploy.require.python.virtualenv.virtualenv)
     fabric.api.execute(pydiploy.require.circus.upstart)
 
@@ -67,11 +69,10 @@ def deploy_backend(upgrade_pkg=False, **kwargs):
         fabric.api.execute(pydiploy.require.releases_manager.deploy_code)
         fabric.api.execute(pydiploy.require.django.utils.deploy_wsgi_file)
         fabric.api.execute(
-            pydiploy.require.python.utils.application_dependencies,
-            upgrade_pkg)
+            pydiploy.require.python.utils.application_dependencies, upgrade_pkg
+        )
         # TODO PUT THIS METHOD IN OTHER PACKAGE
-        fabric.api.execute(pydiploy.require.bottle.utils.app_settings,
-                           **kwargs)
+        fabric.api.execute(pydiploy.require.bottle.utils.app_settings, **kwargs)
         fabric.api.execute(pydiploy.require.bottle.utils.deploy_environ_file)
         fabric.api.execute(pydiploy.require.bottle.command.bottle_prepare)
         fabric.api.execute(pydiploy.require.system.permissions)
@@ -122,7 +123,7 @@ def set_app_up():
     fabric.api.execute(pydiploy.require.nginx.set_website_up)
 
 
-def install_postgres_server(user=None,dbname=None,password=None):
+def install_postgres_server(user=None, dbname=None, password=None):
     """ Install postgres server & add user for postgres
 
         if no parameters are provided using (if exists) ::
@@ -134,16 +135,30 @@ def install_postgres_server(user=None,dbname=None,password=None):
     """
 
     if not (user and dbname and password):
-        if all([e in env.keys() for e in ('default_db_user', 'default_db_name', 'default_db_password')]):
+        if all(
+            [
+                e in env.keys()
+                for e in ('default_db_user', 'default_db_name', 'default_db_password')
+            ]
+        ):
             user = env.default_db_user
             dbname = env.default_db_name
             password = env.default_db_password
         else:
-            fabric.api.abort('Please provide user,dbname,password parameters for postgres.')
+            fabric.api.abort(
+                'Please provide user,dbname,password parameters for postgres.'
+            )
 
     fabric.api.execute(pydiploy.require.databases.postgres.install_postgres_server)
-    fabric.api.execute(pydiploy.require.databases.postgres.add_postgres_user,user,password=password)
-    fabric.api.execute(pydiploy.require.databases.postgres.add_postgres_database,dbname,owner=user,locale=env.locale)
+    fabric.api.execute(
+        pydiploy.require.databases.postgres.add_postgres_user, user, password=password
+    )
+    fabric.api.execute(
+        pydiploy.require.databases.postgres.add_postgres_database,
+        dbname,
+        owner=user,
+        locale=env.locale,
+    )
 
 
 def install_oracle_client():

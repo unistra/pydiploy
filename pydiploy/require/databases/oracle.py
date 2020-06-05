@@ -30,10 +30,17 @@ def install_oracle_client():
     * env.oracle_packages : name(s) of zip file(s) for oracle's packages to deploy
 
     """
-    if all([e in env.keys() for e in ('oracle_client_version',
-                                      'oracle_download_url',
-                                      'oracle_remote_dir',
-                                      'oracle_packages')]):
+    if all(
+        [
+            e in env.keys()
+            for e in (
+                'oracle_client_version',
+                'oracle_download_url',
+                'oracle_remote_dir',
+                'oracle_packages',
+            )
+        ]
+    ):
 
         # system libs and goodies installation
         fabtools.require.deb.packages(['libaio-dev', 'unzip'])
@@ -43,20 +50,19 @@ def install_oracle_client():
             use_sudo=True,
             owner=env.remote_owner,
             group=env.remote_group,
-            mode='750')
+            mode='750',
+        )
 
         # get oracle's zip file(s) and unzip
         with fabric.api.cd(env.remote_home):
             for package in env.oracle_packages:
-                fabric.api.sudo('wget -c %s%s' %
-                                (env.oracle_download_url, package))
-                fabric.api.sudo('unzip %s -d %s' %
-                                (package, env.oracle_remote_dir))
-                fabric.api.sudo(
-                    'rm %s' % os.path.join(env.remote_home, package))
+                fabric.api.sudo('wget -c %s%s' % (env.oracle_download_url, package))
+                fabric.api.sudo('unzip %s -d %s' % (package, env.oracle_remote_dir))
+                fabric.api.sudo('rm %s' % os.path.join(env.remote_home, package))
 
             oracle_dir = 'instantclient_%s' % '_'.join(
-                env.oracle_client_version.split('.')[:2])
+                env.oracle_client_version.split('.')[:2]
+            )
             oracle_root_path = os.path.join(env.oracle_remote_dir, oracle_dir)
             oracle_full_path = os.path.join(env.remote_home, oracle_root_path)
 
@@ -72,11 +78,14 @@ def install_oracle_client():
             )
 
             fabric.api.sudo('pwd')
-            fabric.api.sudo('echo \'%s\' >> .bashrc' %
-                            oracle_conf.substitute(oracle_dir=oracle_full_path))
+            fabric.api.sudo(
+                'echo \'%s\' >> .bashrc'
+                % oracle_conf.substitute(oracle_dir=oracle_full_path)
+            )
             fabric.api.sudo('source .bashrc')
             fabric.api.sudo(
-                'echo %s > /etc/ld.so.conf.d/oracle.conf' % oracle_full_path)
+                'echo %s > /etc/ld.so.conf.d/oracle.conf' % oracle_full_path
+            )
             fabric.api.sudo('ldconfig')
     else:
         fabric.api.abort('Please provide parameters for oracle installation !')

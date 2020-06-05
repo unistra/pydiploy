@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" This module is used to deploy a whole django webapp using chaussette/circus nginx on a remote/vagrant machine.
+""" This module is used to deploy a whole php webapp using chaussette/circus nginx on a remote/vagrant machine.
 
 This module shoud be imported in a fabfile to deploy an application using pydiploy.
 
@@ -11,9 +11,8 @@ from contextlib import contextmanager
 
 import fabric
 import fabtools
-from fabric.api import env
-
 import pydiploy
+from fabric.api import env
 from pydiploy.decorators import do_verbose
 
 
@@ -30,22 +29,10 @@ def wrap_deploy():
 
 @do_verbose
 def application_packages(update=False):
-    """ Installs all packages for django webapp """
-    fabtools.require.deb.packages(['gettext'], update=update)
-
-    if env.remote_python_version >= 3:
-        fabric.api.execute(
-            pydiploy.require.system.check_python3_install,
-            version='python%s' % env.remote_python_version,
-        )
-    fabric.api.execute(pydiploy.require.python.utils.python_pkg)
+    """ Installs all packages for php webapp """
     if env.has_key('extra_ppa_to_install'):
         fabric.api.execute(
             pydiploy.require.system.install_extra_ppa, env.extra_ppa_to_install
-        )
-    if env.has_key('extra_source_to_install'):
-        fabric.api.execute(
-            pydiploy.require.system.install_extra_source, env.extra_source_to_install
         )
     if env.has_key('extra_pkg_to_install'):
         fabric.api.execute(
@@ -53,93 +40,50 @@ def application_packages(update=False):
         )
 
 
-def pre_install_backend(commands='/usr/bin/rsync', upgrade_circus=False):
-    """ Installs requirements for circus & virtualenv env """
+def pre_install_backend(commands='/usr/bin/rsync'):
+    """ Installs requirements for apache / php """
     fabric.api.execute(pydiploy.require.system.add_user, commands=commands)
     fabric.api.execute(pydiploy.require.system.set_locale)
     fabric.api.execute(pydiploy.require.system.set_timezone)
     fabric.api.execute(pydiploy.require.system.update_pkg_index)
+    fabric.api.execute(pydiploy.require.apache.apache_pkg)
+    fabtools.require.deb.packages(['php5', 'libapache2-mod-php5'], update=True)
     fabric.api.execute(application_packages)
-    fabric.api.execute(pydiploy.require.circus.circus_pkg, update=upgrade_circus)
-    fabric.api.execute(pydiploy.require.python.virtualenv.virtualenv)
-    fabric.api.execute(pydiploy.require.circus.upstart)
-
-
-def pre_install_frontend():
-    """ Installs requirements for nginx """
-    fabric.api.execute(pydiploy.require.nginx.root_web)
-    fabric.api.execute(pydiploy.require.system.update_pkg_index)
-    fabric.api.execute(pydiploy.require.nginx.nginx_pkg)
 
 
 def deploy_backend(upgrade_pkg=False, **kwargs):
-    """ Deploys django webapp with required tag """
+    """ Deploys php webapp with required tag """
     with wrap_deploy():
         fabric.api.execute(pydiploy.require.releases_manager.setup)
         fabric.api.execute(pydiploy.require.releases_manager.deploy_code)
-        fabric.api.execute(pydiploy.require.django.utils.deploy_manage_file)
-        fabric.api.execute(pydiploy.require.django.utils.deploy_wsgi_file)
-        fabric.api.execute(
-            pydiploy.require.python.utils.application_dependencies, upgrade_pkg
-        )
-        fabric.api.execute(pydiploy.require.django.utils.app_settings, **kwargs)
-        fabric.api.execute(pydiploy.require.django.command.django_prepare)
         fabric.api.execute(pydiploy.require.system.permissions)
-        fabric.api.execute(pydiploy.require.circus.app_reload)
         fabric.api.execute(pydiploy.require.releases_manager.cleanup)
 
 
-def deploy_frontend():
-    """ Synchronises static files after deploy """
-    fabric.api.execute(pydiploy.require.nginx.web_static_files)
+def post_install_backend():
+    fabric.api.execute(pydiploy.require.apache.web_configuration)
+    fabric.api.execute(pydiploy.require.apache.apache_restart)
 
 
 def rollback():
-    """ Rolls back django webapp """
+    """ Rolls back php webapp """
     fabric.api.execute(pydiploy.require.releases_manager.rollback_code)
-    fabric.api.execute(pydiploy.require.circus.app_reload)
-
-
-def post_install_backend():
-    """ Post-installation of webapp"""
-    fabric.api.execute(pydiploy.require.circus.app_circus_conf)
-    fabric.api.execute(pydiploy.require.circus.app_reload)
-
-
-def post_install_frontend():
-    fabric.api.execute(pydiploy.require.nginx.web_configuration)
-    fabric.api.execute(pydiploy.require.nginx.nginx_restart)
-
-
-def dump_database():
-    """ Dumps database in json """
-    fabric.api.execute(pydiploy.require.django.command.django_dump_database)
-
-
-def reload_frontend():
-    """ Reloads frontend """
-    fabric.api.execute(pydiploy.require.nginx.nginx_reload)
 
 
 def reload_backend():
     """ Reloads backend """
-    fabric.api.execute(pydiploy.require.circus.app_reload)
+    fabric.api.execute(pydiploy.require.apache.apache_reload)
 
 
 def set_app_down():
     """ Sets app in maintenance mode """
-    fabric.api.execute(pydiploy.require.nginx.down_site_config)
-    fabric.api.execute(pydiploy.require.nginx.set_website_down)
+    fabric.api.execute(pydiploy.require.apache.down_site_config)
+    fabric.api.execute(pydiploy.require.apache.set_website_down)
 
 
 def set_app_up():
-    """ Sets app up """
-    fabric.api.execute(pydiploy.require.nginx.set_website_up)
-
-
-def custom_manage_command(cmd):
-    """ Passes custom commandes to manage.py """
-    fabric.api.execute(pydiploy.require.django.command.django_custom_cmd, cmd)
+    """ Sets app in maintenance mode """
+    fabric.api.execute(pydiploy.require.apache.set_website_up)
 
 
 def install_postgres_server(user=None, dbname=None, password=None):

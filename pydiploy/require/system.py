@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
 """
-This class is for sytem relatives tools and commands
+This class is for system relatives tools and commands
 
 """
 
 from contextlib import contextmanager
+
 import fabric
 import fabtools
 from fabric.api import env
+
 from pydiploy.decorators import do_verbose
 
 
@@ -27,16 +29,20 @@ def add_user(commands=None):
     """
 
     fabtools.require.group(env.remote_group)
-    fabtools.require.user(env.remote_owner,
-                          create_home=True,
-                          create_group=True,
-                          group=env.remote_group,
-                          shell='/bin/bash')
+    fabtools.require.user(
+        env.remote_owner,
+        create_home=True,
+        create_group=True,
+        group=env.remote_group,
+        shell='/bin/bash',
+    )
     if commands:
-        fabtools.require.sudoer('%%%s' % env.remote_group,
-                                operators='%s,root' % env.remote_owner,
-                                passwd=False,
-                                commands=commands)
+        fabtools.require.sudoer(
+            '%%%s' % env.remote_group,
+            operators='%s,root' % env.remote_owner,
+            passwd=False,
+            commands=commands,
+        )
 
 
 @do_verbose
@@ -59,7 +65,7 @@ def set_locale():
     Sets server's locales
     """
     locale = fabric.api.run("echo $LANG")
-    if(locale != env.locale):
+    if locale != env.locale:
         fabric.api.sudo('locale-gen ' + env.locale)
         fabric.api.sudo('/usr/sbin/update-locale LANG=' + env.locale)
 
@@ -69,14 +75,18 @@ def set_timezone():
     """
     Sets the timezone
     """
-    if fabtools.system.distrib_id() not in('Ubuntu', 'Debian'):
+    if fabtools.system.distrib_id() not in ('Ubuntu', 'Debian'):
         print("Cannot deploy to non-debian/ubuntu host")
         return
 
     if fabtools.files.is_link("/etc/localtime"):
-        return fabric.api.sudo("ln -sf /usr/share/zoneinfo/%s /etc/localtime" % env.timezone)
+        return fabric.api.sudo(
+            "ln -sf /usr/share/zoneinfo/%s /etc/localtime" % env.timezone
+        )
     else:
-        return fabric.api.sudo("cp -f /usr/share/zoneinfo/%s /etc/localtime" % env.timezone)
+        return fabric.api.sudo(
+            "cp -f /usr/share/zoneinfo/%s /etc/localtime" % env.timezone
+        )
 
 
 @do_verbose
@@ -85,12 +95,17 @@ def permissions():
     Makes the release group-writable
     """
 
-    fabric.api.sudo("chown -R %(user)s:%(group)s %(domain_path)s" %
-                    {'domain_path': env.remote_project_dir,
-                     'user': env.remote_owner,
-                     'group': env.remote_group})
-    fabric.api.sudo("chmod -R g+w %(domain_path)s" %
-                    {'domain_path': env.remote_project_dir})
+    fabric.api.sudo(
+        "chown -R %(user)s:%(group)s %(domain_path)s"
+        % {
+            'domain_path': env.remote_project_dir,
+            'user': env.remote_owner,
+            'group': env.remote_group,
+        }
+    )
+    fabric.api.sudo(
+        "chmod -R g+w %(domain_path)s" % {'domain_path': env.remote_project_dir}
+    )
 
 
 @do_verbose
@@ -116,11 +131,16 @@ def check_python3_install(version='python3', update=False):
 
     if not package_installed(version):
         # TODO check for others ubuntu"s versions !!!!!
-        if fabtools.system.distrib_id() == 'Ubuntu' and float(fabtools.system.distrib_release()) < 13.10 or float(fabtools.system.distrib_release()) >= 16.04:
-            fabtools.require.deb.packages(['software-properties-common'],
-                                          update=update)
-            # Install mighty PPA
+        # Install mighty PPA
+        if fabtools.system.distrib_release() >= 14.04:
+            # add-apt-repository moved to software-properties-common in 14.04
+            fabtools.require.deb.package('software-properties-common')
+            # deb.pap problem for 20.04 in fabtools
+            fabric.api.sudo('add-apt-repository --yes ppa:deadsnakes/ppa')
+        else:
+            fabtools.require.deb.package('python-software-properties')
             fabtools.require.deb.ppa('ppa:deadsnakes/ppa')
+
         fabtools.require.deb.package(version, update=True)
 
 

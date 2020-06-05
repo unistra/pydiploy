@@ -1,8 +1,8 @@
-import pytest
-from fabric.api import run, env
-import pydiploy
 import os
 
+import pydiploy
+import pytest
+from fabric.api import env, run
 
 pytestmark = pytest.mark.network
 
@@ -13,14 +13,17 @@ def buildmyenv():
     env.remote_owner = 'django'  # remote server user
     env.remote_group = 'di'  # remote server group
 
-    env.application_name = 'myapp'   # name of webapp
+    env.application_name = 'myapp'  # name of webapp
     env.root_package_name = 'myapp'  # name of app in webapp
 
     env.remote_home = '/home/django'  # remote home root
     env.remote_python_version = 3.4  # python version
-    env.remote_virtualenv_root = os.path.join(env.remote_home, '.virtualenvs')  # venv root
-    env.remote_virtualenv_dir = os.path.join(env.remote_virtualenv_root,
-                                     env.application_name)  # venv for webapp dir
+    env.remote_virtualenv_root = os.path.join(
+        env.remote_home, '.virtualenvs'
+    )  # venv root
+    env.remote_virtualenv_dir = os.path.join(
+        env.remote_virtualenv_root, env.application_name
+    )  # venv for webapp dir
     env.remote_repo_url = 'git@git.net:myapp.git'  # git repository url
     env.local_tmp_dir = '/tmp'  # tmp dir
     env.remote_static_root = '/var/www/static'  # root of static files

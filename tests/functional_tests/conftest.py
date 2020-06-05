@@ -1,16 +1,13 @@
-from pipes import quote
 import logging
 import os
 import sys
+from pipes import quote
 
-from mock import patch
 import pytest
-
 from fabric.api import env, hide, lcd, local, settings
 from fabric.state import connections
-
 from fabtools.vagrant import version as _vagrant_version
-
+from mock import patch
 
 HERE = os.path.dirname(__file__)
 
@@ -19,7 +16,9 @@ HERE = os.path.dirname(__file__)
 def setup_package(request):
     vagrant_box = os.environ.get('FABTOOLS_TEST_BOX')
     if not vagrant_box:
-        pytest.skip("Set FABTOOLS_TEST_BOX to choose a Vagrant base box for functional tests")
+        pytest.skip(
+            "Set FABTOOLS_TEST_BOX to choose a Vagrant base box for functional tests"
+        )
     vagrant_provider = os.environ.get('FABTOOLS_TEST_PROVIDER')
     reuse_vm = os.environ.get('FABTOOLS_TEST_REUSE_VM')
     _check_vagrant_version()
@@ -42,7 +41,10 @@ def _check_vagrant_version():
     if VAGRANT_VERSION is None:
         pytest.skip("Vagrant is required for functional tests")
     elif VAGRANT_VERSION < MIN_VAGRANT_VERSION:
-        pytest.skip("Vagrant >= %s is required for functional tests" % ".".join(map(str, MIN_VAGRANT_VERSION)))
+        pytest.skip(
+            "Vagrant >= %s is required for functional tests"
+            % ".".join(map(str, MIN_VAGRANT_VERSION))
+        )
 
 
 def _configure_logging():
@@ -123,7 +125,9 @@ def _clear_fabric_connection_cache():
 
 def _update_package_index():
     from fabtools.system import distrib_family
+
     family = distrib_family()
     if family == 'debian':
         from fabtools.require.deb import uptodate_index
+
         uptodate_index()

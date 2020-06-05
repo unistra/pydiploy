@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+
 import fabric
 import fabtools
 from fabric.api import env
@@ -43,13 +44,12 @@ def extract_settings():
 def app_settings(**kwargs):
     """ Manages django settings file """
 
-    settings_present = fabtools.files.is_file(path=env.previous_settings_file,
-                                              use_sudo=True)
+    settings_present = fabtools.files.is_file(
+        path=env.previous_settings_file, use_sudo=True
+    )
 
     # if values are set within the --set option on command line
-    kwargs.update({
-        key: value for key, value in env.items() if key in env.map_settings
-    })
+    kwargs.update({key: value for key, value in env.items() if key in env.map_settings})
 
     if settings_present:
         fabric.api.execute(extract_settings)
@@ -65,45 +65,48 @@ def app_settings(**kwargs):
     fabric.api.require(*env.map_settings.keys())
     settings_dir = os.path.join(env.local_tmp_root_app_package, 'settings')
 
-    fabtools.files.upload_template('%s.py' % env.goal,
-                                   env.remote_settings_file,
-                                   template_dir=settings_dir,
-                                   context=env,
-                                   use_sudo=True,
-                                   user=env.remote_owner,
-                                   mode='644',
-                                   chown=True,
-                                   use_jinja=True)
+    fabtools.files.upload_template(
+        '%s.py' % env.goal,
+        env.remote_settings_file,
+        template_dir=settings_dir,
+        context=env,
+        use_sudo=True,
+        user=env.remote_owner,
+        mode='644',
+        chown=True,
+        use_jinja=True,
+    )
 
 
 @do_verbose
 def deploy_environ_file():
     """ Uploads environ.py template on remote """
 
-    fabtools.files.upload_template('environ.py',
-                                   os.path.join(
-                                       env.remote_base_package_dir,
-                                       'environ.py'),
-                                   template_dir=env.local_tmp_root_app_package,
-                                   context=env,
-                                   use_sudo=True,
-                                   user=env.remote_owner,
-                                   chown=True,
-                                   mode='644',
-                                   use_jinja=True)
+    fabtools.files.upload_template(
+        'environ.py',
+        os.path.join(env.remote_base_package_dir, 'environ.py'),
+        template_dir=env.local_tmp_root_app_package,
+        context=env,
+        use_sudo=True,
+        user=env.remote_owner,
+        chown=True,
+        mode='644',
+        use_jinja=True,
+    )
 
 
 @do_verbose
 def deploy_wsgi_file():
     """ Uploads wsgi.py template on remote """
 
-    fabtools.files.upload_template('wsgi.py',
-                                   os.path.join(
-                                       env.remote_base_package_dir, 'wsgi.py'),
-                                   template_dir=env.local_tmp_root_app_package,
-                                   context=env,
-                                   use_sudo=True,
-                                   user=env.remote_owner,
-                                   chown=True,
-                                   mode='644',
-                                   use_jinja=True)
+    fabtools.files.upload_template(
+        'wsgi.py',
+        os.path.join(env.remote_base_package_dir, 'wsgi.py'),
+        template_dir=env.local_tmp_root_app_package,
+        context=env,
+        use_sudo=True,
+        user=env.remote_owner,
+        chown=True,
+        mode='644',
+        use_jinja=True,
+    )
