@@ -289,3 +289,7 @@ Optional parameters
     - no_tag_check : if True, not using tag/branch check mainly used when fabfile is not in a git repository : ::
 
         env.no_tag_check = True
+
+    - old_nginx : if True, using old deprecated directive ssl on in nginx host config file
+
+        env.old_nginx = True

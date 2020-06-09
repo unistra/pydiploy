@@ -7,6 +7,7 @@
 from os.path import join
 
 from fabric.api import env, execute, roles, task
+
 from pydiploy.django import custom_manage_command as pydiploy_custom_command
 from pydiploy.django import deploy_backend as pydiploy_deploy_backend
 from pydiploy.django import deploy_frontend as pydiploy_deploy_frontend
@@ -37,7 +38,9 @@ env.root_package_name = 'myapp'  # name of app in webapp
 env.remote_home = '/home/django'  # remote home root
 env.remote_python_version = 3.4  # python version
 env.remote_virtualenv_root = join(env.remote_home, '.virtualenvs')  # venv root
-env.remote_virtualenv_dir = join(env.remote_virtualenv_root, env.application_name)  # venv for webapp dir
+env.remote_virtualenv_dir = join(
+    env.remote_virtualenv_root, env.application_name
+)  # venv for webapp dir
 env.remote_repo_url = 'git@git.net:myapp.git'  # git repository url
 env.local_tmp_dir = '/tmp'  # tmp dir
 env.remote_static_root = '/var/www/static'  # root of static files
@@ -96,6 +99,7 @@ env.keep_releases = 2  # number of old releases to keep before cleaning
 # env.default_db_password = 'S3CR3T'
 
 # env.no_tag_check = True # When your fabfile is not in your project git repository be sure to set this var
+# env.old_nginx = True # When using old nginx version so using ssl on deprecated directive
 
 
 @task
@@ -300,4 +304,3 @@ def set_up():
 def custom_manage_cmd(cmd):
     """ Execute custom command in manage.py """
     execute(pydiploy_custom_command, cmd)
-

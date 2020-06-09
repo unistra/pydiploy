@@ -17,11 +17,13 @@ server {
 {% endif %}
 
 server {
-    listen {% if server_ip %}{{ server_ip }}:{% endif %}{% if server_ssl_on %}443{% else %}80{% endif %};
+    listen {% if server_ip %}{{ server_ip }}:{% endif %}{% if server_ssl_on %}443 {% if not old_nginx %}ssl{% endif %}{% else %}80{% endif %};
     server_name {{ server_name }} {{ short_server_name }};
 
 {% if server_ssl_on %}
+    {% if old_nginx %}
     ssl                  on;
+    {% endif %}
     ssl_certificate      {{ path_to_cert }};
     ssl_certificate_key  {{ path_to_cert_key }};
 {% endif %}

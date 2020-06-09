@@ -18,11 +18,11 @@ def virtualenv(clear=False):
         use_sudo=True,
     )
     python_bin = '/usr/bin/python%s' % env.remote_python_version
-    with shell("HOME=~%s %s" % (env.remote_owner, env.shell)):
-        fabtools.require.python.virtualenv(
-            env.remote_virtualenv_dir,
-            user=env.remote_owner,
-            clear=clear,
-            use_sudo=True,
-            venv_python=python_bin,
-        )
+    # with shell("HOME=~%s %s" % (env.remote_owner, env.shell)):
+    fabtools.require.python.virtualenv(
+        env.remote_virtualenv_dir,
+        user=env.remote_owner,
+        clear=clear,
+        use_sudo=True,
+        venv_python=python_bin,
+    )

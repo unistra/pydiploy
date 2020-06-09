@@ -28,22 +28,24 @@ def python_pkg(update=False):
                 'python2-dev'
                 if env.remote_python_version < 3
                 else 'python%s-dev' % env.remote_python_version,
-                'python3-pip' if not env.remote_python_version < 3 else 'python2',
+                'python2' if env.remote_python_version < 3 else '',
                 'build-essential',
             ],
             update=update,
         )
-
-        if env.remote_python_version < 3:
-            # Warning dangerous !!!!!
+        if not fabtools.require.python.is_pip_installed():
             fabric.api.sudo('curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py')
-            fabric.api.sudo('python2 get-pip.py')
+            cmd = 'python%s get-pip.py' % (
+                '2' if env.remote_python_version < 3 else '3'
+            )
+            fabric.api.sudo(cmd)
     else:
         fabtools.require.deb.packages(
             [
                 'python-dev'
                 if env.remote_python_version < 3
                 else 'python%s-dev' % env.remote_python_version,
+                'python3-dev',
                 'python-pip',
             ],
             update=update,
