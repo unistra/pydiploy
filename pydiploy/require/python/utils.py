@@ -7,7 +7,6 @@ import os
 import fabric
 import fabtools
 from fabric.api import env
-
 from pydiploy.decorators import do_verbose
 from pydiploy.require.system import shell
 
@@ -45,8 +44,6 @@ def python_pkg(update=False):
                 'python-dev'
                 if env.remote_python_version < 3
                 else 'python%s-dev' % env.remote_python_version,
-                'python3-dev',
-                'python-pip',
             ],
             update=update,
         )

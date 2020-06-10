@@ -18,6 +18,7 @@ def virtualenv(clear=False):
         use_sudo=True,
     )
     python_bin = '/usr/bin/python%s' % env.remote_python_version
+    # TODO: check if used on older python version !
     # with shell("HOME=~%s %s" % (env.remote_owner, env.shell)):
     fabtools.require.python.virtualenv(
         env.remote_virtualenv_dir,

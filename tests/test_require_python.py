@@ -37,9 +37,20 @@ class UtilsCheck(TestCase):
     def test_python_pkg(self, dist_id, dist_rls, python_install, deb_packages):
         python_pkg()
         self.assertTrue(deb_packages.called)
+        self.assertEqual(deb_packages.call_args, call(['python-dev'], update=False))
+        self.assertTrue(python_install.called)
         self.assertEqual(
-            deb_packages.call_args, call(['python-dev', 'python-pip'], update=False)
+            python_install.call_args, call('pip', upgrade=True, use_sudo=True)
         )
+
+    @patch('fabtools.require.deb.packages', return_value=Mock())
+    @patch('fabtools.require.python.install', return_value=Mock())
+    @patch('fabtools.system.distrib_release', return_value='18')
+    @patch('fabtools.system.distrib_id', return_value='Ubuntu')
+    def test_python_ubuntu18_pkg(self, dist_id, dist_rls, python_install, deb_packages):
+        python_pkg()
+        self.assertTrue(deb_packages.called)
+        self.assertEqual(deb_packages.call_args, call(['python-dev'], update=False))
         self.assertTrue(python_install.called)
         self.assertEqual(
             python_install.call_args, call('pip', upgrade=True, use_sudo=True)
