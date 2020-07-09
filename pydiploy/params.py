@@ -79,6 +79,7 @@ PARAMS = {
             'remote_media_folder': "remote folder of the application's media files",
             'media_folder': "path of the application's media files",
             'no_tag_check': "If True no tag/branch check when deploying",
+            'old_nginx': "If True use old deprecated nginx ssl on directive",
         },
     },
     'simple': {

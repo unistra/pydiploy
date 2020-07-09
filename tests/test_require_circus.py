@@ -255,7 +255,8 @@ class CircusCheck(TestCase):
 
     @patch('fabtools.files.is_dir', return_value=False)
     @patch('fabtools.files.upload_template', return_value=Mock())
-    def test_upstart(self, upload_template, is_systemd):
+    @patch('fabtools.systemd.start_and_enable', return_value=Mock())
+    def test_upstart(self, start_and_enable, upload_template, is_systemd):
         upstart()
 
         self.assertTrue(upload_template.called)
@@ -271,7 +272,10 @@ class CircusCheck(TestCase):
     @patch('fabric.api.sudo', return_value=Mock())
     @patch('fabtools.files.is_dir', return_value=True)
     @patch('fabtools.files.upload_template', return_value=Mock())
-    def test_upstart_systemd(self, upload_template, is_systemd, mock_reload_daemon):
+    @patch('fabtools.systemd.start_and_enable', return_value=Mock())
+    def test_upstart_systemd(
+        self, start_and_enable, upload_template, is_systemd, mock_reload_daemon
+    ):
         upstart()
 
         self.assertTrue(upload_template.called)

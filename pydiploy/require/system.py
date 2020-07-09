@@ -10,7 +10,6 @@ from contextlib import contextmanager
 import fabric
 import fabtools
 from fabric.api import env
-
 from pydiploy.decorators import do_verbose
 
 
