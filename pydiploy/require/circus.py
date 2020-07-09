@@ -122,6 +122,7 @@ def upstart():
             use_jinja=True,
         )
         fabric.api.sudo('systemctl daemon-reload')
+        fabtools.systemd.start_and_enable('circus')
     # Upstart
     else:
         #  init files to declare circus as an upstart daemon
