@@ -49,7 +49,7 @@ def python_pkg(update=False):
             ],
             update=update,
         )
-    fabtools.require.python.install('pip', upgrade=True, use_sudo=True)
+        fabtools.require.python.install('pip', upgrade=True, use_sudo=True)
 
 
 @do_verbose
