@@ -91,7 +91,8 @@ def deploy_code():
         env.tag = tag_requested
 
     env.local_tmp_root_app = os.path.join(
-        env.local_tmp_dir, '%(application_name)s-%(tag)s' % env
+        env.local_tmp_dir,
+        '%s-%s' % (env.application_name, env.tag.lower()),
     )
     env.local_tmp_root_app_package = os.path.join(
         env.local_tmp_root_app, env.root_package_name
@@ -314,4 +315,3 @@ def run_tests():
         fabric.api.abort(
             fabric.colors.red("wrong test command. Currently, only tox is supported")
         )
-
