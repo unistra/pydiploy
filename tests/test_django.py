@@ -26,6 +26,7 @@ from pydiploy.django import (
     set_app_down,
     set_app_up,
     wrap_deploy,
+    update_python_version,
 )
 
 
@@ -342,5 +343,50 @@ class ReleasesManagerCheck(TestCase):
         self.assertTrue(api_execute.called)
         self.assertTrue(
             str(api_execute.call_args_list[0]).find('call(<function install_sap_client')
+            == 0
+        )
+
+    # @patch('pydiploy.require.nginx.set_website_down', return_value=Mock())
+    # @patch('pydiploy.require.nginx.down_site_config', return_value=Mock())
+    @patch('fabric.api.execute', return_value=Mock())
+    def test_update_python_version(self, api_execute):
+        update_python_version()
+        self.assertTrue(api_execute.called)
+        self.assertTrue(
+            str(api_execute.call_args_list[0]).find('call(<function down_site_config')
+            == 0
+        )
+        self.assertTrue(
+            str(api_execute.call_args_list[1]).find('call(<function set_website_down')
+            == 0
+        )
+        self.assertTrue(
+            str(api_execute.call_args_list[2]).find('call(<function remove_virtualenv')
+            == 0
+        )
+        self.assertTrue(
+            str(api_execute.call_args_list[3]).find(
+                'call(<function application_packages'
+            )
+            == 0
+        )
+        self.assertTrue(
+            str(api_execute.call_args_list[4]).find('call(<function virtualenv') == 0
+        )
+        self.assertTrue(
+            str(api_execute.call_args_list[5]).find(
+                'call(<function application_dependencies'
+            )
+            == 0
+        )
+        self.assertTrue(
+            str(api_execute.call_args_list[6]).find('call(<function app_circus_conf')
+            == 0
+        )
+        self.assertTrue(
+            str(api_execute.call_args_list[7]).find('call(<function app_reload') == 0
+        )
+        self.assertTrue(
+            str(api_execute.call_args_list[8]).find('call(<function set_website_up')
             == 0
         )

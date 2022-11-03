@@ -8,7 +8,7 @@ from fabric.api import env
 from mock import Mock, call, patch
 
 from pydiploy.require.python.utils import application_dependencies, python_pkg
-from pydiploy.require.python.virtualenv import virtualenv
+from pydiploy.require.python.virtualenv import virtualenv, remove_virtualenv
 
 
 class UtilsCheck(TestCase):
@@ -131,5 +131,20 @@ class VirtualEnvCheck(TestCase):
                 owner='remote_owner',
                 use_sudo=True,
                 group='remote_group',
+            ),
+        )
+
+    @patch('fabtools.files.remove', return_value=Mock())
+    def test_remove_virtualenv(self, remove_directory):
+
+        remove_virtualenv()
+
+        self.assertTrue(remove_directory.called)
+        self.assertEqual(
+            remove_directory.call_args,
+            call(
+                'remote_virtualenv_dir',
+                recursive=True,
+                use_sudo=True,
             ),
         )
