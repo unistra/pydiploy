@@ -163,13 +163,13 @@ def prod():
 
 @task
 def tag(version_string):
-    """ Set the version to deploy to `version_number`. """
+    """Set the version to deploy to `version_number`."""
     execute(pydiploy_tag, version=version_string)
 
 
 @task
 def head_master():
-    """ Set the version to deploy to the head of the master. """
+    """Set the version to deploy to the head of the master."""
     execute(pydiploy_tag, version='master')
 
 
@@ -288,19 +288,26 @@ def reload_backend():
 @roles('lb')
 @task
 def set_down():
-    """ Set app to maintenance mode """
+    """Set app to maintenance mode"""
     execute(pydiploy_set_down)
 
 
 @roles('lb')
 @task
 def set_up():
-    """ Set app to up mode """
+    """Set app to up mode"""
     execute(pydiploy_set_up)
 
 
 @roles('web')
 @task
 def custom_manage_cmd(cmd):
-    """ Execute custom command in manage.py """
+    """Execute custom command in manage.py"""
     execute(pydiploy_custom_command, cmd)
+
+
+@roles("web")
+@task
+def update_python_version():
+    """Update python version according to remote_python_version"""
+    execute(pydiploy.django.update_python_version)
