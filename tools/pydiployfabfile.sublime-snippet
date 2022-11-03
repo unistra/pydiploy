@@ -308,7 +308,7 @@ def custom_manage_cmd(cmd):
     execute(pydiploy_custom_command, cmd)
 
 ]]></content>
-<description>Pydiploy fabfile 1.2.0.2</description>
+<description>Pydiploy fabfile 1.2.0.5</description>
 <tabTrigger>pydiployfab</tabTrigger>
 <scope>source.python</scope>
 </snippet>
