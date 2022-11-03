@@ -46,14 +46,14 @@ def add_user(commands=None):
 
 @do_verbose
 def add_group(name):
-    """ Creates user's group (=name) on a remote server """
+    """Creates user's group (=name) on a remote server"""
 
     fabtools.require.group(name)
 
 
 @do_verbose
 def update_pkg_index():
-    """ Updates packages on remote server (ubuntu/debian) """
+    """Updates packages on remote server (ubuntu/debian)"""
 
     fabtools.require.deb.uptodate_index(max_age={'day': 1})
 
@@ -164,7 +164,7 @@ def install_extra_ppa(extra_ppa):
 
 @do_verbose
 def is_systemd():
-    """ Returns True if systemd is used """
+    """Returns True if systemd is used"""
     return fabtools.files.is_dir("/run/systemd/system")
 
 

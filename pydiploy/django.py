@@ -30,7 +30,7 @@ def wrap_deploy():
 
 @do_verbose
 def application_packages(update=False):
-    """ Installs all packages for django webapp """
+    """Installs all packages for django webapp"""
     fabtools.require.deb.packages(['gettext'], update=update)
 
     if env.remote_python_version >= 3:
@@ -54,7 +54,7 @@ def application_packages(update=False):
 
 
 def pre_install_backend(commands='/usr/bin/rsync', upgrade_circus=False):
-    """ Installs requirements for circus & virtualenv env """
+    """Installs requirements for circus & virtualenv env"""
     fabric.api.execute(pydiploy.require.system.add_user, commands=commands)
     fabric.api.execute(pydiploy.require.system.set_locale)
     fabric.api.execute(pydiploy.require.system.set_timezone)
@@ -66,14 +66,14 @@ def pre_install_backend(commands='/usr/bin/rsync', upgrade_circus=False):
 
 
 def pre_install_frontend():
-    """ Installs requirements for nginx """
+    """Installs requirements for nginx"""
     fabric.api.execute(pydiploy.require.nginx.root_web)
     fabric.api.execute(pydiploy.require.system.update_pkg_index)
     fabric.api.execute(pydiploy.require.nginx.nginx_pkg)
 
 
 def deploy_backend(upgrade_pkg=False, **kwargs):
-    """ Deploys django webapp with required tag """
+    """Deploys django webapp with required tag"""
     with wrap_deploy():
         fabric.api.execute(pydiploy.require.releases_manager.setup)
         fabric.api.execute(pydiploy.require.releases_manager.deploy_code)
@@ -90,18 +90,18 @@ def deploy_backend(upgrade_pkg=False, **kwargs):
 
 
 def deploy_frontend():
-    """ Synchronises static files after deploy """
+    """Synchronises static files after deploy"""
     fabric.api.execute(pydiploy.require.nginx.web_static_files)
 
 
 def rollback():
-    """ Rolls back django webapp """
+    """Rolls back django webapp"""
     fabric.api.execute(pydiploy.require.releases_manager.rollback_code)
     fabric.api.execute(pydiploy.require.circus.app_reload)
 
 
 def post_install_backend():
-    """ Post-installation of webapp"""
+    """Post-installation of webapp"""
     fabric.api.execute(pydiploy.require.circus.app_circus_conf)
     fabric.api.execute(pydiploy.require.circus.app_reload)
 
@@ -112,44 +112,44 @@ def post_install_frontend():
 
 
 def dump_database():
-    """ Dumps database in json """
+    """Dumps database in json"""
     fabric.api.execute(pydiploy.require.django.command.django_dump_database)
 
 
 def reload_frontend():
-    """ Reloads frontend """
+    """Reloads frontend"""
     fabric.api.execute(pydiploy.require.nginx.nginx_reload)
 
 
 def reload_backend():
-    """ Reloads backend """
+    """Reloads backend"""
     fabric.api.execute(pydiploy.require.circus.app_reload)
 
 
 def set_app_down():
-    """ Sets app in maintenance mode """
+    """Sets app in maintenance mode"""
     fabric.api.execute(pydiploy.require.nginx.down_site_config)
     fabric.api.execute(pydiploy.require.nginx.set_website_down)
 
 
 def set_app_up():
-    """ Sets app up """
+    """Sets app up"""
     fabric.api.execute(pydiploy.require.nginx.set_website_up)
 
 
 def custom_manage_command(cmd):
-    """ Passes custom commandes to manage.py """
+    """Passes custom commandes to manage.py"""
     fabric.api.execute(pydiploy.require.django.command.django_custom_cmd, cmd)
 
 
 def install_postgres_server(user=None, dbname=None, password=None):
-    """ Install postgres server & add user for postgres
+    """Install postgres server & add user for postgres
 
-        if no parameters are provided using (if exists) ::
+    if no parameters are provided using (if exists) ::
 
-            default_db_user
-            default_db_name
-            default_db_password
+        default_db_user
+        default_db_name
+        default_db_password
 
     """
 
@@ -181,10 +181,31 @@ def install_postgres_server(user=None, dbname=None, password=None):
 
 
 def install_oracle_client():
-    """ Install oracle client. """
+    """Install oracle client."""
     fabric.api.execute(pydiploy.require.databases.oracle.install_oracle_client)
 
 
 def install_sap_client():
-    """ Install saprfc bindings to an SAP instance. """
+    """Install saprfc bindings to an SAP instance."""
     fabric.api.execute(pydiploy.require.databases.sap.install_sap_client)
+
+
+def update_python_version(python_version=None):
+    """Move to an other python version"""
+
+    if not (python_version):
+        if 'remote_python_version' in env:
+            python_version = env.remote_python_version
+        else:
+            fabric.api.abort('Please provide a python version to use.')
+
+    set_app_down()
+    fabric.api.execute(pydiploy.require.python.virtualenv.remove_virtualenv)
+    fabric.api.execute(application_packages)
+    fabric.api.execute(pydiploy.require.python.virtualenv.virtualenv)
+    fabric.api.execute(
+        pydiploy.require.python.utils.application_dependencies, upgrade_pkg=False
+    )
+    fabric.api.execute(pydiploy.require.circus.app_circus_conf)
+    fabric.api.execute(pydiploy.require.circus.app_reload)
+    set_app_up()

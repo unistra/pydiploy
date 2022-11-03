@@ -10,7 +10,7 @@ from pydiploy.require.system import shell
 
 @do_verbose
 def virtualenv(clear=False):
-    """ Creates virtualenv """
+    """Creates virtualenv"""
     fabtools.require.files.directory(
         env.remote_virtualenv_dir,
         owner=env.remote_owner,
@@ -27,3 +27,9 @@ def virtualenv(clear=False):
         use_sudo=True,
         venv_python=python_bin,
     )
+
+
+@do_verbose
+def remove_virtualenv():
+    """Removes virtialenv"""
+    fabtools.files.remove(env.remote_virtualenv_dir, recursive=True, use_sudo=True)
