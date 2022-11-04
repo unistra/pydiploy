@@ -14,7 +14,7 @@ from pydiploy.require.system import shell
 
 @do_verbose
 def python_pkg(update=False):
-    """ Installs python packages and pip """
+    """Installs python packages and pip"""
 
     if (
         fabtools.system.distrib_id() == 'Ubuntu'
@@ -34,7 +34,7 @@ def python_pkg(update=False):
             ],
             update=update,
         )
-        if not fabtools.require.python.is_pip_installed():
+        if not fabtools.python.is_pip_installed():
             fabric.api.sudo('curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py')
             cmd = 'python%s get-pip.py' % (
                 '2' if env.remote_python_version < 3 else '3'
@@ -54,7 +54,7 @@ def python_pkg(update=False):
 
 @do_verbose
 def application_dependencies(upgrade_pkg, staging=True):
-    """ Installs application dependencies with requirements.txt files """
+    """Installs application dependencies with requirements.txt files"""
 
     with fabtools.python.virtualenv(env.remote_virtualenv_dir):
         with fabric.api.cd(env.remote_current_path):
