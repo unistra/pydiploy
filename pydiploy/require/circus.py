@@ -26,7 +26,7 @@ from .system import is_systemd
 
 @do_verbose
 def circus_pkg(update=False):
-    """ Installs packages relatives to circus """
+    """Installs packages relatives to circus"""
 
     # TOOLD !
     # install ubuntu ppa for libzmq-dev if ubuntu <= 10.04
@@ -52,7 +52,9 @@ def circus_pkg(update=False):
     )
 
     if 'no_circus_web' not in env or not env.no_circus_web:
-        fabtools.require.python.install('circus-web', use_sudo=True, upgrade=update)
+        # Circus-web is not working on python3
+        if env.remote_python_version < 3:
+            fabtools.require.python.install('circus-web', use_sudo=True, upgrade=update)
         fabtools.require.python.install('gevent', use_sudo=True, upgrade=update)
 
     # install circus backend sets in fabfile
@@ -141,7 +143,7 @@ def upstart():
 
 @do_verbose
 def app_reload():
-    """ Starts/restarts app using circus """
+    """Starts/restarts app using circus"""
     # Systemd
     if is_systemd():
         start_cmd = 'systemctl start circus.service'

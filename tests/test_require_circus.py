@@ -23,6 +23,7 @@ class CircusCheck(TestCase):
         env.remote_owner = 'remote_owner'
         env.remote_group = 'remote_group'
         env.application_name = "application_name"
+        env.remote_python_version = 2.7
 
     def tearDown(self):
         env.clear()
