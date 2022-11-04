@@ -315,7 +315,7 @@ def update_python_version():
     execute(pydiploy.django.update_python_version)
 
 ]]></content>
-<description>Pydiploy fabfile 1.2.0.5</description>
+<description>Pydiploy fabfile 1.2.0.7</description>
 <tabTrigger>pydiployfab</tabTrigger>
 <scope>source.python</scope>
 </snippet>
