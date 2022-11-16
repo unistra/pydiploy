@@ -199,7 +199,6 @@ def update_python_version(python_version=None):
         else:
             fabric.api.abort('Please provide a python version to use.')
 
-    set_app_down()
     fabric.api.execute(pydiploy.require.python.virtualenv.remove_virtualenv)
     fabric.api.execute(application_packages)
     fabric.api.execute(pydiploy.require.python.virtualenv.virtualenv)
@@ -208,4 +207,3 @@ def update_python_version(python_version=None):
     )
     fabric.api.execute(pydiploy.require.circus.app_circus_conf)
     fabric.api.execute(pydiploy.require.circus.app_reload)
-    set_app_up()

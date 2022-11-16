@@ -310,4 +310,6 @@ def custom_manage_cmd(cmd):
 @task
 def update_python_version():
     """Update python version according to remote_python_version"""
+    set_down()
     execute(pydiploy.django.update_python_version)
+    set_up()
