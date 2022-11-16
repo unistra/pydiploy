@@ -317,7 +317,7 @@ def update_python_version():
     set_up()
 
 ]]></content>
-<description>Pydiploy fabfile 1.2.0.7</description>
+<description>Pydiploy fabfile 1.2.0.8</description>
 <tabTrigger>pydiployfab</tabTrigger>
 <scope>source.python</scope>
 </snippet>
