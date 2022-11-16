@@ -353,40 +353,28 @@ class ReleasesManagerCheck(TestCase):
         update_python_version()
         self.assertTrue(api_execute.called)
         self.assertTrue(
-            str(api_execute.call_args_list[0]).find('call(<function down_site_config')
+            str(api_execute.call_args_list[0]).find('call(<function remove_virtualenv')
             == 0
         )
         self.assertTrue(
-            str(api_execute.call_args_list[1]).find('call(<function set_website_down')
-            == 0
-        )
-        self.assertTrue(
-            str(api_execute.call_args_list[2]).find('call(<function remove_virtualenv')
-            == 0
-        )
-        self.assertTrue(
-            str(api_execute.call_args_list[3]).find(
+            str(api_execute.call_args_list[1]).find(
                 'call(<function application_packages'
             )
             == 0
         )
         self.assertTrue(
-            str(api_execute.call_args_list[4]).find('call(<function virtualenv') == 0
+            str(api_execute.call_args_list[2]).find('call(<function virtualenv') == 0
         )
         self.assertTrue(
-            str(api_execute.call_args_list[5]).find(
+            str(api_execute.call_args_list[3]).find(
                 'call(<function application_dependencies'
             )
             == 0
         )
         self.assertTrue(
-            str(api_execute.call_args_list[6]).find('call(<function app_circus_conf')
+            str(api_execute.call_args_list[4]).find('call(<function app_circus_conf')
             == 0
         )
         self.assertTrue(
-            str(api_execute.call_args_list[7]).find('call(<function app_reload') == 0
-        )
-        self.assertTrue(
-            str(api_execute.call_args_list[8]).find('call(<function set_website_up')
-            == 0
+            str(api_execute.call_args_list[5]).find('call(<function app_reload') == 0
         )
